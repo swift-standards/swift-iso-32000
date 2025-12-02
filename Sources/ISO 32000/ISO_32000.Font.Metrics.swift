@@ -4,7 +4,7 @@ extension ISO_32000.Font {
     /// Font metrics for text measurement
     ///
     /// Metrics are in font design units (1000 units per em for Type 1 fonts).
-    /// To get actual size: `width * fontSize / 1000`
+    /// To get actual size: `value * fontSize / 1000`
     public struct Metrics: Sendable {
         /// Glyph width table
         private let widths: [UInt32: Int]
@@ -12,10 +12,33 @@ extension ISO_32000.Font {
         /// Default width for missing glyphs
         private let defaultWidth: Int
 
-        /// Create metrics with a width table
-        init(widths: [UInt32: Int], defaultWidth: Int) {
+        /// Ascender: height above baseline for tallest glyphs (e.g., 'b', 'd', 'h')
+        public let ascender: Int
+
+        /// Descender: depth below baseline (negative value, e.g., 'g', 'p', 'y')
+        public let descender: Int
+
+        /// Cap height: height of capital letters
+        public let capHeight: Int
+
+        /// x-height: height of lowercase 'x'
+        public let xHeight: Int
+
+        /// Create metrics with a width table and vertical metrics
+        init(
+            widths: [UInt32: Int],
+            defaultWidth: Int,
+            ascender: Int,
+            descender: Int,
+            capHeight: Int,
+            xHeight: Int
+        ) {
             self.widths = widths
             self.defaultWidth = defaultWidth
+            self.ascender = ascender
+            self.descender = descender
+            self.capHeight = capHeight
+            self.xHeight = xHeight
         }
 
         /// Get width of a single character in font design units
@@ -35,6 +58,26 @@ extension ISO_32000.Font {
         /// Calculate string width at a specific font size
         public func stringWidth(_ text: String, atSize size: Double) -> Double {
             Double(stringWidth(text)) * size / 1000.0
+        }
+
+        /// Line height in font design units (ascender - descender)
+        public var lineHeight: Int {
+            ascender - descender
+        }
+
+        /// Line height at a specific font size
+        public func lineHeight(atSize size: Double) -> Double {
+            Double(lineHeight) * size / 1000.0
+        }
+
+        /// Ascender at a specific font size
+        public func ascender(atSize size: Double) -> Double {
+            Double(ascender) * size / 1000.0
+        }
+
+        /// Descender at a specific font size (negative value)
+        public func descender(atSize size: Double) -> Double {
+            Double(descender) * size / 1000.0
         }
     }
 }
@@ -74,7 +117,7 @@ extension ISO_32000.Font.Standard14 {
 // MARK: - Pre-defined Metrics
 
 extension ISO_32000.Font.Metrics {
-    /// Helvetica metrics (simplified - ASCII printable characters)
+    /// Helvetica metrics (from Adobe AFM)
     static let helvetica = Self(
         widths: [
             // Space and punctuation
@@ -100,10 +143,14 @@ extension ISO_32000.Font.Metrics {
             // Braces
             123: 334, 124: 260, 125: 334, 126: 584,
         ],
-        defaultWidth: 556
+        defaultWidth: 556,
+        ascender: 718,
+        descender: -207,
+        capHeight: 718,
+        xHeight: 523
     )
 
-    /// Helvetica Bold metrics
+    /// Helvetica Bold metrics (from Adobe AFM)
     static let helveticaBold = Self(
         widths: [
             32: 278, 33: 333, 34: 474, 35: 556, 36: 556, 37: 889, 38: 722, 39: 238,
@@ -122,10 +169,14 @@ extension ISO_32000.Font.Metrics {
             118: 556, 119: 778, 120: 556, 121: 556, 122: 500,
             123: 389, 124: 280, 125: 389, 126: 584,
         ],
-        defaultWidth: 611
+        defaultWidth: 611,
+        ascender: 718,
+        descender: -207,
+        capHeight: 718,
+        xHeight: 532
     )
 
-    /// Times Roman metrics
+    /// Times Roman metrics (from Adobe AFM)
     static let timesRoman = Self(
         widths: [
             32: 250, 33: 333, 34: 408, 35: 500, 36: 500, 37: 833, 38: 778, 39: 180,
@@ -144,10 +195,14 @@ extension ISO_32000.Font.Metrics {
             118: 500, 119: 722, 120: 500, 121: 500, 122: 444,
             123: 480, 124: 200, 125: 480, 126: 541,
         ],
-        defaultWidth: 500
+        defaultWidth: 500,
+        ascender: 683,
+        descender: -217,
+        capHeight: 662,
+        xHeight: 450
     )
 
-    /// Times Bold metrics
+    /// Times Bold metrics (from Adobe AFM)
     static let timesBold = Self(
         widths: [
             32: 250, 33: 333, 34: 555, 35: 500, 36: 500, 37: 1000, 38: 833, 39: 278,
@@ -166,15 +221,40 @@ extension ISO_32000.Font.Metrics {
             118: 500, 119: 722, 120: 500, 121: 500, 122: 444,
             123: 394, 124: 220, 125: 394, 126: 520,
         ],
-        defaultWidth: 556
+        defaultWidth: 556,
+        ascender: 683,
+        descender: -217,
+        capHeight: 676,
+        xHeight: 461
     )
 
-    /// Courier metrics (monospaced - all glyphs are 600 units wide)
-    static let courier = Self(widths: [:], defaultWidth: 600)
+    /// Courier metrics (monospaced - all glyphs are 600 units wide, from Adobe AFM)
+    static let courier = Self(
+        widths: [:],
+        defaultWidth: 600,
+        ascender: 629,
+        descender: -157,
+        capHeight: 562,
+        xHeight: 426
+    )
 
-    /// Symbol metrics (placeholder - uses default width)
-    static let symbol = Self(widths: [:], defaultWidth: 500)
+    /// Symbol metrics (from Adobe AFM)
+    static let symbol = Self(
+        widths: [:],
+        defaultWidth: 500,
+        ascender: 0,
+        descender: 0,
+        capHeight: 0,
+        xHeight: 0
+    )
 
-    /// ZapfDingbats metrics (placeholder - uses default width)
-    static let zapfDingbats = Self(widths: [:], defaultWidth: 500)
+    /// ZapfDingbats metrics (from Adobe AFM)
+    static let zapfDingbats = Self(
+        widths: [:],
+        defaultWidth: 500,
+        ascender: 820,
+        descender: -143,
+        capHeight: 0,
+        xHeight: 0
+    )
 }

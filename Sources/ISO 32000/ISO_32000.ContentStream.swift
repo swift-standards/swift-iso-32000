@@ -1,5 +1,7 @@
 // ISO_32000.ContentStream.swift
 
+import ISO_9899
+
 extension ISO_32000 {
     /// PDF Content Stream
     ///
@@ -92,8 +94,8 @@ extension ISO_32000.ContentStream {
 
         /// Rotate (convenience wrapper for cm)
         public mutating func rotate(angle: Double) {
-            let cos_a = cos(angle)
-            let sin_a = sin(angle)
+            let cos_a = angle.c.cos
+            let sin_a = angle.c.sin
             emit(.transform(a: cos_a, b: sin_a, c: -sin_a, d: cos_a, e: 0, f: 0))
         }
 
@@ -309,13 +311,3 @@ extension ISO_32000.ContentStream {
         case bevel = 2
     }
 }
-
-// MARK: - Math Functions
-
-#if canImport(Darwin)
-import Darwin
-#elseif canImport(Glibc)
-import Glibc
-#elseif canImport(ucrt)
-import ucrt
-#endif
