@@ -131,6 +131,16 @@ extension ISO_32000.ContentStream {
             emit(.setFillRGB(r: r, g: g, b: b))
         }
 
+        /// Set stroking color in DeviceCMYK (K)
+        public mutating func setStrokeColorCMYK(c: Double, m: Double, y: Double, k: Double) {
+            emit(.setStrokeCMYK(c: c, m: m, y: y, k: k))
+        }
+
+        /// Set non-stroking color in DeviceCMYK (k)
+        public mutating func setFillColorCMYK(c: Double, m: Double, y: Double, k: Double) {
+            emit(.setFillCMYK(c: c, m: m, y: y, k: k))
+        }
+
         // MARK: - Path Construction Operators
 
         /// Begin a new subpath (m)

@@ -31,6 +31,12 @@ extension ISO_32000.ContentStream {
         /// Set non-stroking color in DeviceRGB (r g b rg)
         case setFillRGB(r: Double, g: Double, b: Double)
 
+        /// Set stroking color in DeviceCMYK (c m y k K)
+        case setStrokeCMYK(c: Double, m: Double, y: Double, k: Double)
+
+        /// Set non-stroking color in DeviceCMYK (c m y k k)
+        case setFillCMYK(c: Double, m: Double, y: Double, k: Double)
+
         // MARK: - Path Construction (Section 8.5.2)
 
         /// Begin new subpath (x y m)
@@ -170,6 +176,12 @@ extension ISO_32000.ContentStream.Operator {
 
         case .setFillRGB(let r, let g, let b):
             buffer.append(contentsOf: "\(formatNumber(r)) \(formatNumber(g)) \(formatNumber(b)) rg".utf8)
+
+        case .setStrokeCMYK(let c, let m, let y, let k):
+            buffer.append(contentsOf: "\(formatNumber(c)) \(formatNumber(m)) \(formatNumber(y)) \(formatNumber(k)) K".utf8)
+
+        case .setFillCMYK(let c, let m, let y, let k):
+            buffer.append(contentsOf: "\(formatNumber(c)) \(formatNumber(m)) \(formatNumber(y)) \(formatNumber(k)) k".utf8)
 
         // Path Construction
         case .moveTo(let x, let y):
