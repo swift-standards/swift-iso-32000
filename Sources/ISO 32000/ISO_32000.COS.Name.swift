@@ -147,6 +147,16 @@ extension ISO_32000.COS.Name {
     public static let size = Self(__unchecked: (), rawValue: "Size")
     public static let root = Self(__unchecked: (), rawValue: "Root")
     public static let info = Self(__unchecked: (), rawValue: "Info")
+
+    // Annotations
+    public static let annots = Self(__unchecked: (), rawValue: "Annots")
+    public static let annot = Self(__unchecked: (), rawValue: "Annot")
+    public static let link = Self(__unchecked: (), rawValue: "Link")
+    public static let rect = Self(__unchecked: (), rawValue: "Rect")
+    public static let border = Self(__unchecked: (), rawValue: "Border")
+    public static let a = Self(__unchecked: (), rawValue: "A")
+    public static let s = Self(__unchecked: (), rawValue: "S")
+    public static let uri = Self(__unchecked: (), rawValue: "URI")
 }
 
 // MARK: - Error

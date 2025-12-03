@@ -83,6 +83,40 @@ extension ISO_32000 {
                 contentRefs.append(pageContentRefs)
             }
 
+            // Create annotation objects for each page
+            var annotationRefs: [[COS.IndirectReference]] = []
+            for page in document.pages {
+                var pageAnnotRefs: [COS.IndirectReference] = []
+                for annotation in page.annotations {
+                    let objNum = state.nextObjectNumber()
+                    pageAnnotRefs.append(COS.IndirectReference(objectNumber: objNum))
+
+                    var annotDict = COS.Dictionary()
+                    annotDict[.type] = .name(.annot)
+
+                    switch annotation {
+                    case .link(let linkAnnot):
+                        annotDict[.subtype] = .name(.link)
+                        annotDict[.rect] = linkAnnot.rect.asArray
+                        annotDict[.border] = .array([
+                            .integer(0),
+                            .integer(0),
+                            .real(linkAnnot.borderWidth)
+                        ])
+
+                        // URI action
+                        var actionDict = COS.Dictionary()
+                        actionDict[.s] = .name(.uri)
+                        actionDict[.uri] = .string(COS.StringValue(linkAnnot.uri))
+                        annotDict[.a] = .dictionary(actionDict)
+                    }
+
+                    state.objectOffsets[objNum] = buffer.count
+                    writeIndirectObject(objNum, object: .dictionary(annotDict), into: &buffer)
+                }
+                annotationRefs.append(pageAnnotRefs)
+            }
+
             // Create page objects
             let pagesObjNum = state.nextObjectNumber()
             let pagesRef = COS.IndirectReference(objectNumber: pagesObjNum)
@@ -110,6 +144,11 @@ extension ISO_32000 {
                     pageDict[.contents] = .reference(contentRefs[i][0])
                 } else if contentRefs[i].count > 1 {
                     pageDict[.contents] = .array(contentRefs[i].map { .reference($0) })
+                }
+
+                // Annotations
+                if !annotationRefs[i].isEmpty {
+                    pageDict[.annots] = .array(annotationRefs[i].map { .reference($0) })
                 }
 
                 // Resources

@@ -21,32 +21,39 @@ extension ISO_32000 {
         /// Page resources (fonts, etc.)
         public var resources: Resources
 
+        /// Page annotations (links, etc.)
+        public var annotations: [Annotation]
+
         /// Create a page
         public init(
             mediaBox: Rectangle = .a4,
             cropBox: Rectangle? = nil,
             rotation: Int? = nil,
             contents: [ContentStream] = [],
-            resources: Resources = Resources()
+            resources: Resources = Resources(),
+            annotations: [Annotation] = []
         ) {
             self.mediaBox = mediaBox
             self.cropBox = cropBox
             self.rotation = rotation
             self.contents = contents
             self.resources = resources
+            self.annotations = annotations
         }
 
         /// Create a page with a single content stream
         public init(
             mediaBox: Rectangle = .a4,
             content: ContentStream,
-            resources: Resources = Resources()
+            resources: Resources = Resources(),
+            annotations: [Annotation] = []
         ) {
             self.mediaBox = mediaBox
             self.cropBox = nil
             self.rotation = nil
             self.contents = [content]
             self.resources = resources
+            self.annotations = annotations
         }
 
         /// Create an empty page
