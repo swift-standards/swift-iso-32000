@@ -1,33 +1,22 @@
 // ISO_32000.Annotation.swift
+// Typealias to authoritative implementation in Section 12.5
+
+import ISO_32000_12_Interactive_features
 
 extension ISO_32000 {
-    /// PDF Annotation
+    /// PDF Annotation (Section 12.5)
     ///
-    /// Per ISO 32000-1 Section 12.5, annotations are interactive elements
-    /// associated with a page.
-    public enum Annotation: Sendable {
-        /// Link annotation with URI action
-        case link(LinkAnnotation)
-    }
+    /// This is a typealias to the authoritative implementation in
+    /// `ISO_32000.12.5.Annotation`.
+    public typealias Annotation = ISO_32000.`12`.`5`.Annotation
 
-    /// Link annotation
+    /// Link annotation (Section 12.5.6.4)
     ///
-    /// A clickable region that opens a URI when clicked.
-    public struct LinkAnnotation: Sendable {
-        /// Rectangle defining the clickable area (in PDF coordinates, bottom-left origin)
-        public var rect: Rectangle
+    /// This is a typealias to the authoritative implementation in
+    /// `ISO_32000.12.5.6.4.LinkAnnotation`.
+    public typealias LinkAnnotation = ISO_32000.`12`.`5`.`6`.`4`.LinkAnnotation
+}
 
-        /// The URI to open
-        public var uri: String
-
-        /// Border style (default: no visible border)
-        public var borderWidth: Double
-
-        /// Create a link annotation
-        public init(rect: Rectangle, uri: String, borderWidth: Double = 0) {
-            self.rect = rect
-            self.uri = uri
-            self.borderWidth = borderWidth
-        }
-    }
+extension ISO_32000.Annotation {
+    public typealias Link = ISO_32000.`12`.`5`.`6`.`4`.LinkAnnotation
 }

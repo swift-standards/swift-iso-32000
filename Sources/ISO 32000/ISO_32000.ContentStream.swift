@@ -23,14 +23,19 @@ extension ISO_32000 {
         /// Raw content stream bytes
         public var data: [UInt8]
 
+        /// Fonts used in this content stream
+        public var fontsUsed: Set<Font>
+
         /// Create an empty content stream
         public init() {
             self.data = []
+            self.fontsUsed = []
         }
 
         /// Create a content stream from raw bytes
-        public init(data: [UInt8]) {
+        public init(data: [UInt8], fontsUsed: Set<Font> = []) {
             self.data = data
+            self.fontsUsed = fontsUsed
         }
 
         /// Create a content stream using a builder
@@ -38,6 +43,7 @@ extension ISO_32000 {
             var builder = Builder()
             build(&builder)
             self.data = builder.data
+            self.fontsUsed = builder.fontsUsed
         }
     }
 }
@@ -49,6 +55,9 @@ extension ISO_32000.ContentStream {
     public struct Builder: Sendable {
         /// Accumulated content stream data
         public var data: [UInt8] = []
+
+        /// Fonts used in this content stream
+        public var fontsUsed: Set<ISO_32000.Font> = []
 
         /// Create an empty builder
         public init() {}
@@ -210,6 +219,7 @@ extension ISO_32000.ContentStream {
 
         /// Set text font and size (Tf)
         public mutating func setFont(_ font: ISO_32000.Font, size: Double) {
+            fontsUsed.insert(font)
             emit(.setFont(name: font.resourceName, size: size))
         }
 

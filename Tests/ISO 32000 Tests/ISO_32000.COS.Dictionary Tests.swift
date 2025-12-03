@@ -10,64 +10,55 @@ struct `ISO_32000.COS.Dictionary Tests` {
 
     @Test
     func `Creates empty dictionary`() {
-        let dict = ISO_32000.COS.Dictionary()
+        let dict: ISO_32000.COS.Dictionary = [:]
         #expect(dict.isEmpty)
         #expect(dict.count == 0)
     }
 
     @Test
-    func `Creates dictionary with initial entries`() {
-        let dict = ISO_32000.COS.Dictionary([
+    func `Creates dictionary with initial entries`() throws {
+        let dict: ISO_32000.COS.Dictionary = [
             .type: .name(.catalog),
             .pages: .integer(5)
-        ])
+        ]
         #expect(dict.count == 2)
         #expect(dict[.type] == .name(.catalog))
         #expect(dict[.pages] == .integer(5))
     }
 
-    @Test
-    func `Creates dictionary via literal`() {
-        let dict: ISO_32000.COS.Dictionary = [
-            .type: .name(.page),
-            .mediaBox: [0, 0, 612, 792]
-        ]
-        #expect(dict.count == 2)
-    }
-
     // MARK: - Subscript Access
 
     @Test
-    func `Gets existing entry`() {
-        var dict = ISO_32000.COS.Dictionary()
+    func `Gets existing entry`() throws {
+        var dict: ISO_32000.COS.Dictionary = [:]
         dict[.type] = .name(.catalog)
         #expect(dict[.type] == .name(.catalog))
     }
 
     @Test
     func `Gets nil for missing entry`() {
-        let dict = ISO_32000.COS.Dictionary()
+        let dict: ISO_32000.COS.Dictionary = [:]
         #expect(dict[.type] == nil)
     }
 
     @Test
-    func `Sets new entry`() {
-        var dict = ISO_32000.COS.Dictionary()
-        dict[.author] = .string("Swift")
+    func `Sets new entry`() throws {
+        var dict: ISO_32000.COS.Dictionary = [:]
+        dict[.author] = .string(ISO_32000.COS.StringValue("Swift"))
         #expect(dict[.author] == .string(ISO_32000.COS.StringValue("Swift")))
     }
 
     @Test
-    func `Overwrites existing entry`() {
-        var dict = ISO_32000.COS.Dictionary()
+    func `Overwrites existing entry`() throws {
+        var dict: ISO_32000.COS.Dictionary = [:]
         dict[.type] = .name(.catalog)
         dict[.type] = .name(.page)
         #expect(dict[.type] == .name(.page))
     }
 
     @Test
-    func `Removes entry by setting nil`() {
-        var dict = ISO_32000.COS.Dictionary()
+    func `Removes entry by setting nil`() throws {
+        var dict: ISO_32000.COS.Dictionary = [:]
         dict[.type] = .name(.catalog)
         dict[.type] = nil
         #expect(dict[.type] == nil)
@@ -77,7 +68,7 @@ struct `ISO_32000.COS.Dictionary Tests` {
     // MARK: - Keys and Values
 
     @Test
-    func `Keys collection`() {
+    func `Keys collection`() throws {
         let dict: ISO_32000.COS.Dictionary = [
             .type: .name(.page),
             .parent: .reference(ISO_32000.COS.IndirectReference(objectNumber: 2, generation: 0))
@@ -89,7 +80,7 @@ struct `ISO_32000.COS.Dictionary Tests` {
     }
 
     @Test
-    func `Values collection`() {
+    func `Values collection`() throws {
         let dict: ISO_32000.COS.Dictionary = [
             .count: .integer(5),
             .length: .integer(100)
@@ -101,10 +92,10 @@ struct `ISO_32000.COS.Dictionary Tests` {
     // MARK: - Sorted Entries
 
     @Test
-    func `Sorted entries are alphabetical by key`() {
+    func `Sorted entries are alphabetical by key`() throws {
         let dict: ISO_32000.COS.Dictionary = [
             .type: .name(.page),
-            .author: .string("Test"),
+            .author: .string(ISO_32000.COS.StringValue("Test")),
             .count: .integer(1)
         ]
         let sorted = dict.sortedEntries
@@ -116,26 +107,29 @@ struct `ISO_32000.COS.Dictionary Tests` {
     // MARK: - Equality
 
     @Test
-    func `Equal dictionaries with same entries`() {
+    func `Equal dictionaries with same entries`() throws {
         let a: ISO_32000.COS.Dictionary = [.type: .name(.page)]
         let b: ISO_32000.COS.Dictionary = [.type: .name(.page)]
         #expect(a == b)
     }
 
     @Test
-    func `Unequal dictionaries with different entries`() {
+    func `Unequal dictionaries with different entries`() throws {
         let a: ISO_32000.COS.Dictionary = [.type: .name(.page)]
         let b: ISO_32000.COS.Dictionary = [.type: .name(.catalog)]
         #expect(a != b)
     }
 
-    // MARK: - Description
+    // MARK: - Serialization
 
     @Test
-    func `Description shows dictionary syntax`() {
+    func `Serializes dictionary to PDF syntax`() throws {
         let dict: ISO_32000.COS.Dictionary = [.type: .name(.page)]
-        #expect(dict.description.contains("<<"))
-        #expect(dict.description.contains(">>"))
-        #expect(dict.description.contains("/Type"))
+        var buffer: [UInt8] = []
+        ISO_32000.COS.serializeDictionary(dict, into: &buffer)
+        let str = String(decoding: buffer, as: UTF8.self)
+        #expect(str.contains("<<"))
+        #expect(str.contains(">>"))
+        #expect(str.contains("/Type"))
     }
 }

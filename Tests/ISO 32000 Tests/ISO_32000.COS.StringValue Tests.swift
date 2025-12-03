@@ -88,18 +88,19 @@ struct `ISO_32000.COS.StringValue Tests` {
 
     @Test
     func `Hex uses uppercase letters`() {
-        let str = ISO_32000.COS.StringValue("\u{FF}")  // Non-ASCII triggers UTF-16BE
+        // Use a character NOT in PDFDocEncoding to trigger UTF-16BE
+        let str = ISO_32000.COS.StringValue("\u{4F60}")  // 你 (Chinese character)
         let bytes = str.asHexadecimal()
         let result = String(decoding: bytes, as: UTF8.self)
-        #expect(result.contains("FEFF"))  // BOM
+        #expect(result.contains("FEFF"))  // UTF-16BE BOM
     }
 
     // MARK: - Unicode Support
 
     @Test
     func `Literal includes BOM for Unicode`() {
-        // Use explicit Unicode character that's definitely > 0x7F
-        let str = ISO_32000.COS.StringValue("\u{00E9}")  // é
+        // Use character NOT in PDFDocEncoding to trigger UTF-16BE with BOM
+        let str = ISO_32000.COS.StringValue("\u{4F60}")  // 你 (Chinese character)
         let bytes = str.asLiteral()
         #expect(bytes[0] == UInt8(ascii: "("))
         #expect(bytes.contains(0xFE))

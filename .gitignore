@@ -24,6 +24,8 @@ Thumbs.db
 !SECURITY.md
 !**/*.docc/**/*.md
 
+*.pdf
+
 
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache

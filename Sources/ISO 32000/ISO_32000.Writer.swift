@@ -97,7 +97,7 @@ extension ISO_32000 {
                     switch annotation {
                     case .link(let linkAnnot):
                         annotDict[.subtype] = .name(.link)
-                        annotDict[.rect] = linkAnnot.rect.asArray
+                        annotDict[.rect] = COS.Object(linkAnnot.rect)
                         annotDict[.border] = .array([
                             .integer(0),
                             .integer(0),
@@ -129,10 +129,10 @@ extension ISO_32000 {
                 var pageDict = COS.Dictionary()
                 pageDict[.type] = .name(.page)
                 pageDict[.parent] = .reference(pagesRef)
-                pageDict[.mediaBox] = page.mediaBox.asArray
+                pageDict[.mediaBox] = COS.Object(page.mediaBox)
 
                 if let cropBox = page.cropBox {
-                    pageDict[.cropBox] = cropBox.asArray
+                    pageDict[.cropBox] = COS.Object(cropBox)
                 }
 
                 if let rotation = page.rotation, rotation != 0 {
@@ -221,10 +221,10 @@ extension ISO_32000 {
                     infoDict[.producer] = .string(COS.StringValue(producer))
                 }
                 if let date = info.creationDate {
-                    infoDict[.creationDate] = .string(COS.StringValue(date.pdfString))
+                    infoDict[.creationDate] = .string(COS.StringValue(date.description))
                 }
                 if let date = info.modificationDate {
-                    infoDict[.modDate] = .string(COS.StringValue(date.pdfString))
+                    infoDict[.modDate] = .string(COS.StringValue(date.description))
                 }
 
                 state.objectOffsets[infoObjNum] = buffer.count
