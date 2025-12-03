@@ -13,7 +13,8 @@
 //   7.3.10 Indirect objects
 
 public import ISO_32000_Shared
-import INCITS_4_1986
+public import INCITS_4_1986
+public import Standards
 
 extension ISO_32000.`7` {
     /// ISO 32000-2:2020, 7.3 Objects
@@ -260,10 +261,6 @@ extension ISO_32000.`7`.`3` {
 }
 
 extension ISO_32000.`7`.`3`.`8` {
-    /// The Dictionary type used by Stream
-    /// Uses COS.Object for values
-    public typealias Dictionary = Swift.Dictionary<ISO_32000.`7`.`3`.`5`.Name, ISO_32000.`7`.`3`.COS.Object>
-
     /// PDF Stream object
     ///
     /// Per ISO 32000-2 Section 7.3.8:
@@ -287,13 +284,13 @@ extension ISO_32000.`7`.`3`.`8` {
     /// ISO 32000-2:2020, Section 7.3.8 — Stream objects
     public struct Stream: Sendable, Hashable {
         /// Stream dictionary (contains /Length, /Filter, etc.)
-        public var dictionary: Dictionary
+        public var dictionary: ISO_32000.`7`.`3`.COS.Dictionary
 
         /// Raw stream data (may be compressed)
         public var data: [UInt8]
 
         /// Create a stream with dictionary and data
-        public init(dictionary: Dictionary = [:], data: [UInt8] = []) {
+        public init(dictionary: ISO_32000.`7`.`3`.COS.Dictionary = [:], data: [UInt8] = []) {
             self.dictionary = dictionary
             self.data = data
         }
@@ -412,13 +409,48 @@ extension ISO_32000.`7`.`3`.COS {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 7.3.7 — Dictionary objects
-    public typealias Dictionary = Swift.Dictionary<Name, Object>
+    public struct Dictionary: Sendable, Hashable {
+        public var storage: Swift.Dictionary<Name, Object>
+
+        public init() {
+            self.storage = [:]
+        }
+
+        public init(_ storage: Swift.Dictionary<Name, Object>) {
+            self.storage = storage
+        }
+
+        public subscript(key: Name) -> Object? {
+            get { storage[key] }
+            set { storage[key] = newValue }
+        }
+
+        public var keys: Swift.Dictionary<Name, Object>.Keys {
+            storage.keys
+        }
+
+        public var values: Swift.Dictionary<Name, Object>.Values {
+            storage.values
+        }
+
+        public var count: Int {
+            storage.count
+        }
+
+        public var isEmpty: Bool {
+            storage.isEmpty
+        }
+
+        /// Iterate over entries in a consistent order (sorted by key)
+        public var sortedEntries: [(key: Name, value: Object)] {
+            storage.sorted { $0.key.rawValue < $1.key.rawValue }
+        }
+    }
 }
 
-extension ISO_32000.`7`.`3`.COS.Dictionary {
-    /// Iterate over entries in a consistent order (sorted by key)
-    public var sortedEntries: [(key: ISO_32000.`7`.`3`.COS.Name, value: ISO_32000.`7`.`3`.COS.Object)] {
-        self.sorted { $0.key.rawValue < $1.key.rawValue }
+extension ISO_32000.`7`.`3`.COS.Dictionary: ExpressibleByDictionaryLiteral {
+    public init(dictionaryLiteral elements: (ISO_32000.`7`.`3`.COS.Name, ISO_32000.`7`.`3`.COS.Object)...) {
+        self.storage = .init(uniqueKeysWithValues: elements)
     }
 }
 
@@ -580,19 +612,10 @@ extension ISO_32000.`7`.`3`.COS {
             buffer.append(contentsOf: formatted.utf8)
 
         case .name(let name):
-            serializeName(name, into: &buffer)
+            Name.serialize(name, into: &buffer)
 
         case .string(let str):
-            // Simple literal string serialization
-            buffer.append(.ascii.leftParenthesis)
-            for byte in str.value.utf8 {
-                if let escaped = ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] {
-                    buffer.append(contentsOf: escaped)
-                } else {
-                    buffer.append(byte)
-                }
-            }
-            buffer.append(.ascii.rightParenthesis)
+            StringValue.serialize(str, into: &buffer)
 
         case .array(let elements):
             buffer.append(.ascii.leftBracket)
@@ -605,19 +628,92 @@ extension ISO_32000.`7`.`3`.COS {
             buffer.append(.ascii.rightBracket)
 
         case .dictionary(let dict):
-            serializeDictionary(dict, into: &buffer)
+            Dictionary.serialize(dict, into: &buffer)
 
         case .stream(let stream):
-            serializeStream(stream, into: &buffer)
+            Stream.serialize(stream, into: &buffer)
 
         case .reference(let ref):
             buffer.append(contentsOf: "\(ref.objectNumber) \(ref.generation) R".utf8)
         }
     }
 
-    /// Serialize a name object
-    static func serializeName<Buffer: RangeReplaceableCollection>(
-        _ name: Name,
+    /// Format a real number with appropriate precision
+    private static func formatReal(_ value: Double) -> Swift.String {
+        if value == value.rounded() && abs(value) < 1e10 {
+            return Swift.String(Int64(value))
+        }
+
+        let isNegative = value < 0
+        let absValue = abs(value)
+        let intPart = Int64(absValue)
+        let fracPart = absValue - Double(intPart)
+
+        let fracDigits = Int64((fracPart * 1_000_000).rounded())
+
+        var result = isNegative ? "-" : ""
+        result += Swift.String(intPart)
+
+        if fracDigits != 0 {
+            result += "."
+            var fracStr = Swift.String(fracDigits)
+            while fracStr.count < 6 {
+                fracStr = "0" + fracStr
+            }
+            while fracStr.hasSuffix("0") {
+                fracStr.removeLast()
+            }
+            result += fracStr
+        }
+
+        return result
+    }
+}
+
+// MARK: - UInt8.Serializable Conformances
+
+extension ISO_32000.`7`.`3`.COS.Object: UInt8.Serializable {
+    /// Serialize a COS object to PDF syntax
+    ///
+    /// Conforms to `UInt8.Serializable` for streaming output.
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ object: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        ISO_32000.`7`.`3`.COS.serialize(object, into: &buffer)
+    }
+}
+
+extension ISO_32000.`7`.`3`.COS.Dictionary: UInt8.Serializable {
+    /// Serialize a PDF Dictionary to bytes
+    ///
+    /// Format: `<< /Key1 Value1 /Key2 Value2 >>`
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ dict: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        buffer.append(.ascii.lessThan)
+        buffer.append(.ascii.lessThan)
+
+        for (key, value) in dict.sortedEntries {
+            buffer.append(.ascii.space)
+            ISO_32000.`7`.`3`.COS.Name.serialize(key, into: &buffer)
+            buffer.append(.ascii.space)
+            ISO_32000.`7`.`3`.COS.Object.serialize(value, into: &buffer)
+        }
+
+        buffer.append(.ascii.greaterThan)
+        buffer.append(.ascii.greaterThan)
+    }
+}
+
+extension ISO_32000.`7`.`3`.`5`.Name: UInt8.Serializable {
+    /// Serialize a PDF Name to bytes
+    ///
+    /// Names are serialized with a leading solidus: `/Name`
+    /// Special characters are escaped as `#XX`.
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ name: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == UInt8 {
         buffer.append(.ascii.solidus)
@@ -652,68 +748,58 @@ extension ISO_32000.`7`.`3`.COS {
     private static func hexChar(_ nibble: UInt8) -> UInt8 {
         nibble < 10 ? .ascii.0 + nibble : .ascii.A + nibble - 10
     }
+}
 
-    /// Serialize a dictionary
-    public static func serializeDictionary<Buffer: RangeReplaceableCollection>(
-        _ dict: Dictionary,
+extension ISO_32000.`7`.`3`.COS.StringValue: UInt8.Serializable {
+    /// Serialize a PDF String to bytes
+    ///
+    /// Strings are serialized as literal strings: `(Hello)`
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ str: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == UInt8 {
-        buffer.append(.ascii.lessThan)
-        buffer.append(.ascii.lessThan)
-
-        for (key, value) in dict.sortedEntries {
-            buffer.append(.ascii.space)
-            serializeName(key, into: &buffer)
-            buffer.append(.ascii.space)
-            serialize(value, into: &buffer)
+        buffer.append(.ascii.leftParenthesis)
+        for byte in str.value.utf8 {
+            if let escaped = ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] {
+                buffer.append(contentsOf: escaped)
+            } else {
+                buffer.append(byte)
+            }
         }
-
-        buffer.append(.ascii.greaterThan)
-        buffer.append(.ascii.greaterThan)
+        buffer.append(.ascii.rightParenthesis)
     }
+}
 
-    /// Serialize a stream
-    static func serializeStream<Buffer: RangeReplaceableCollection>(
-        _ stream: Stream,
+extension ISO_32000.`7`.`3`.`8`.Stream: UInt8.Serializable {
+    /// Serialize a PDF Stream to bytes
+    ///
+    /// Format:
+    /// ```
+    /// << /Length N ... >>
+    /// stream
+    /// ...data...
+    /// endstream
+    /// ```
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ stream: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == UInt8 {
         var dict = stream.dictionary
         dict[.length] = .integer(Int64(stream.data.count))
-        serializeDictionary(dict, into: &buffer)
+        ISO_32000.`7`.`3`.COS.Dictionary.serialize(dict, into: &buffer)
 
         buffer.append(contentsOf: "\nstream\n".utf8)
         buffer.append(contentsOf: stream.data)
         buffer.append(contentsOf: "\nendstream".utf8)
     }
+}
 
-    /// Format a real number with appropriate precision
-    private static func formatReal(_ value: Double) -> Swift.String {
-        if value == value.rounded() && abs(value) < 1e10 {
-            return Swift.String(Int64(value))
-        }
-
-        let isNegative = value < 0
-        let absValue = abs(value)
-        let intPart = Int64(absValue)
-        let fracPart = absValue - Double(intPart)
-
-        let fracDigits = Int64((fracPart * 1_000_000).rounded())
-
-        var result = isNegative ? "-" : ""
-        result += Swift.String(intPart)
-
-        if fracDigits != 0 {
-            result += "."
-            var fracStr = Swift.String(fracDigits)
-            while fracStr.count < 6 {
-                fracStr = "0" + fracStr
-            }
-            while fracStr.hasSuffix("0") {
-                fracStr.removeLast()
-            }
-            result += fracStr
-        }
-
-        return result
+extension ISO_32000.`7`.`3`.`10`.IndirectReference: UInt8.Serializable {
+    /// Serialize an indirect reference: `12 0 R`
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ ref: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        buffer.append(contentsOf: "\(ref.objectNumber) \(ref.generation) R".utf8)
     }
 }

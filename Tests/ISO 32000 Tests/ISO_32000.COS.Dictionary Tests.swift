@@ -126,7 +126,7 @@ struct `ISO_32000.COS.Dictionary Tests` {
     func `Serializes dictionary to PDF syntax`() throws {
         let dict: ISO_32000.COS.Dictionary = [.type: .name(.page)]
         var buffer: [UInt8] = []
-        ISO_32000.COS.serializeDictionary(dict, into: &buffer)
+        ISO_32000.COS.Dictionary.serialize(dict, into: &buffer)
         let str = String(decoding: buffer, as: UTF8.self)
         #expect(str.contains("<<"))
         #expect(str.contains(">>"))

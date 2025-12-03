@@ -1,5 +1,7 @@
 // ISO_32000.Writer.swift
 
+import Standards
+
 extension ISO_32000 {
     /// PDF Writer - serializes documents to PDF format
     ///
@@ -24,7 +26,7 @@ extension ISO_32000 {
             _ document: Document,
             into buffer: inout Buffer
         ) where Buffer.Element == UInt8 {
-            var state = WriterState()
+            var state = Writer.State()
 
             // Header
             writeHeader(document.version, into: &buffer)
@@ -272,7 +274,7 @@ extension ISO_32000 {
         }
 
         private func writeXref<Buffer: RangeReplaceableCollection>(
-            state: WriterState,
+            state: Writer.State,
             into buffer: inout Buffer
         ) where Buffer.Element == UInt8 {
             buffer.append(contentsOf: "xref\n".utf8)
@@ -310,7 +312,7 @@ extension ISO_32000 {
                 trailerDict[.info] = .reference(info)
             }
 
-            COS.serializeDictionary(trailerDict, into: &buffer)
+            COS.Dictionary.serialize(trailerDict, into: &buffer)
 
             buffer.append(contentsOf: "\nstartxref\n".utf8)
             buffer.append(contentsOf: "\(xrefOffset)\n".utf8)
@@ -321,9 +323,9 @@ extension ISO_32000 {
 
 // MARK: - Writer State
 
-extension ISO_32000 {
+extension ISO_32000.Writer {
     /// Internal state for PDF writing
-    struct WriterState {
+    struct State {
         var objectCount: Int = 0
         var objectOffsets: [Int: Int] = [:]
 
@@ -355,5 +357,32 @@ extension ISO_32000 {
         public func compress(_ input: [UInt8], into output: inout [UInt8]) {
             _compress(input, &output)
         }
+    }
+}
+
+// MARK: - UInt8.Serializable
+
+extension ISO_32000.Document: UInt8.Serializable {
+    /// Serialize a PDF document to bytes
+    ///
+    /// Uses a default Writer without compression.
+    /// For compression support, use `Writer.write(_:into:)` directly.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// // Simple usage with .bytes property
+    /// let pdfBytes = document.bytes
+    ///
+    /// // Streaming to a buffer
+    /// var buffer: [UInt8] = []
+    /// document.serialize(into: &buffer)
+    /// ```
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ document: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        var writer = ISO_32000.Writer()
+        writer.write(document, into: &buffer)
     }
 }

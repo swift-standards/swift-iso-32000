@@ -1,6 +1,7 @@
 // ISO_32000.ContentStream.swift
 
 import ISO_9899
+import Standards
 
 extension ISO_32000 {
     /// PDF Content Stream
@@ -319,5 +320,19 @@ extension ISO_32000.ContentStream {
         case miter = 0
         case round = 1
         case bevel = 2
+    }
+}
+
+// MARK: - UInt8.Serializable
+
+extension ISO_32000.ContentStream: UInt8.Serializable {
+    /// Serialize content stream data to bytes
+    ///
+    /// Streams the raw content stream data directly to the buffer.
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ stream: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        buffer.append(contentsOf: stream.data)
     }
 }
