@@ -6,10 +6,11 @@ import PackageDescription
 let package = Package(
     name: "swift-iso-32000",
     platforms: [
-        .macOS(.v15),
-        .iOS(.v18),
-        .tvOS(.v18),
-        .watchOS(.v11),
+        .macOS(.v26),
+        .iOS(.v26),
+        .tvOS(.v26),
+        .watchOS(.v26),
+        .visionOS(.v26),
     ],
     products: [
         .library(name: "ISO 32000", targets: ["ISO 32000"]),
@@ -28,15 +29,21 @@ let package = Package(
         .library(name: "ISO 32000 Refactor", targets: ["ISO 32000 Refactor"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-standards/swift-standards", from: "0.8.0"),
-        .package(url: "https://github.com/swift-standards/swift-iso-9899", from: "0.1.0"),
-        .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.0"),
+        .package(path: "../swift-standards"),
+        .package(path: "../swift-iso-9899"),
+        .package(path: "../swift-incits-4-1986"),
         .package(path: "../swift-rfc-1950"),
+        .package(path: "../swift-iec-61966"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0"),
     ],
     targets: [
         // MARK: - Shared
-        .target(name: "ISO 32000 Shared"),
+        .target(
+            name: "ISO 32000 Shared",
+            dependencies: [
+                .product(name: "Geometry", package: "swift-standards"),
+            ]
+        ),
         .target(
             name: "ISO 32000 Refactor",
             dependencies: [
@@ -59,11 +66,19 @@ let package = Package(
         ),
         .target(
             name: "ISO 32000 7 Syntax",
-            dependencies: ["ISO 32000 Shared", "ISO 32000 3 Terms and definitions"]
+            dependencies: [
+                "ISO 32000 Shared",
+                "ISO 32000 3 Terms and definitions",
+                .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
+            ]
         ),
         .target(
             name: "ISO 32000 8 Graphics",
-            dependencies: ["ISO 32000 Shared", "ISO 32000 7 Syntax"]
+            dependencies: [
+                "ISO 32000 Shared",
+                "ISO 32000 7 Syntax",
+                .product(name: "IEC 61966", package: "swift-iec-61966"),
+            ]
         ),
         .target(
             name: "ISO 32000 9 Text",
@@ -79,7 +94,7 @@ let package = Package(
         ),
         .target(
             name: "ISO 32000 12 Interactive features",
-            dependencies: ["ISO 32000 Shared", "ISO 32000 7 Syntax"]
+            dependencies: ["ISO 32000 Shared", "ISO 32000 7 Syntax", "ISO 32000 8 Graphics"]
         ),
         .target(
             name: "ISO 32000 13 Multimedia features",
@@ -109,6 +124,7 @@ let package = Package(
                 "ISO 32000 14 Document interchange",
                 "ISO 32000 Annex D",
                 .product(name: "Standards", package: "swift-standards"),
+                .product(name: "Geometry", package: "swift-standards"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
                 .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
             ]

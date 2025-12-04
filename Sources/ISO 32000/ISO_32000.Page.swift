@@ -1,5 +1,8 @@
 // ISO_32000.Page.swift
 
+import ISO_32000_8_Graphics
+public import Geometry
+
 extension ISO_32000 {
     /// A PDF page
     ///
@@ -20,27 +23,27 @@ extension ISO_32000 {
         /// Media box - boundaries of physical medium (required)
         ///
         /// Defines the size of the page. Origin is at lower-left.
-        public var mediaBox: Rectangle
+        public var mediaBox: UserSpace.Rectangle
 
         /// Crop box - visible region when displayed or printed
         ///
         /// Defaults to mediaBox if not specified.
-        public var cropBox: Rectangle?
+        public var cropBox: UserSpace.Rectangle?
 
         /// Bleed box - region to clip when output in production
         ///
         /// Defaults to cropBox if not specified.
-        public var bleedBox: Rectangle?
+        public var bleedBox: UserSpace.Rectangle?
 
         /// Trim box - intended dimensions of finished page
         ///
         /// Defaults to cropBox if not specified.
-        public var trimBox: Rectangle?
+        public var trimBox: UserSpace.Rectangle?
 
         /// Art box - extent of meaningful content
         ///
         /// Defaults to cropBox if not specified.
-        public var artBox: Rectangle?
+        public var artBox: UserSpace.Rectangle?
 
         // MARK: - Other Properties
 
@@ -60,11 +63,11 @@ extension ISO_32000 {
 
         /// Create a page
         public init(
-            mediaBox: Rectangle = .a4,
-            cropBox: Rectangle? = nil,
-            bleedBox: Rectangle? = nil,
-            trimBox: Rectangle? = nil,
-            artBox: Rectangle? = nil,
+            mediaBox: UserSpace.Rectangle = .a4,
+            cropBox: UserSpace.Rectangle? = nil,
+            bleedBox: UserSpace.Rectangle? = nil,
+            trimBox: UserSpace.Rectangle? = nil,
+            artBox: UserSpace.Rectangle? = nil,
             rotation: Int? = nil,
             contents: [ContentStream] = [],
             resources: Resources = Resources(),
@@ -83,7 +86,7 @@ extension ISO_32000 {
 
         /// Create a page with a single content stream
         public init(
-            mediaBox: Rectangle = .a4,
+            mediaBox: UserSpace.Rectangle = .a4,
             content: ContentStream,
             resources: Resources = Resources(),
             annotations: [Annotation] = []
@@ -100,7 +103,7 @@ extension ISO_32000 {
         }
 
         /// Create an empty page
-        public static func empty(size: Rectangle = .a4) -> Page {
+        public static func empty(size: UserSpace.Rectangle = .a4) -> Page {
             Page(mediaBox: size)
         }
     }
@@ -110,28 +113,28 @@ extension ISO_32000 {
 
 extension ISO_32000.Page {
     /// Page width (from mediaBox)
-    public var width: Double { mediaBox.width }
+    public var width: ISO_32000.UserSpace.Unit { mediaBox.width.value }
 
     /// Page height (from mediaBox)
-    public var height: Double { mediaBox.height }
+    public var height: ISO_32000.UserSpace.Unit { mediaBox.height.value }
 
     /// Effective crop box (cropBox or mediaBox if not set)
-    public var effectiveCropBox: ISO_32000.Rectangle {
+    public var effectiveCropBox: ISO_32000.UserSpace.Rectangle {
         cropBox ?? mediaBox
     }
 
     /// Effective bleed box (bleedBox or effectiveCropBox if not set)
-    public var effectiveBleedBox: ISO_32000.Rectangle {
+    public var effectiveBleedBox: ISO_32000.UserSpace.Rectangle {
         bleedBox ?? effectiveCropBox
     }
 
     /// Effective trim box (trimBox or effectiveCropBox if not set)
-    public var effectiveTrimBox: ISO_32000.Rectangle {
+    public var effectiveTrimBox: ISO_32000.UserSpace.Rectangle {
         trimBox ?? effectiveCropBox
     }
 
     /// Effective art box (artBox or effectiveCropBox if not set)
-    public var effectiveArtBox: ISO_32000.Rectangle {
+    public var effectiveArtBox: ISO_32000.UserSpace.Rectangle {
         artBox ?? effectiveCropBox
     }
 }

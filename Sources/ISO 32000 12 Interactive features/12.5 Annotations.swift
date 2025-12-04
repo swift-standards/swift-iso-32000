@@ -14,7 +14,8 @@
 //     ...
 
 public import ISO_32000_Shared
-public import ISO_32000_7_Syntax
+public import ISO_32000_8_Graphics
+public import Geometry
 
 extension ISO_32000.`12` {
     /// ISO 32000-2:2020, 12.5 Annotations
@@ -67,20 +68,27 @@ extension ISO_32000.`12`.`5`.`6`.`4` {
     ///
     /// ISO 32000-2:2020, Section 12.5.6.4 — Link annotations
     public struct LinkAnnotation: Sendable {
-        /// Rectangle defining the clickable area (in PDF coordinates, bottom-left origin)
-        public var rect: ISO_32000.`7`.`9`.`5`.Rectangle
+        /// Rectangle defining the clickable area in user space coordinates
+        ///
+        /// Uses `UserSpace.Rectangle` to enforce type-safe coordinate handling.
+        public var rect: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle
 
         /// The URI to open
         public var uri: String
 
-        /// Border style (default: no visible border)
-        public var borderWidth: Double
+        /// Border width in user space units (default: no visible border)
+        public var borderWidth: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
 
         /// Create a link annotation
+        ///
+        /// - Parameters:
+        ///   - rect: The clickable area in user space coordinates
+        ///   - uri: The URI to navigate to when clicked
+        ///   - borderWidth: Border width in user space units (default: 0, no border)
         public init(
-            rect: ISO_32000.`7`.`9`.`5`.Rectangle,
+            rect: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle,
             uri: String,
-            borderWidth: Double = 0
+            borderWidth: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit = 0
         ) {
             self.rect = rect
             self.uri = uri

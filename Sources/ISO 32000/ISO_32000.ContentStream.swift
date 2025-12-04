@@ -2,6 +2,7 @@
 
 import ISO_9899
 import Standards
+public import Geometry
 
 extension ISO_32000 {
     /// PDF Content Stream
@@ -86,27 +87,31 @@ extension ISO_32000.ContentStream {
         }
 
         /// Set transformation matrix (cm)
+        ///
+        /// - Parameters:
+        ///   - a, b, c, d: Dimensionless scale/rotation coefficients
+        ///   - e, f: Translation in user space units
         public mutating func transform(
-            a: Double, b: Double, c: Double, d: Double, e: Double, f: Double
+            a: Double,
+            b: Double,
+            c: Double,
+            d: Double,
+            e: ISO_32000.UserSpace.X,
+            f: ISO_32000.UserSpace.Y
         ) {
             emit(.transform(a: a, b: b, c: c, d: d, e: e, f: f))
         }
 
         /// Translate (convenience wrapper for cm)
-        public mutating func translate(x: Double, y: Double) {
+        public mutating func translate(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y) {
             emit(.transform(a: 1, b: 0, c: 0, d: 1, e: x, f: y))
         }
 
         /// Scale (convenience wrapper for cm)
+        ///
+        /// Scale factors are dimensionless multipliers.
         public mutating func scale(x: Double, y: Double) {
-            emit(.transform(a: x, b: 0, c: 0, d: y, e: 0, f: 0))
-        }
-
-        /// Rotate (convenience wrapper for cm)
-        public mutating func rotate(angle: Double) {
-            let cos_a = angle.c.cos
-            let sin_a = angle.c.sin
-            emit(.transform(a: cos_a, b: sin_a, c: -sin_a, d: cos_a, e: 0, f: 0))
+            emit(.transform(a: x, b: 0, c: 0, d: y, e: .init(0), f: .init(0)))
         }
 
         // MARK: - Color Operators
@@ -144,26 +149,31 @@ extension ISO_32000.ContentStream {
         // MARK: - Path Construction Operators
 
         /// Begin a new subpath (m)
-        public mutating func moveTo(x: Double, y: Double) {
+        public mutating func moveTo(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y) {
             emit(.moveTo(x: x, y: y))
         }
 
         /// Append a line segment (l)
-        public mutating func lineTo(x: Double, y: Double) {
+        public mutating func lineTo(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y) {
             emit(.lineTo(x: x, y: y))
         }
 
         /// Append a cubic Bezier curve (c)
         public mutating func curveTo(
-            x1: Double, y1: Double,
-            x2: Double, y2: Double,
-            x3: Double, y3: Double
+            x1: ISO_32000.UserSpace.X, y1: ISO_32000.UserSpace.Y,
+            x2: ISO_32000.UserSpace.X, y2: ISO_32000.UserSpace.Y,
+            x3: ISO_32000.UserSpace.X, y3: ISO_32000.UserSpace.Y
         ) {
             emit(.curveTo(x1: x1, y1: y1, x2: x2, y2: y2, x3: x3, y3: y3))
         }
 
         /// Append a rectangle (re)
-        public mutating func rectangle(x: Double, y: Double, width: Double, height: Double) {
+        public mutating func rectangle(
+            x: ISO_32000.UserSpace.X,
+            y: ISO_32000.UserSpace.Y,
+            width: ISO_32000.UserSpace.Width,
+            height: ISO_32000.UserSpace.Height
+        ) {
             emit(.rectangle(x: x, y: y, width: width, height: height))
         }
 
@@ -229,24 +239,29 @@ extension ISO_32000.ContentStream {
         }
 
         /// Set text font and size (Tf)
-        public mutating func setFont(_ font: ISO_32000.Font, size: Double) {
+        public mutating func setFont(_ font: ISO_32000.Font, size: ISO_32000.UserSpace.Unit) {
             fontsUsed.insert(font)
             emit(.setFont(name: font.resourceName, size: size))
         }
 
         /// Move text position (Td)
-        public mutating func moveText(x: Double, y: Double) {
+        public mutating func moveText(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y) {
             emit(.moveTextPosition(tx: x, ty: y))
         }
 
         /// Move to next line with leading (TD)
-        public mutating func moveTextWithLeading(x: Double, y: Double) {
+        public mutating func moveTextWithLeading(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y) {
             emit(.moveTextPositionWithLeading(tx: x, ty: y))
         }
 
         /// Set text matrix (Tm)
+        ///
+        /// - Parameters:
+        ///   - a, b, c, d: Dimensionless scale/rotation coefficients
+        ///   - e, f: Translation in user space units
         public mutating func setTextMatrix(
-            a: Double, b: Double, c: Double, d: Double, e: Double, f: Double
+            a: Double, b: Double, c: Double, d: Double,
+            e: ISO_32000.UserSpace.X, f: ISO_32000.UserSpace.Y
         ) {
             emit(.setTextMatrix(a: a, b: b, c: c, d: d, e: e, f: f))
         }
@@ -262,34 +277,36 @@ extension ISO_32000.ContentStream {
         }
 
         /// Set text leading (TL)
-        public mutating func setTextLeading(_ leading: Double) {
+        public mutating func setTextLeading(_ leading: ISO_32000.UserSpace.Height) {
             emit(.setTextLeading(leading))
         }
 
         /// Set character spacing (Tc)
-        public mutating func setCharacterSpacing(_ spacing: Double) {
+        public mutating func setCharacterSpacing(_ spacing: ISO_32000.UserSpace.Width) {
             emit(.setCharacterSpacing(spacing))
         }
 
         /// Set word spacing (Tw)
-        public mutating func setWordSpacing(_ spacing: Double) {
+        public mutating func setWordSpacing(_ spacing: ISO_32000.UserSpace.Width) {
             emit(.setWordSpacing(spacing))
         }
 
         /// Set horizontal scaling (Tz)
+        ///
+        /// Scale is a percentage (100 = normal).
         public mutating func setHorizontalScaling(_ scale: Double) {
             emit(.setHorizontalScaling(scale))
         }
 
         /// Set text rise (Ts)
-        public mutating func setTextRise(_ rise: Double) {
+        public mutating func setTextRise(_ rise: ISO_32000.UserSpace.Y) {
             emit(.setTextRise(rise))
         }
 
         // MARK: - Line Style Operators
 
         /// Set line width (w)
-        public mutating func setLineWidth(_ width: Double) {
+        public mutating func setLineWidth(_ width: ISO_32000.UserSpace.Width) {
             emit(.setLineWidth(width))
         }
 
@@ -304,13 +321,76 @@ extension ISO_32000.ContentStream {
         }
 
         /// Set miter limit (M)
-        public mutating func setMiterLimit(_ limit: Double) {
+        public mutating func setMiterLimit(_ limit: ISO_32000.UserSpace.Width) {
             emit(.setMiterLimit(limit))
         }
 
         /// Set dash pattern (d)
-        public mutating func setDashPattern(array: [Double], phase: Double) {
+        public mutating func setDashPattern(array: [ISO_32000.UserSpace.Width], phase: ISO_32000.UserSpace.Width) {
             emit(.setDashPattern(array: array, phase: phase))
+        }
+
+        // MARK: - UserSpace Type Overloads
+
+        /// Set transformation matrix from an AffineTransform (cm)
+        ///
+        /// Note: AffineTransform's a,b,c,d are dimensionless coefficients (stored as UserSpace.Unit
+        /// for type uniformity), while tx,ty are actual spatial translations.
+        public mutating func transform(_ t: ISO_32000.UserSpace.AffineTransform) {
+            emit(.transform(a: t.a.value, b: t.b.value, c: t.c.value, d: t.d.value, e: t.tx, f: t.ty))
+        }
+
+        /// Rotate by angle in radians (convenience wrapper for cm)
+        public mutating func rotate(_ angle: Radian) {
+            emit(.transform(a: angle.cos, b: angle.sin, c: -angle.sin, d: angle.cos, e: .init(0), f: .init(0)))
+        }
+
+        /// Rotate by angle in degrees (convenience wrapper for cm)
+        public mutating func rotate(_ angle: Degree) {
+            rotate(angle.radians)
+        }
+
+        /// Translate by a vector (convenience wrapper for cm)
+        public mutating func translate(_ vector: ISO_32000.UserSpace.Vector) {
+            emit(.transform(a: 1, b: 0, c: 0, d: 1, e: vector.dx, f: vector.dy))
+        }
+
+        /// Begin a new subpath at a point (m)
+        public mutating func moveTo(_ point: ISO_32000.UserSpace.Coordinate) {
+            emit(.moveTo(x: point.x, y: point.y))
+        }
+
+        /// Append a line segment to a point (l)
+        public mutating func lineTo(_ point: ISO_32000.UserSpace.Coordinate) {
+            emit(.lineTo(x: point.x, y: point.y))
+        }
+
+        /// Append a cubic Bezier curve with control points (c)
+        public mutating func curveTo(
+            control1: ISO_32000.UserSpace.Coordinate,
+            control2: ISO_32000.UserSpace.Coordinate,
+            end: ISO_32000.UserSpace.Coordinate
+        ) {
+            emit(.curveTo(
+                x1: control1.x, y1: control1.y,
+                x2: control2.x, y2: control2.y,
+                x3: end.x, y3: end.y
+            ))
+        }
+
+        /// Append a rectangle (re)
+        public mutating func rectangle(_ rect: ISO_32000.UserSpace.Rectangle) {
+            emit(.rectangle(x: rect.origin.x, y: rect.origin.y, width: rect.width, height: rect.height))
+        }
+
+        /// Move text position to a point (Td)
+        public mutating func moveText(_ position: ISO_32000.UserSpace.Coordinate) {
+            emit(.moveTextPosition(tx: position.x, ty: position.y))
+        }
+
+        /// Set text matrix from an AffineTransform (Tm)
+        public mutating func setTextMatrix(_ t: ISO_32000.UserSpace.AffineTransform) {
+            emit(.setTextMatrix(a: t.a.value, b: t.b.value, c: t.c.value, d: t.d.value, e: t.tx, f: t.ty))
         }
     }
 }

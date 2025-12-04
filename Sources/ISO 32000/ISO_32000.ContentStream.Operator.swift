@@ -1,5 +1,7 @@
 // ISO_32000.ContentStream.Operator.swift
 
+import Geometry
+
 extension ISO_32000.ContentStream {
     /// PDF Content Stream Operator
     ///
@@ -15,41 +17,67 @@ extension ISO_32000.ContentStream {
         case restoreState
 
         /// Set transformation matrix (a b c d e f cm)
-        case transform(a: Double, b: Double, c: Double, d: Double, e: Double, f: Double)
+        ///
+        /// - Parameters:
+        ///   - a, b, c, d: Dimensionless scale/rotation coefficients
+        ///   - e, f: Translation in user space units
+        case transform(
+            a: Double,
+            b: Double,
+            c: Double,
+            d: Double,
+            e: ISO_32000.UserSpace.X,
+            f: ISO_32000.UserSpace.Y
+        )
 
         // MARK: - Color (Section 8.6)
 
         /// Set stroking color in DeviceGray (gray G)
+        /// Value is normalized 0-1
         case setStrokeGray(Double)
 
         /// Set non-stroking color in DeviceGray (gray g)
+        /// Value is normalized 0-1
         case setFillGray(Double)
 
         /// Set stroking color in DeviceRGB (r g b RG)
+        /// Values are normalized 0-1
         case setStrokeRGB(r: Double, g: Double, b: Double)
 
         /// Set non-stroking color in DeviceRGB (r g b rg)
+        /// Values are normalized 0-1
         case setFillRGB(r: Double, g: Double, b: Double)
 
         /// Set stroking color in DeviceCMYK (c m y k K)
+        /// Values are normalized 0-1
         case setStrokeCMYK(c: Double, m: Double, y: Double, k: Double)
 
         /// Set non-stroking color in DeviceCMYK (c m y k k)
+        /// Values are normalized 0-1
         case setFillCMYK(c: Double, m: Double, y: Double, k: Double)
 
         // MARK: - Path Construction (Section 8.5.2)
 
         /// Begin new subpath (x y m)
-        case moveTo(x: Double, y: Double)
+        case moveTo(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y)
 
         /// Append line segment (x y l)
-        case lineTo(x: Double, y: Double)
+        case lineTo(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y)
 
         /// Append cubic Bezier curve (x1 y1 x2 y2 x3 y3 c)
-        case curveTo(x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double)
+        case curveTo(
+            x1: ISO_32000.UserSpace.X, y1: ISO_32000.UserSpace.Y,
+            x2: ISO_32000.UserSpace.X, y2: ISO_32000.UserSpace.Y,
+            x3: ISO_32000.UserSpace.X, y3: ISO_32000.UserSpace.Y
+        )
 
         /// Append rectangle (x y width height re)
-        case rectangle(x: Double, y: Double, width: Double, height: Double)
+        case rectangle(
+            x: ISO_32000.UserSpace.X,
+            y: ISO_32000.UserSpace.Y,
+            width: ISO_32000.UserSpace.Width,
+            height: ISO_32000.UserSpace.Height
+        )
 
         /// Close current subpath (h)
         case closePath
@@ -91,33 +119,45 @@ extension ISO_32000.ContentStream {
         case endText
 
         /// Set text font and size (/name size Tf)
-        case setFont(name: ISO_32000.COS.Name, size: Double)
+        case setFont(name: ISO_32000.COS.Name, size: ISO_32000.UserSpace.Unit)
 
         /// Set text leading (leading TL)
-        case setTextLeading(Double)
+        case setTextLeading(ISO_32000.UserSpace.Height)
 
         /// Set character spacing (spacing Tc)
-        case setCharacterSpacing(Double)
+        case setCharacterSpacing(ISO_32000.UserSpace.Width)
 
         /// Set word spacing (spacing Tw)
-        case setWordSpacing(Double)
+        case setWordSpacing(ISO_32000.UserSpace.Width)
 
         /// Set horizontal scaling (scale Tz)
+        /// This is a percentage (100 = normal), dimensionless
         case setHorizontalScaling(Double)
 
         /// Set text rise (rise Ts)
-        case setTextRise(Double)
+        case setTextRise(ISO_32000.UserSpace.Y)
 
         // MARK: - Text Positioning (Section 9.4.2)
 
         /// Move text position (tx ty Td)
-        case moveTextPosition(tx: Double, ty: Double)
+        case moveTextPosition(tx: ISO_32000.UserSpace.X, ty: ISO_32000.UserSpace.Y)
 
         /// Move text position and set leading (tx ty TD)
-        case moveTextPositionWithLeading(tx: Double, ty: Double)
+        case moveTextPositionWithLeading(tx: ISO_32000.UserSpace.X, ty: ISO_32000.UserSpace.Y)
 
         /// Set text matrix (a b c d e f Tm)
-        case setTextMatrix(a: Double, b: Double, c: Double, d: Double, e: Double, f: Double)
+        ///
+        /// - Parameters:
+        ///   - a, b, c, d: Dimensionless scale/rotation coefficients
+        ///   - e, f: Translation in user space units
+        case setTextMatrix(
+            a: Double,
+            b: Double,
+            c: Double,
+            d: Double,
+            e: ISO_32000.UserSpace.X,
+            f: ISO_32000.UserSpace.Y
+        )
 
         /// Move to next line (T*)
         case nextLine
@@ -130,7 +170,7 @@ extension ISO_32000.ContentStream {
         // MARK: - Line Style (Section 8.4.3)
 
         /// Set line width (width w)
-        case setLineWidth(Double)
+        case setLineWidth(ISO_32000.UserSpace.Width)
 
         /// Set line cap style (cap J)
         case setLineCap(LineCap)
@@ -139,10 +179,10 @@ extension ISO_32000.ContentStream {
         case setLineJoin(LineJoin)
 
         /// Set miter limit (limit M)
-        case setMiterLimit(Double)
+        case setMiterLimit(ISO_32000.UserSpace.Width)
 
         /// Set dash pattern ([array] phase d)
-        case setDashPattern(array: [Double], phase: Double)
+        case setDashPattern(array: [ISO_32000.UserSpace.Width], phase: ISO_32000.UserSpace.Width)
     }
 }
 
@@ -162,7 +202,7 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "Q".utf8)
 
         case .transform(let a, let b, let c, let d, let e, let f):
-            buffer.append(contentsOf: "\(formatNumber(a)) \(formatNumber(b)) \(formatNumber(c)) \(formatNumber(d)) \(formatNumber(e)) \(formatNumber(f)) cm".utf8)
+            buffer.append(contentsOf: "\(formatNumber(a)) \(formatNumber(b)) \(formatNumber(c)) \(formatNumber(d)) \(formatNumber(e.value.value)) \(formatNumber(f.value.value)) cm".utf8)
 
         // Color
         case .setStrokeGray(let gray):
@@ -185,16 +225,16 @@ extension ISO_32000.ContentStream.Operator {
 
         // Path Construction
         case .moveTo(let x, let y):
-            buffer.append(contentsOf: "\(formatNumber(x)) \(formatNumber(y)) m".utf8)
+            buffer.append(contentsOf: "\(formatNumber(x.value.value)) \(formatNumber(y.value.value)) m".utf8)
 
         case .lineTo(let x, let y):
-            buffer.append(contentsOf: "\(formatNumber(x)) \(formatNumber(y)) l".utf8)
+            buffer.append(contentsOf: "\(formatNumber(x.value.value)) \(formatNumber(y.value.value)) l".utf8)
 
         case .curveTo(let x1, let y1, let x2, let y2, let x3, let y3):
-            buffer.append(contentsOf: "\(formatNumber(x1)) \(formatNumber(y1)) \(formatNumber(x2)) \(formatNumber(y2)) \(formatNumber(x3)) \(formatNumber(y3)) c".utf8)
+            buffer.append(contentsOf: "\(formatNumber(x1.value.value)) \(formatNumber(y1.value.value)) \(formatNumber(x2.value.value)) \(formatNumber(y2.value.value)) \(formatNumber(x3.value.value)) \(formatNumber(y3.value.value)) c".utf8)
 
         case .rectangle(let x, let y, let width, let height):
-            buffer.append(contentsOf: "\(formatNumber(x)) \(formatNumber(y)) \(formatNumber(width)) \(formatNumber(height)) re".utf8)
+            buffer.append(contentsOf: "\(formatNumber(x.value.value)) \(formatNumber(y.value.value)) \(formatNumber(width.value.value)) \(formatNumber(height.value.value)) re".utf8)
 
         case .closePath:
             buffer.append(contentsOf: "h".utf8)
@@ -233,32 +273,32 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "ET".utf8)
 
         case .setFont(let name, let size):
-            buffer.append(contentsOf: "/\(name.rawValue) \(formatNumber(size)) Tf".utf8)
+            buffer.append(contentsOf: "/\(name.rawValue) \(formatNumber(size.value)) Tf".utf8)
 
         case .setTextLeading(let leading):
-            buffer.append(contentsOf: "\(formatNumber(leading)) TL".utf8)
+            buffer.append(contentsOf: "\(formatNumber(leading.value.value)) TL".utf8)
 
         case .setCharacterSpacing(let spacing):
-            buffer.append(contentsOf: "\(formatNumber(spacing)) Tc".utf8)
+            buffer.append(contentsOf: "\(formatNumber(spacing.value.value)) Tc".utf8)
 
         case .setWordSpacing(let spacing):
-            buffer.append(contentsOf: "\(formatNumber(spacing)) Tw".utf8)
+            buffer.append(contentsOf: "\(formatNumber(spacing.value.value)) Tw".utf8)
 
         case .setHorizontalScaling(let scale):
             buffer.append(contentsOf: "\(formatNumber(scale)) Tz".utf8)
 
         case .setTextRise(let rise):
-            buffer.append(contentsOf: "\(formatNumber(rise)) Ts".utf8)
+            buffer.append(contentsOf: "\(formatNumber(rise.value.value)) Ts".utf8)
 
         // Text Positioning
         case .moveTextPosition(let tx, let ty):
-            buffer.append(contentsOf: "\(formatNumber(tx)) \(formatNumber(ty)) Td".utf8)
+            buffer.append(contentsOf: "\(formatNumber(tx.value.value)) \(formatNumber(ty.value.value)) Td".utf8)
 
         case .moveTextPositionWithLeading(let tx, let ty):
-            buffer.append(contentsOf: "\(formatNumber(tx)) \(formatNumber(ty)) TD".utf8)
+            buffer.append(contentsOf: "\(formatNumber(tx.value.value)) \(formatNumber(ty.value.value)) TD".utf8)
 
         case .setTextMatrix(let a, let b, let c, let d, let e, let f):
-            buffer.append(contentsOf: "\(formatNumber(a)) \(formatNumber(b)) \(formatNumber(c)) \(formatNumber(d)) \(formatNumber(e)) \(formatNumber(f)) Tm".utf8)
+            buffer.append(contentsOf: "\(formatNumber(a)) \(formatNumber(b)) \(formatNumber(c)) \(formatNumber(d)) \(formatNumber(e.value.value)) \(formatNumber(f.value.value)) Tm".utf8)
 
         case .nextLine:
             buffer.append(contentsOf: "T*".utf8)
@@ -270,7 +310,7 @@ extension ISO_32000.ContentStream.Operator {
 
         // Line Style
         case .setLineWidth(let width):
-            buffer.append(contentsOf: "\(formatNumber(width)) w".utf8)
+            buffer.append(contentsOf: "\(formatNumber(width.value.value)) w".utf8)
 
         case .setLineCap(let cap):
             buffer.append(contentsOf: "\(cap.rawValue) J".utf8)
@@ -279,11 +319,11 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "\(join.rawValue) j".utf8)
 
         case .setMiterLimit(let limit):
-            buffer.append(contentsOf: "\(formatNumber(limit)) M".utf8)
+            buffer.append(contentsOf: "\(formatNumber(limit.value.value)) M".utf8)
 
         case .setDashPattern(let array, let phase):
-            let arrayStr = array.map { formatNumber($0) }.joined(separator: " ")
-            buffer.append(contentsOf: "[\(arrayStr)] \(formatNumber(phase)) d".utf8)
+            let arrayStr = array.map { formatNumber($0.value.value) }.joined(separator: " ")
+            buffer.append(contentsOf: "[\(arrayStr)] \(formatNumber(phase.value.value)) d".utf8)
         }
     }
 

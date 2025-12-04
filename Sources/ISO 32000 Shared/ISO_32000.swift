@@ -15,27 +15,3 @@
 /// - ``Clause13``: Multimedia (sounds, movies, 3D artwork)
 /// - ``Clause14``: Document interchange (metadata, tagged PDF, accessibility)
 public enum ISO_32000 {}
-
-// MARK: - Utility Types
-
-extension ISO_32000 {
-    /// A size (width and height) in points
-    ///
-    /// Coordinate-system agnostic. All values are in default user space units (1/72 inch).
-    public struct Size: Sendable, Hashable, Codable {
-        /// Width in points
-        public var width: Double
-
-        /// Height in points
-        public var height: Double
-
-        /// Create a size
-        public init(width: Double, height: Double) {
-            self.width = width
-            self.height = height
-        }
-
-        /// Zero size
-        public static let zero = Self(width: 0, height: 0)
-    }
-}

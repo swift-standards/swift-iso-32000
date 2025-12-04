@@ -1,3 +1,37 @@
 // ISO_32000.COS.Object.swift
 // Object is defined in Section 7.3 and re-exported via COS typealias.
-// This file is kept for compatibility.
+// This file provides additional COS.Object convenience initializers.
+
+import ISO_32000_8_Graphics
+public import Geometry
+
+// MARK: - Rectangle Conversions
+
+extension ISO_32000.COS.Object {
+    /// Create a COS array from a UserSpace rectangle
+    ///
+    /// PDF rectangles are represented as arrays of four numbers:
+    /// `[llx lly urx ury]`
+    ///
+    /// - Parameter rect: The rectangle in user space coordinates
+    public init(_ rect: ISO_32000.UserSpace.Rectangle) {
+        self = .array([
+            .real(rect.llx.value),
+            .real(rect.lly.value),
+            .real(rect.urx.value),
+            .real(rect.ury.value)
+        ])
+    }
+
+    /// Create a COS array from a generic rectangle with Double units
+    ///
+    /// - Parameter rect: The rectangle with Double coordinates
+    public init(_ rect: ISO_32000.Rectangle<Double>) {
+        self = .array([
+            .real(rect.llx),
+            .real(rect.lly),
+            .real(rect.urx),
+            .real(rect.ury)
+        ])
+    }
+}

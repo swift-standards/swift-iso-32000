@@ -10,6 +10,7 @@
 
 public import ISO_32000_Shared
 public import ISO_32000_7_Syntax
+public import ISO_32000_8_Graphics
 
 extension ISO_32000.`9` {
     /// ISO 32000-2:2020, 9.6 Simple fonts
@@ -351,7 +352,7 @@ extension ISO_32000.`9`.`6`.Font {
 
 extension ISO_32000.`9`.`6`.Font {
     /// Calculate string width at a specific font size
-    public func stringWidth(_ text: String, atSize size: Double) -> Double {
+    public func stringWidth(_ text: String, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
         metrics.stringWidth(text, atSize: size)
     }
 }

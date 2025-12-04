@@ -103,7 +103,7 @@ extension ISO_32000 {
                         annotDict[.border] = .array([
                             .integer(0),
                             .integer(0),
-                            .real(linkAnnot.borderWidth)
+                            .real(linkAnnot.borderWidth.value)
                         ])
 
                         // URI action

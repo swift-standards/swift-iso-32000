@@ -105,11 +105,11 @@ struct `ISO_32000.Writer Tests` {
     // MARK: - Paper Sizes (Parameterized)
 
     @Test(arguments: [
-        (ISO_32000.Rectangle.letter, 612.0, 792.0),
+        (ISO_32000.UserSpace.Rectangle.letter, 612.0, 792.0),
         (.a4, 595.276, 841.89),
         (.legal, 612.0, 1008.0)
     ])
-    func `Writes correct MediaBox for paper sizes`(rect: ISO_32000.Rectangle, width: Double, height: Double) {
+    func `Writes correct MediaBox for paper sizes`(rect: ISO_32000.UserSpace.Rectangle, width: Double, height: Double) {
         let document = ISO_32000.Document(
             page: ISO_32000.Page.empty(size: rect)
         )
@@ -150,7 +150,8 @@ struct `ISO_32000.Writer Tests` {
             builder.beginText()
             builder.setFont(ISO_32000.Font.helvetica, size: 12)
             for i in 0..<20 {
-                builder.moveText(x: 72, y: 700 - Double(i * 20))
+                let yPos = ISO_32000.UserSpace.Y(ISO_32000.UserSpace.Unit(700 - Double(i * 20)))
+                builder.moveText(x: 72, y: yPos)
                 builder.showText("Line \(i): This is test content for compression testing purposes.")
             }
             builder.endText()
@@ -230,7 +231,7 @@ struct `ISO_32000.Writer Tests` {
         var contentBuilder = ISO_32000.ContentStream.Builder()
         contentBuilder.beginText()
 
-        var y = 700.0
+        var y: ISO_32000.UserSpace.Y = 700
         var fonts: [ISO_32000.COS.Name: ISO_32000.Font] = [:]
 
         for pdfFont in ISO_32000.Font.standard14 {
@@ -239,7 +240,7 @@ struct `ISO_32000.Writer Tests` {
             contentBuilder.setFont(pdfFont, size: 14)
             contentBuilder.moveText(x: 72, y: y)
             contentBuilder.showText("\(pdfFont.baseFontName.rawValue): The quick brown fox jumps over the lazy dog.")
-            y -= 30
+            y = y - 30
             contentBuilder.moveText(x: -72, y: 0)
         }
 

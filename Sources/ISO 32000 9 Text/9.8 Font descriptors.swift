@@ -6,6 +6,7 @@
 //   9.8.3  Font metrics
 
 public import ISO_32000_Shared
+public import ISO_32000_8_Graphics
 
 extension ISO_32000.`9` {
     /// ISO 32000-2:2020, 9.8 Font descriptors
@@ -77,8 +78,8 @@ extension ISO_32000.`9`.`8` {
         }
 
         /// Calculate string width at a specific font size
-        public func stringWidth(_ text: String, atSize size: Double) -> Double {
-            Double(stringWidth(text)) * size / 1000.0
+        public func stringWidth(_ text: String, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(stringWidth(text)) * size.value / 1000.0)
         }
 
         /// Line height in font design units (ascender - descender)
@@ -87,18 +88,18 @@ extension ISO_32000.`9`.`8` {
         }
 
         /// Line height at a specific font size
-        public func lineHeight(atSize size: Double) -> Double {
-            Double(lineHeight) * size / 1000.0
+        public func lineHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(lineHeight) * size.value / 1000.0)
         }
 
         /// Ascender at a specific font size
-        public func ascender(atSize size: Double) -> Double {
-            Double(ascender) * size / 1000.0
+        public func ascender(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(ascender) * size.value / 1000.0)
         }
 
         /// Descender at a specific font size (negative value)
-        public func descender(atSize size: Double) -> Double {
-            Double(descender) * size / 1000.0
+        public func descender(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(descender) * size.value / 1000.0)
         }
     }
 }
