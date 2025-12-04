@@ -1,6 +1,8 @@
 // ISO_32000.ContentStream.Operator.swift
 
 import Geometry
+import Formatting
+import Numeric_Formatting
 
 extension ISO_32000.ContentStream {
     /// PDF Content Stream Operator
@@ -202,39 +204,39 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "Q".utf8)
 
         case .transform(let a, let b, let c, let d, let e, let f):
-            buffer.append(contentsOf: "\(formatNumber(a)) \(formatNumber(b)) \(formatNumber(c)) \(formatNumber(d)) \(formatNumber(e.value.value)) \(formatNumber(f.value.value)) cm".utf8)
+            buffer.append(contentsOf: "\(a.pdf) \(b.pdf) \(c.pdf) \(d.pdf) \(e.pdf) \(f.pdf) cm".utf8)
 
         // Color
         case .setStrokeGray(let gray):
-            buffer.append(contentsOf: "\(formatNumber(gray)) G".utf8)
+            buffer.append(contentsOf: "\(gray.pdf) G".utf8)
 
         case .setFillGray(let gray):
-            buffer.append(contentsOf: "\(formatNumber(gray)) g".utf8)
+            buffer.append(contentsOf: "\(gray.pdf) g".utf8)
 
         case .setStrokeRGB(let r, let g, let b):
-            buffer.append(contentsOf: "\(formatNumber(r)) \(formatNumber(g)) \(formatNumber(b)) RG".utf8)
+            buffer.append(contentsOf: "\(r.pdf) \(g.pdf) \(b.pdf) RG".utf8)
 
         case .setFillRGB(let r, let g, let b):
-            buffer.append(contentsOf: "\(formatNumber(r)) \(formatNumber(g)) \(formatNumber(b)) rg".utf8)
+            buffer.append(contentsOf: "\(r.pdf) \(g.pdf) \(b.pdf) rg".utf8)
 
         case .setStrokeCMYK(let c, let m, let y, let k):
-            buffer.append(contentsOf: "\(formatNumber(c)) \(formatNumber(m)) \(formatNumber(y)) \(formatNumber(k)) K".utf8)
+            buffer.append(contentsOf: "\(c.pdf) \(m.pdf) \(y.pdf) \(k.pdf) K".utf8)
 
         case .setFillCMYK(let c, let m, let y, let k):
-            buffer.append(contentsOf: "\(formatNumber(c)) \(formatNumber(m)) \(formatNumber(y)) \(formatNumber(k)) k".utf8)
+            buffer.append(contentsOf: "\(c.pdf) \(m.pdf) \(y.pdf) \(k.pdf) k".utf8)
 
         // Path Construction
         case .moveTo(let x, let y):
-            buffer.append(contentsOf: "\(formatNumber(x.value.value)) \(formatNumber(y.value.value)) m".utf8)
+            buffer.append(contentsOf: "\(x.pdf) \(y.pdf) m".utf8)
 
         case .lineTo(let x, let y):
-            buffer.append(contentsOf: "\(formatNumber(x.value.value)) \(formatNumber(y.value.value)) l".utf8)
+            buffer.append(contentsOf: "\(x.pdf) \(y.pdf) l".utf8)
 
         case .curveTo(let x1, let y1, let x2, let y2, let x3, let y3):
-            buffer.append(contentsOf: "\(formatNumber(x1.value.value)) \(formatNumber(y1.value.value)) \(formatNumber(x2.value.value)) \(formatNumber(y2.value.value)) \(formatNumber(x3.value.value)) \(formatNumber(y3.value.value)) c".utf8)
+            buffer.append(contentsOf: "\(x1.pdf) \(y1.pdf) \(x2.pdf) \(y2.pdf) \(x3.pdf) \(y3.pdf) c".utf8)
 
         case .rectangle(let x, let y, let width, let height):
-            buffer.append(contentsOf: "\(formatNumber(x.value.value)) \(formatNumber(y.value.value)) \(formatNumber(width.value.value)) \(formatNumber(height.value.value)) re".utf8)
+            buffer.append(contentsOf: "\(x.pdf) \(y.pdf) \(width.pdf) \(height.pdf) re".utf8)
 
         case .closePath:
             buffer.append(contentsOf: "h".utf8)
@@ -273,32 +275,32 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "ET".utf8)
 
         case .setFont(let name, let size):
-            buffer.append(contentsOf: "/\(name.rawValue) \(formatNumber(size.value)) Tf".utf8)
+            buffer.append(contentsOf: "/\(name.rawValue) \(size.pdf) Tf".utf8)
 
         case .setTextLeading(let leading):
-            buffer.append(contentsOf: "\(formatNumber(leading.value.value)) TL".utf8)
+            buffer.append(contentsOf: "\(leading.pdf) TL".utf8)
 
         case .setCharacterSpacing(let spacing):
-            buffer.append(contentsOf: "\(formatNumber(spacing.value.value)) Tc".utf8)
+            buffer.append(contentsOf: "\(spacing.pdf) Tc".utf8)
 
         case .setWordSpacing(let spacing):
-            buffer.append(contentsOf: "\(formatNumber(spacing.value.value)) Tw".utf8)
+            buffer.append(contentsOf: "\(spacing.pdf) Tw".utf8)
 
         case .setHorizontalScaling(let scale):
-            buffer.append(contentsOf: "\(formatNumber(scale)) Tz".utf8)
+            buffer.append(contentsOf: "\(scale.pdf) Tz".utf8)
 
         case .setTextRise(let rise):
-            buffer.append(contentsOf: "\(formatNumber(rise.value.value)) Ts".utf8)
+            buffer.append(contentsOf: "\(rise.pdf) Ts".utf8)
 
         // Text Positioning
         case .moveTextPosition(let tx, let ty):
-            buffer.append(contentsOf: "\(formatNumber(tx.value.value)) \(formatNumber(ty.value.value)) Td".utf8)
+            buffer.append(contentsOf: "\(tx.pdf) \(ty.pdf) Td".utf8)
 
         case .moveTextPositionWithLeading(let tx, let ty):
-            buffer.append(contentsOf: "\(formatNumber(tx.value.value)) \(formatNumber(ty.value.value)) TD".utf8)
+            buffer.append(contentsOf: "\(tx.pdf) \(ty.pdf) TD".utf8)
 
         case .setTextMatrix(let a, let b, let c, let d, let e, let f):
-            buffer.append(contentsOf: "\(formatNumber(a)) \(formatNumber(b)) \(formatNumber(c)) \(formatNumber(d)) \(formatNumber(e.value.value)) \(formatNumber(f.value.value)) Tm".utf8)
+            buffer.append(contentsOf: "\(a.pdf) \(b.pdf) \(c.pdf) \(d.pdf) \(e.pdf) \(f.pdf) Tm".utf8)
 
         case .nextLine:
             buffer.append(contentsOf: "T*".utf8)
@@ -310,7 +312,7 @@ extension ISO_32000.ContentStream.Operator {
 
         // Line Style
         case .setLineWidth(let width):
-            buffer.append(contentsOf: "\(formatNumber(width.value.value)) w".utf8)
+            buffer.append(contentsOf: "\(width.pdf) w".utf8)
 
         case .setLineCap(let cap):
             buffer.append(contentsOf: "\(cap.rawValue) J".utf8)
@@ -319,42 +321,58 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "\(join.rawValue) j".utf8)
 
         case .setMiterLimit(let limit):
-            buffer.append(contentsOf: "\(formatNumber(limit.value.value)) M".utf8)
+            buffer.append(contentsOf: "\(limit.pdf) M".utf8)
 
         case .setDashPattern(let array, let phase):
-            let arrayStr = array.map { formatNumber($0.value.value) }.joined(separator: " ")
-            buffer.append(contentsOf: "[\(arrayStr)] \(formatNumber(phase.value.value)) d".utf8)
+            let arrayStr = array.map { $0.pdf }.joined(separator: " ")
+            buffer.append(contentsOf: "[\(arrayStr)] \(phase.pdf) d".utf8)
         }
     }
+}
 
-    /// Format a number for PDF output
-    private func formatNumber(_ value: Double) -> String {
-        if value == value.rounded() && abs(value) < 1e9 {
-            return String(Int(value))
-        }
+// MARK: - PDF Number Formatting
 
-        let isNegative = value < 0
-        let absValue = abs(value)
-        let intPart = Int64(absValue)
-        let fracPart = absValue - Double(intPart)
+/// PDF number format style (max 4 decimal places, trailing zeros stripped)
+private let pdfFormat = Format.Numeric.Style.number.precision(.fractionLength(0...4))
 
-        let fracDigits = Int64((fracPart * 10_000).rounded())
+extension Double {
+    /// Format for PDF output (max 4 decimal places, trailing zeros stripped)
+    package var pdf: String {
+        formatted(pdfFormat)
+    }
+}
 
-        var result = isNegative ? "-" : ""
-        result += String(intPart)
+extension ISO_32000.UserSpace.Unit {
+    /// Format for PDF output
+    package var pdf: String {
+        value.pdf
+    }
+}
 
-        if fracDigits != 0 {
-            result += "."
-            var fracStr = String(fracDigits)
-            while fracStr.count < 4 {
-                fracStr = "0" + fracStr
-            }
-            while fracStr.hasSuffix("0") {
-                fracStr.removeLast()
-            }
-            result += fracStr
-        }
+extension ISO_32000.UserSpace.X {
+    /// Format for PDF output
+    package var pdf: String {
+        value.pdf
+    }
+}
 
-        return result
+extension ISO_32000.UserSpace.Y {
+    /// Format for PDF output
+    package var pdf: String {
+        value.pdf
+    }
+}
+
+extension ISO_32000.UserSpace.Width {
+    /// Format for PDF output
+    package var pdf: String {
+        value.pdf
+    }
+}
+
+extension ISO_32000.UserSpace.Height {
+    /// Format for PDF output
+    package var pdf: String {
+        value.pdf
     }
 }

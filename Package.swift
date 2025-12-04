@@ -34,6 +34,7 @@ let package = Package(
         .package(path: "../swift-incits-4-1986"),
         .package(path: "../swift-rfc-1950"),
         .package(path: "../swift-iec-61966"),
+        .package(path: "../swift-numeric-formatting-standard"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0"),
     ],
     targets: [
@@ -125,8 +126,10 @@ let package = Package(
                 "ISO 32000 Annex D",
                 .product(name: "Standards", package: "swift-standards"),
                 .product(name: "Geometry", package: "swift-standards"),
+                .product(name: "Formatting", package: "swift-standards"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
                 .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
+                .product(name: "Numeric Formatting", package: "swift-numeric-formatting-standard"),
             ]
         ),
         .target(
