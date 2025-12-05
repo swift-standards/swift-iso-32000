@@ -15,6 +15,8 @@
 public import ISO_32000_Shared
 public import INCITS_4_1986
 public import Standards
+public import Formatting
+import IEEE_754
 
 extension ISO_32000.`7` {
     /// ISO 32000-2:2020, 7.3 Objects
@@ -54,6 +56,133 @@ extension ISO_32000.`7`.`3`.Table.`3` {
         .ascii.rightParenthesis: [.ascii.backslash, .ascii.rightParenthesis], // \)
         .ascii.backslash: [.ascii.backslash, .ascii.backslash],               // \\
     ]
+}
+
+// MARK: - 7.3.3 Numeric Objects
+
+extension ISO_32000.`7`.`3` {
+    /// ISO 32000-2:2020, 7.3.3 Numeric objects
+    ///
+    /// Per Section 7.3.3:
+    /// > PDF provides two types of numeric objects: integer and real.
+    /// > An integer shall be written as one or more decimal digits optionally
+    /// > preceded by a sign. The value shall be interpreted as a signed decimal integer.
+    /// > A real value shall be written as one or more decimal digits with an optional sign
+    /// > and a leading, trailing, or embedded PERIOD (2Eh) (decimal point).
+    public enum `3` {}
+}
+
+extension ISO_32000.`7`.`3`.`3` {
+    /// PDF number format style
+    ///
+    /// Per ISO 32000-2:2020 Section 7.3.3:
+    /// > An integer shall be written as one or more decimal digits optionally preceded by a sign.
+    /// >
+    /// > A real value shall be written as one or more decimal digits with an optional sign and a
+    /// > leading, trailing, or embedded PERIOD (2Eh) (decimal point).
+    /// >
+    /// > Wherever a real number is expected, an integer may be used instead.
+    /// > For example, it is not necessary to write the number 1.0 in real format;
+    /// > the integer 1 is sufficient.
+    /// >
+    /// > A PDF writer shall not use the PostScript language syntax for numbers with
+    /// > non-decimal radices (such as 16#FFFE) or in exponential format (such as 6.02E23).
+    ///
+    /// This format style outputs numbers following PDF syntax rules:
+    /// - Integers output without decimal point (e.g., `42` not `42.0`)
+    /// - Reals output with decimal point, trailing zeros stripped
+    /// - **Never** uses exponential notation (e.g., `0.00001` not `1E-5`)
+    /// - Maximum 5 decimal places (per Annex C portability recommendations)
+    /// - No grouping separators
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// let x: UserSpace.X = 72.5
+    /// let formatted = x.formatted(.pdf)  // "72.5"
+    ///
+    /// let whole: Double = 42.0
+    /// whole.formatted(.pdf)  // "42" (integer form)
+    /// ```
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Section 7.3.3 — Numeric objects
+    public struct RealFormatStyle: FormatStyle, Sendable {
+        public typealias FormatInput = Double
+        public typealias FormatOutput = String
+
+        /// Maximum decimal places for real numbers (per Annex C recommendations)
+        private static let maxDecimalPlaces = 5
+
+        /// Multiplier for extracting fractional digits (10^maxDecimalPlaces)
+        private static let multiplier: Double = 100_000
+
+        public init() {}
+
+        public func format(_ value: Double) -> String {
+            // Handle special cases per IEEE 754 classification (Annex C references IEEE 754)
+            guard IEEE_754.Classification.isFinite(value) else {
+                // PDF doesn't support infinity/NaN - output 0 as fallback
+                return "0"
+            }
+
+            // Check if value is effectively an integer
+            // Per spec: "it is not necessary to write the number 1.0 in real format"
+            let rounded = value.rounded()
+            if value == rounded && abs(value) < Double(Int64.max) {
+                return String(Int64(value))
+            }
+
+            // Format as real number without exponential notation
+            // Per spec: "shall not use... exponential format (such as 6.02E23)"
+            return formatReal(value)
+        }
+
+        /// Format a real number without exponential notation
+        private func formatReal(_ value: Double) -> String {
+            let isNegative = value < 0
+            let absValue = abs(value)
+
+            // Split into integer and fractional parts
+            let intPart = Int64(absValue)
+            let fracPart = absValue - Double(intPart)
+
+            // Calculate fractional digits (up to maxDecimalPlaces)
+            let fracDigits = Int64((fracPart * Self.multiplier).rounded())
+
+            var result = isNegative ? "-" : ""
+            result += String(intPart)
+
+            if fracDigits != 0 {
+                result += "."
+                var fracStr = String(fracDigits)
+                // Pad with leading zeros if needed
+                while fracStr.count < Self.maxDecimalPlaces {
+                    fracStr = "0" + fracStr
+                }
+                // Strip trailing zeros
+                while fracStr.hasSuffix("0") {
+                    fracStr.removeLast()
+                }
+                result += fracStr
+            }
+
+            return result
+        }
+    }
+}
+
+extension FormatStyle where Self == ISO_32000.`7`.`3`.`3`.RealFormatStyle {
+    /// PDF number format style
+    ///
+    /// Formats numbers according to ISO 32000-2:2020 Section 7.3.3 (Numeric objects):
+    /// - Integers output without decimal point
+    /// - Never uses exponential notation
+    /// - Maximum 5 decimal places, trailing zeros stripped
+    public static var pdf: ISO_32000.`7`.`3`.`3`.RealFormatStyle {
+        ISO_32000.`7`.`3`.`3`.RealFormatStyle()
+    }
 }
 
 // MARK: - 7.3.5 Name Objects
@@ -639,34 +768,10 @@ extension ISO_32000.`7`.`3`.COS {
     }
 
     /// Format a real number with appropriate precision
+    ///
+    /// Uses `ISO_32000.7.3.3.RealFormatStyle` for consistent PDF number formatting.
     private static func formatReal(_ value: Double) -> Swift.String {
-        if value == value.rounded() && abs(value) < 1e10 {
-            return Swift.String(Int64(value))
-        }
-
-        let isNegative = value < 0
-        let absValue = abs(value)
-        let intPart = Int64(absValue)
-        let fracPart = absValue - Double(intPart)
-
-        let fracDigits = Int64((fracPart * 1_000_000).rounded())
-
-        var result = isNegative ? "-" : ""
-        result += Swift.String(intPart)
-
-        if fracDigits != 0 {
-            result += "."
-            var fracStr = Swift.String(fracDigits)
-            while fracStr.count < 6 {
-                fracStr = "0" + fracStr
-            }
-            while fracStr.hasSuffix("0") {
-                fracStr.removeLast()
-            }
-            result += fracStr
-        }
-
-        return result
+        value.formatted(.pdf)
     }
 }
 

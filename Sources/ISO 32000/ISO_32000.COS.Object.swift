@@ -16,10 +16,10 @@ extension ISO_32000.COS.Object {
     /// - Parameter rect: The rectangle in user space coordinates
     public init(_ rect: ISO_32000.UserSpace.Rectangle) {
         self = .array([
-            .real(rect.llx.value),
-            .real(rect.lly.value),
-            .real(rect.urx.value),
-            .real(rect.ury.value)
+            .real(rect.llx.value.value),
+            .real(rect.lly.value.value),
+            .real(rect.urx.value.value),
+            .real(rect.ury.value.value)
         ])
     }
 
@@ -28,10 +28,10 @@ extension ISO_32000.COS.Object {
     /// - Parameter rect: The rectangle with Double coordinates
     public init(_ rect: ISO_32000.Rectangle<Double>) {
         self = .array([
-            .real(rect.llx),
-            .real(rect.lly),
-            .real(rect.urx),
-            .real(rect.ury)
+            .real(rect.llx.value),
+            .real(rect.lly.value),
+            .real(rect.urx.value),
+            .real(rect.ury.value)
         ])
     }
 }

@@ -2,7 +2,7 @@
 
 import Geometry
 import Formatting
-import Numeric_Formatting
+import ISO_32000_7_Syntax
 
 extension ISO_32000.ContentStream {
     /// PDF Content Stream Operator
@@ -204,39 +204,39 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "Q".utf8)
 
         case .transform(let a, let b, let c, let d, let e, let f):
-            buffer.append(contentsOf: "\(a.pdf) \(b.pdf) \(c.pdf) \(d.pdf) \(e.pdf) \(f.pdf) cm".utf8)
+            buffer.append(contentsOf: "\(a.formatted(.pdf)) \(b.formatted(.pdf)) \(c.formatted(.pdf)) \(d.formatted(.pdf)) \(e.formatted(.pdf)) \(f.formatted(.pdf)) cm".utf8)
 
         // Color
         case .setStrokeGray(let gray):
-            buffer.append(contentsOf: "\(gray.pdf) G".utf8)
+            buffer.append(contentsOf: "\(gray.formatted(.pdf)) G".utf8)
 
         case .setFillGray(let gray):
-            buffer.append(contentsOf: "\(gray.pdf) g".utf8)
+            buffer.append(contentsOf: "\(gray.formatted(.pdf)) g".utf8)
 
         case .setStrokeRGB(let r, let g, let b):
-            buffer.append(contentsOf: "\(r.pdf) \(g.pdf) \(b.pdf) RG".utf8)
+            buffer.append(contentsOf: "\(r.formatted(.pdf)) \(g.formatted(.pdf)) \(b.formatted(.pdf)) RG".utf8)
 
         case .setFillRGB(let r, let g, let b):
-            buffer.append(contentsOf: "\(r.pdf) \(g.pdf) \(b.pdf) rg".utf8)
+            buffer.append(contentsOf: "\(r.formatted(.pdf)) \(g.formatted(.pdf)) \(b.formatted(.pdf)) rg".utf8)
 
         case .setStrokeCMYK(let c, let m, let y, let k):
-            buffer.append(contentsOf: "\(c.pdf) \(m.pdf) \(y.pdf) \(k.pdf) K".utf8)
+            buffer.append(contentsOf: "\(c.formatted(.pdf)) \(m.formatted(.pdf)) \(y.formatted(.pdf)) \(k.formatted(.pdf)) K".utf8)
 
         case .setFillCMYK(let c, let m, let y, let k):
-            buffer.append(contentsOf: "\(c.pdf) \(m.pdf) \(y.pdf) \(k.pdf) k".utf8)
+            buffer.append(contentsOf: "\(c.formatted(.pdf)) \(m.formatted(.pdf)) \(y.formatted(.pdf)) \(k.formatted(.pdf)) k".utf8)
 
         // Path Construction
         case .moveTo(let x, let y):
-            buffer.append(contentsOf: "\(x.pdf) \(y.pdf) m".utf8)
+            buffer.append(contentsOf: "\(x.formatted(.pdf)) \(y.formatted(.pdf)) m".utf8)
 
         case .lineTo(let x, let y):
-            buffer.append(contentsOf: "\(x.pdf) \(y.pdf) l".utf8)
+            buffer.append(contentsOf: "\(x.formatted(.pdf)) \(y.formatted(.pdf)) l".utf8)
 
         case .curveTo(let x1, let y1, let x2, let y2, let x3, let y3):
-            buffer.append(contentsOf: "\(x1.pdf) \(y1.pdf) \(x2.pdf) \(y2.pdf) \(x3.pdf) \(y3.pdf) c".utf8)
+            buffer.append(contentsOf: "\(x1.formatted(.pdf)) \(y1.formatted(.pdf)) \(x2.formatted(.pdf)) \(y2.formatted(.pdf)) \(x3.formatted(.pdf)) \(y3.formatted(.pdf)) c".utf8)
 
         case .rectangle(let x, let y, let width, let height):
-            buffer.append(contentsOf: "\(x.pdf) \(y.pdf) \(width.pdf) \(height.pdf) re".utf8)
+            buffer.append(contentsOf: "\(x.formatted(.pdf)) \(y.formatted(.pdf)) \(width.formatted(.pdf)) \(height.formatted(.pdf)) re".utf8)
 
         case .closePath:
             buffer.append(contentsOf: "h".utf8)
@@ -275,32 +275,32 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "ET".utf8)
 
         case .setFont(let name, let size):
-            buffer.append(contentsOf: "/\(name.rawValue) \(size.pdf) Tf".utf8)
+            buffer.append(contentsOf: "/\(name.rawValue) \(size.formatted(.pdf)) Tf".utf8)
 
         case .setTextLeading(let leading):
-            buffer.append(contentsOf: "\(leading.pdf) TL".utf8)
+            buffer.append(contentsOf: "\(leading.formatted(.pdf)) TL".utf8)
 
         case .setCharacterSpacing(let spacing):
-            buffer.append(contentsOf: "\(spacing.pdf) Tc".utf8)
+            buffer.append(contentsOf: "\(spacing.formatted(.pdf)) Tc".utf8)
 
         case .setWordSpacing(let spacing):
-            buffer.append(contentsOf: "\(spacing.pdf) Tw".utf8)
+            buffer.append(contentsOf: "\(spacing.formatted(.pdf)) Tw".utf8)
 
         case .setHorizontalScaling(let scale):
-            buffer.append(contentsOf: "\(scale.pdf) Tz".utf8)
+            buffer.append(contentsOf: "\(scale.formatted(.pdf)) Tz".utf8)
 
         case .setTextRise(let rise):
-            buffer.append(contentsOf: "\(rise.pdf) Ts".utf8)
+            buffer.append(contentsOf: "\(rise.formatted(.pdf)) Ts".utf8)
 
         // Text Positioning
         case .moveTextPosition(let tx, let ty):
-            buffer.append(contentsOf: "\(tx.pdf) \(ty.pdf) Td".utf8)
+            buffer.append(contentsOf: "\(tx.formatted(.pdf)) \(ty.formatted(.pdf)) Td".utf8)
 
         case .moveTextPositionWithLeading(let tx, let ty):
-            buffer.append(contentsOf: "\(tx.pdf) \(ty.pdf) TD".utf8)
+            buffer.append(contentsOf: "\(tx.formatted(.pdf)) \(ty.formatted(.pdf)) TD".utf8)
 
         case .setTextMatrix(let a, let b, let c, let d, let e, let f):
-            buffer.append(contentsOf: "\(a.pdf) \(b.pdf) \(c.pdf) \(d.pdf) \(e.pdf) \(f.pdf) Tm".utf8)
+            buffer.append(contentsOf: "\(a.formatted(.pdf)) \(b.formatted(.pdf)) \(c.formatted(.pdf)) \(d.formatted(.pdf)) \(e.formatted(.pdf)) \(f.formatted(.pdf)) Tm".utf8)
 
         case .nextLine:
             buffer.append(contentsOf: "T*".utf8)
@@ -312,7 +312,7 @@ extension ISO_32000.ContentStream.Operator {
 
         // Line Style
         case .setLineWidth(let width):
-            buffer.append(contentsOf: "\(width.pdf) w".utf8)
+            buffer.append(contentsOf: "\(width.formatted(.pdf)) w".utf8)
 
         case .setLineCap(let cap):
             buffer.append(contentsOf: "\(cap.rawValue) J".utf8)
@@ -321,58 +321,12 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: "\(join.rawValue) j".utf8)
 
         case .setMiterLimit(let limit):
-            buffer.append(contentsOf: "\(limit.pdf) M".utf8)
+            buffer.append(contentsOf: "\(limit.formatted(.pdf)) M".utf8)
 
         case .setDashPattern(let array, let phase):
-            let arrayStr = array.map { $0.pdf }.joined(separator: " ")
-            buffer.append(contentsOf: "[\(arrayStr)] \(phase.pdf) d".utf8)
+            let arrayStr = array.map { $0.formatted(.pdf) }.joined(separator: " ")
+            buffer.append(contentsOf: "[\(arrayStr)] \(phase.formatted(.pdf)) d".utf8)
         }
     }
 }
 
-// MARK: - PDF Number Formatting
-
-/// PDF number format style (max 4 decimal places, trailing zeros stripped)
-private let pdfFormat = Format.Numeric.Style.number.precision(.fractionLength(0...4))
-
-extension Double {
-    /// Format for PDF output (max 4 decimal places, trailing zeros stripped)
-    package var pdf: String {
-        formatted(pdfFormat)
-    }
-}
-
-extension ISO_32000.UserSpace.Unit {
-    /// Format for PDF output
-    package var pdf: String {
-        value.pdf
-    }
-}
-
-extension ISO_32000.UserSpace.X {
-    /// Format for PDF output
-    package var pdf: String {
-        value.pdf
-    }
-}
-
-extension ISO_32000.UserSpace.Y {
-    /// Format for PDF output
-    package var pdf: String {
-        value.pdf
-    }
-}
-
-extension ISO_32000.UserSpace.Width {
-    /// Format for PDF output
-    package var pdf: String {
-        value.pdf
-    }
-}
-
-extension ISO_32000.UserSpace.Height {
-    /// Format for PDF output
-    package var pdf: String {
-        value.pdf
-    }
-}

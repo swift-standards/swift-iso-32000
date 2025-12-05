@@ -9,21 +9,21 @@ extension ISO_32000 {
         /// PDF version
         public var version: Version
         
-        /// Document pages
-        public var pages: [Page]
-        
         /// Document metadata
         public var info: Info?
+        
+        /// Document pages
+        public var pages: [Page]
         
         /// Create a document
         public init(
             version: Version = .default,
+            info: Info? = nil,
             pages: [Page] = [],
-            info: Info? = nil
         ) {
             self.version = version
-            self.pages = pages
             self.info = info
+            self.pages = pages
         }
     }
 }
@@ -32,11 +32,11 @@ extension ISO_32000.Document {
     /// Create a document with a single page
     public init(
         version: ISO_32000.Version = .default,
+        info: ISO_32000.Document.Info? = nil,
         page: ISO_32000.Page,
-        info: ISO_32000.Document.Info? = nil
     ) {
         self.version = version
-        self.pages = [page]
         self.info = info
+        self.pages = [page]
     }
 }

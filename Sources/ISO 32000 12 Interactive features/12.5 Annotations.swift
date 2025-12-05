@@ -47,7 +47,7 @@ extension ISO_32000.`12`.`5` {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 12.5 — Annotations
-    public enum Annotation: Sendable {
+    public enum Annotation: Sendable, Hashable {
         /// Link annotation with URI action (Section 12.5.6.4)
         case link(LinkAnnotation)
     }
@@ -67,7 +67,7 @@ extension ISO_32000.`12`.`5`.`6`.`4` {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 12.5.6.4 — Link annotations
-    public struct LinkAnnotation: Sendable {
+    public struct LinkAnnotation: Sendable, Hashable {
         /// Rectangle defining the clickable area in user space coordinates
         ///
         /// Uses `UserSpace.Rectangle` to enforce type-safe coordinate handling.
@@ -96,6 +96,25 @@ extension ISO_32000.`12`.`5`.`6`.`4` {
         }
     }
 }
+
+extension ISO_32000.`12`.`5`.`6` {
+    public enum `10` {}
+}
+
+extension ISO_32000.`12`.`5`.`6`.`10` {
+    public enum TextMarkup: Sendable, Hashable {
+        case highlight(ISO_32000.`8`.`6`.Color)
+        case underline
+        case strikeout
+        case jagged
+    }
+}
+
+extension ISO_32000.`12`.`5`.`6`.`10`.TextMarkup {
+    @inlinable
+    public static var squiggly: Self { .jagged }
+}
+
 
 // MARK: - Convenience Typealias
 

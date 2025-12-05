@@ -26,11 +26,11 @@ let package = Package(
         .library(name: "ISO 32000 13 Multimedia features", targets: ["ISO 32000 13 Multimedia features"]),
         .library(name: "ISO 32000 14 Document interchange", targets: ["ISO 32000 14 Document interchange"]),
         .library(name: "ISO 32000 Annex D", targets: ["ISO 32000 Annex D"]),
-        .library(name: "ISO 32000 Refactor", targets: ["ISO 32000 Refactor"]),
     ],
     dependencies: [
         .package(path: "../swift-standards"),
         .package(path: "../swift-iso-9899"),
+        .package(path: "../swift-ieee-754"),
         .package(path: "../swift-incits-4-1986"),
         .package(path: "../swift-rfc-1950"),
         .package(path: "../swift-iec-61966"),
@@ -45,21 +45,7 @@ let package = Package(
                 .product(name: "Geometry", package: "swift-standards"),
             ]
         ),
-        .target(
-            name: "ISO 32000 Refactor",
-            dependencies: [
-                "ISO 32000 3 Terms and definitions",
-                "ISO 32000 7 Syntax",
-                "ISO 32000 8 Graphics",
-                "ISO 32000 9 Text",
-                "ISO 32000 10 Rendering",
-                "ISO 32000 11 Transparency",
-                "ISO 32000 12 Interactive features",
-                "ISO 32000 13 Multimedia features",
-                "ISO 32000 14 Document interchange",
-            ]
-        ),
-
+        
         // MARK: - Clause Targets (literal spec encoding)
         .target(
             name: "ISO 32000 3 Terms and definitions",
@@ -71,6 +57,8 @@ let package = Package(
                 "ISO 32000 Shared",
                 "ISO 32000 3 Terms and definitions",
                 .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
+                .product(name: "Formatting", package: "swift-standards"),
+                .product(name: "IEEE 754", package: "swift-ieee-754"),
             ]
         ),
         .target(

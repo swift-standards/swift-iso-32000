@@ -29,6 +29,10 @@ extension ISO_32000.`8`.`3`.`2`.`3` {
     public enum UserSpace {}
 }
 
+extension ISO_32000 {
+    public typealias UserSpace = ISO_32000.`8`.`3`.`2`.`3`.UserSpace
+}
+
 extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace {
     /// User space unit (1/72 inch)
     ///
@@ -38,6 +42,9 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace {
     ///
     /// This type provides type-safety for measurements in PDF's default user space,
     /// distinguishing scalar size/distance values from raw `Double` values.
+    ///
+    /// Conforms to `BinaryFloatingPoint` to enable seamless use with formatting APIs
+    /// and numeric algorithms.
     ///
     /// ## Example
     ///
@@ -51,7 +58,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace {
     /// ISO 32000-2:2020, Section 8.3.2.3 — User space
     public struct Unit: Sendable, Codable {
         /// The measurement value in user space units (1/72 inch)
-        public let value: Double
+        public var value: Double
 
         /// Create a user space unit measurement
         ///
@@ -125,6 +132,238 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: Hashable {
     @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(value)
+    }
+}
+
+// MARK: - Numeric
+
+extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: Numeric {
+    public typealias Magnitude = Self
+
+    @inlinable
+    public var magnitude: Self {
+        Self(value.magnitude)
+    }
+
+    @inlinable
+    public static func * (lhs: Self, rhs: Self) -> Self {
+        Self(lhs.value * rhs.value)
+    }
+
+    @inlinable
+    public static func *= (lhs: inout Self, rhs: Self) {
+        lhs.value *= rhs.value
+    }
+
+    @inlinable
+    public init?<T>(exactly source: T) where T: BinaryInteger {
+        guard let v = Double(exactly: source) else { return nil }
+        self.value = v
+    }
+}
+
+// MARK: - SignedNumeric
+
+extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: SignedNumeric {
+    @inlinable
+    public mutating func negate() {
+        value.negate()
+    }
+}
+
+// MARK: - Strideable
+
+extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: Strideable {
+    public typealias Stride = Self
+
+    @inlinable
+    public func distance(to other: Self) -> Self {
+        Self(other.value - value)
+    }
+
+    @inlinable
+    public func advanced(by n: Self) -> Self {
+        Self(value + n.value)
+    }
+}
+
+// MARK: - FloatingPoint
+
+extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: FloatingPoint {
+    public typealias Exponent = Double.Exponent
+
+    @inlinable
+    public init(sign: FloatingPointSign, exponent: Exponent, significand: Self) {
+        self.value = Double(sign: sign, exponent: exponent, significand: significand.value)
+    }
+
+    @inlinable
+    public init(signOf: Self, magnitudeOf: Self) {
+        self.value = Double(signOf: signOf.value, magnitudeOf: magnitudeOf.value)
+    }
+
+    @inlinable
+    public static var radix: Int { Double.radix }
+
+    @inlinable
+    public static var nan: Self { Self(Double.nan) }
+
+    @inlinable
+    public static var signalingNaN: Self { Self(Double.signalingNaN) }
+
+    @inlinable
+    public static var infinity: Self { Self(Double.infinity) }
+
+    @inlinable
+    public static var greatestFiniteMagnitude: Self { Self(Double.greatestFiniteMagnitude) }
+
+    @inlinable
+    public static var leastNormalMagnitude: Self { Self(Double.leastNormalMagnitude) }
+
+    @inlinable
+    public static var leastNonzeroMagnitude: Self { Self(Double.leastNonzeroMagnitude) }
+
+    @inlinable
+    public static var pi: Self { Self(Double.pi) }
+
+    @inlinable
+    public var exponent: Exponent { value.exponent }
+
+    @inlinable
+    public var significand: Self { Self(value.significand) }
+
+    @inlinable
+    public var sign: FloatingPointSign { value.sign }
+
+    @inlinable
+    public var ulp: Self { Self(value.ulp) }
+
+    @inlinable
+    public var nextUp: Self { Self(value.nextUp) }
+
+    @inlinable
+    public var isNormal: Bool { value.isNormal }
+
+    @inlinable
+    public var isFinite: Bool { value.isFinite }
+
+    @inlinable
+    public var isZero: Bool { value.isZero }
+
+    @inlinable
+    public var isSubnormal: Bool { value.isSubnormal }
+
+    @inlinable
+    public var isInfinite: Bool { value.isInfinite }
+
+    @inlinable
+    public var isNaN: Bool { value.isNaN }
+
+    @inlinable
+    public var isSignalingNaN: Bool { value.isSignalingNaN }
+
+    @inlinable
+    public var isCanonical: Bool { value.isCanonical }
+
+    @inlinable
+    public static func / (lhs: Self, rhs: Self) -> Self {
+        Self(lhs.value / rhs.value)
+    }
+
+    @inlinable
+    public static func /= (lhs: inout Self, rhs: Self) {
+        lhs.value /= rhs.value
+    }
+
+    @inlinable
+    public mutating func round(_ rule: FloatingPointRoundingRule) {
+        value.round(rule)
+    }
+
+    @inlinable
+    public mutating func formRemainder(dividingBy other: Self) {
+        value.formRemainder(dividingBy: other.value)
+    }
+
+    @inlinable
+    public mutating func formTruncatingRemainder(dividingBy other: Self) {
+        value.formTruncatingRemainder(dividingBy: other.value)
+    }
+
+    @inlinable
+    public mutating func formSquareRoot() {
+        value.formSquareRoot()
+    }
+
+    @inlinable
+    public mutating func addProduct(_ lhs: Self, _ rhs: Self) {
+        value.addProduct(lhs.value, rhs.value)
+    }
+
+    @inlinable
+    public func isEqual(to other: Self) -> Bool {
+        value.isEqual(to: other.value)
+    }
+
+    @inlinable
+    public func isLess(than other: Self) -> Bool {
+        value.isLess(than: other.value)
+    }
+
+    @inlinable
+    public func isLessThanOrEqualTo(_ other: Self) -> Bool {
+        value.isLessThanOrEqualTo(other.value)
+    }
+
+    @inlinable
+    public func isTotallyOrdered(belowOrEqualTo other: Self) -> Bool {
+        value.isTotallyOrdered(belowOrEqualTo: other.value)
+    }
+}
+
+// MARK: - BinaryFloatingPoint
+
+extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: BinaryFloatingPoint {
+    public typealias RawSignificand = Double.RawSignificand
+    public typealias RawExponent = Double.RawExponent
+
+    @inlinable
+    public static var exponentBitCount: Int { Double.exponentBitCount }
+
+    @inlinable
+    public static var significandBitCount: Int { Double.significandBitCount }
+
+    @inlinable
+    public var binade: Self { Self(value.binade) }
+
+    @inlinable
+    public var significandWidth: Int { value.significandWidth }
+
+    @inlinable
+    public var exponentBitPattern: RawExponent { value.exponentBitPattern }
+
+    @inlinable
+    public var significandBitPattern: RawSignificand { value.significandBitPattern }
+
+    @inlinable
+    public init(sign: FloatingPointSign, exponentBitPattern: RawExponent, significandBitPattern: RawSignificand) {
+        self.value = Double(sign: sign, exponentBitPattern: exponentBitPattern, significandBitPattern: significandBitPattern)
+    }
+
+    @inlinable
+    public init(_ value: Float) {
+        self.value = Double(value)
+    }
+
+    @inlinable
+    public init<Source: BinaryFloatingPoint>(_ value: Source) {
+        self.value = Double(value)
+    }
+
+    @inlinable
+    public init?<Source: BinaryFloatingPoint>(exactly value: Source) {
+        guard let v = Double(exactly: value) else { return nil }
+        self.value = v
     }
 }
 
@@ -264,7 +503,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace {
     /// Edge insets (margins/padding) in user space
     ///
     /// Represents distances from rectangle edges for margins, padding, or insets.
-    public typealias EdgeInsets = ISO_32000.EdgeInsets<ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit>
+    public typealias EdgeInsets = Geometry<ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit>.EdgeInsets
 
     // MARK: - Type-safe Dimensions
 
@@ -314,7 +553,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
         if width.value >= height.value {
             return self
         }
-        return Self(x: llx, y: lly, width: height.value, height: width.value)
+        return Self(x: llx, y: lly, width: .init(height.value), height: .init(width.value))
     }
 
     /// Return the portrait version (height > width)
@@ -325,7 +564,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
         if height.value >= width.value {
             return self
         }
-        return Self(x: llx, y: lly, width: height.value, height: width.value)
+        return Self(x: llx, y: lly, width: .init(height.value), height: .init(width.value))
     }
 }
 
@@ -393,7 +632,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
     /// - Returns: Y coordinate from top edge
     public func topLeftY(
         pageHeight: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-    ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+    ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Y {
         pageHeight - ury
     }
 
