@@ -469,7 +469,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace {
     /// A rectangle in user space
     ///
     /// Defined by lower-left and upper-right corners in user space units.
-    public typealias Rectangle = ISO_32000.Rectangle<ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit>
+    public typealias Rectangle = Geometry<ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit>.Rectangle
 
     // MARK: - Transformations
 

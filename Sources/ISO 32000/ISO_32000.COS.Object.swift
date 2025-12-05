@@ -26,7 +26,7 @@ extension ISO_32000.COS.Object {
     /// Create a COS array from a generic rectangle with Double units
     ///
     /// - Parameter rect: The rectangle with Double coordinates
-    public init(_ rect: ISO_32000.Rectangle<Double>) {
+    public init(_ rect: Geometry<Double>.Rectangle) {
         self = .array([
             .real(rect.llx.value),
             .real(rect.lly.value),
