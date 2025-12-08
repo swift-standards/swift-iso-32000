@@ -13,6 +13,121 @@ extension ISO_32000.`9` {
     public enum `8` {}
 }
 
+// MARK: - 9.8.3 Font Design Units
+
+extension ISO_32000.`9`.`8` {
+    /// Font design space namespace
+    ///
+    /// Per ISO 32000-2:2020, Section 9.8.3, font metrics are specified in
+    /// font design units. For Type 1 fonts (including the Standard 14),
+    /// the em square is 1000 units.
+    public enum FontDesign {}
+}
+
+extension ISO_32000 {
+    public typealias FontDesign = ISO_32000.`9`.`8`.FontDesign
+}
+
+extension ISO_32000.`9`.`8`.FontDesign {
+    /// Font design unit (1/1000 em for Type 1 fonts)
+    ///
+    /// Per ISO 32000-2:2020, Section 9.8.3:
+    /// > Glyph coordinate systems are defined so that the em square has a
+    /// > standard 1000-unit width for Type 1 fonts.
+    ///
+    /// This type provides type-safety for measurements in font design space,
+    /// which is used for font metrics like ascender, descender, x-height, etc.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// let ascender: FontDesign.Unit = 683   // Times Roman ascender
+    /// let descender: FontDesign.Unit = -217 // Times Roman descender
+    /// let lineHeight = ascender - descender // 900 units
+    /// ```
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Section 9.8.3 — Font metrics
+    public struct Unit: Sendable, Codable {
+        /// The measurement value in font design units (1/1000 em for Type 1)
+        public var value: Int
+
+        /// Create a font design unit measurement
+        ///
+        /// - Parameter value: The measurement in font design units
+        @inlinable
+        public init(_ value: Int) {
+            self.value = value
+        }
+
+        /// Convert to user space units at a specific font size
+        ///
+        /// - Parameter fontSize: The font size in user space units
+        /// - Returns: The measurement in user space units
+        @inlinable
+        public func atSize(_ fontSize: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(value) * fontSize.value / 1000.0)
+        }
+    }
+}
+
+// MARK: - AdditiveArithmetic
+
+extension ISO_32000.`9`.`8`.FontDesign.Unit: AdditiveArithmetic {
+    /// Zero
+    public static var zero: Self { Self(0) }
+
+    /// Add two measurements
+    @inlinable
+    public static func + (lhs: Self, rhs: Self) -> Self {
+        Self(lhs.value + rhs.value)
+    }
+
+    /// Subtract two measurements
+    @inlinable
+    public static func - (lhs: Self, rhs: Self) -> Self {
+        Self(lhs.value - rhs.value)
+    }
+}
+
+// MARK: - Comparable
+
+extension ISO_32000.`9`.`8`.FontDesign.Unit: Comparable {
+    @inlinable
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        lhs.value < rhs.value
+    }
+}
+
+// MARK: - Hashable
+
+extension ISO_32000.`9`.`8`.FontDesign.Unit: Hashable {
+    @inlinable
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(value)
+    }
+}
+
+// MARK: - ExpressibleByIntegerLiteral
+
+extension ISO_32000.`9`.`8`.FontDesign.Unit: ExpressibleByIntegerLiteral {
+    @inlinable
+    public init(integerLiteral value: Int) {
+        self.value = value
+    }
+}
+
+// MARK: - Negation
+
+extension ISO_32000.`9`.`8`.FontDesign.Unit {
+    /// Negate
+    @inlinable
+    public static prefix func - (value: Self) -> Self {
+        Self(-value.value)
+    }
+}
+
 // MARK: - Font Metrics
 
 extension ISO_32000.`9`.`8` {
@@ -22,29 +137,59 @@ extension ISO_32000.`9`.`8` {
     /// that describe the font's characteristics.
     ///
     /// Metrics are in font design units (1000 units per em for Type 1 fonts).
-    /// To get actual size: `value * fontSize / 1000`
+    /// Use the `atSize(_:)` method on `FontDesign.Unit` to convert to user space.
     ///
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 9.8.3 — Font metrics
+    /// ISO 32000-2:2020, Table 121 — Entries common to all font descriptors
     public struct Metrics: Sendable {
-        /// Glyph width table
-        private let widths: [UInt32: Int]
+        /// Glyph width table (in font design units)
+        private let widths: [UInt32: FontDesign.Unit]
 
-        /// Default width for missing glyphs
-        private let defaultWidth: Int
+        /// Default width for missing glyphs (in font design units)
+        private let defaultWidth: FontDesign.Unit
 
-        /// Ascender: height above baseline for tallest glyphs (e.g., 'b', 'd', 'h')
-        public let ascender: Int
+        /// Ascent: maximum height above the baseline reached by glyphs
+        ///
+        /// Per ISO 32000-2 Table 121:
+        /// > (Required, except for Type 3 fonts) The maximum height above the
+        /// > baseline reached by glyphs in this font.
+        public let ascender: FontDesign.Unit
 
-        /// Descender: depth below baseline (negative value, e.g., 'g', 'p', 'y')
-        public let descender: Int
+        /// Descent: maximum depth below the baseline reached by glyphs
+        ///
+        /// Per ISO 32000-2 Table 121:
+        /// > (Required, except for Type 3 fonts) The maximum depth below the
+        /// > baseline reached by glyphs in this font. The value shall be a
+        /// > negative number.
+        public let descender: FontDesign.Unit
 
-        /// Cap height: height of capital letters
-        public let capHeight: Int
+        /// Cap height: vertical coordinate of the top of flat capital letters
+        ///
+        /// Per ISO 32000-2 Table 121:
+        /// > (Required for fonts that have Latin characters, except for Type 3
+        /// > fonts) The y coordinate of the top of flat capital letters,
+        /// > measured from the baseline.
+        public let capHeight: FontDesign.Unit
 
-        /// x-height: height of lowercase 'x'
-        public let xHeight: Int
+        /// x-height: vertical coordinate of the top of flat nonascending lowercase letters
+        ///
+        /// Per ISO 32000-2 Table 121:
+        /// > (Optional) The font's x height: the vertical coordinate of the top
+        /// > of flat nonascending lowercase letters (like the letter x),
+        /// > measured from the baseline.
+        public let xHeight: FontDesign.Unit
+
+        /// Leading: desired spacing between baselines of consecutive lines of text
+        ///
+        /// Per ISO 32000-2 Table 121:
+        /// > (Optional) The spacing between baselines of consecutive lines of text.
+        /// > Default value: 0.
+        ///
+        /// The normal line height (CSS `line-height: normal`) is computed as:
+        /// `ascender - descender + leading`
+        public let leading: FontDesign.Unit
 
         /// Create metrics with a width table and vertical metrics
         public init(
@@ -53,53 +198,80 @@ extension ISO_32000.`9`.`8` {
             ascender: Int,
             descender: Int,
             capHeight: Int,
-            xHeight: Int
+            xHeight: Int,
+            leading: Int = 0
         ) {
-            self.widths = widths
-            self.defaultWidth = defaultWidth
-            self.ascender = ascender
-            self.descender = descender
-            self.capHeight = capHeight
-            self.xHeight = xHeight
+            self.widths = widths.mapValues { FontDesign.Unit($0) }
+            self.defaultWidth = FontDesign.Unit(defaultWidth)
+            self.ascender = FontDesign.Unit(ascender)
+            self.descender = FontDesign.Unit(descender)
+            self.capHeight = FontDesign.Unit(capHeight)
+            self.xHeight = FontDesign.Unit(xHeight)
+            self.leading = FontDesign.Unit(leading)
         }
 
         /// Get width of a single character in font design units
-        public func glyphWidth(for scalar: UnicodeScalar) -> Int {
+        public func glyphWidth(for scalar: UnicodeScalar) -> FontDesign.Unit {
             widths[scalar.value] ?? defaultWidth
         }
 
         /// Calculate string width in font design units
-        public func stringWidth(_ text: String) -> Int {
-            var total = 0
+        public func stringWidth(_ text: String) -> FontDesign.Unit {
+            var total: FontDesign.Unit = 0
             for scalar in text.unicodeScalars {
-                total += glyphWidth(for: scalar)
+                total = total + glyphWidth(for: scalar)
             }
             return total
         }
 
         /// Calculate string width at a specific font size
         public func stringWidth(_ text: String, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(stringWidth(text)) * size.value / 1000.0)
+            stringWidth(text).atSize(size)
         }
 
         /// Line height in font design units (ascender - descender)
-        public var lineHeight: Int {
+        ///
+        /// This is the minimum line height without any leading/line gap.
+        public var lineHeight: FontDesign.Unit {
             ascender - descender
+        }
+
+        /// Normal line height in font design units (ascender - descender + leading)
+        ///
+        /// This corresponds to CSS `line-height: normal` and includes the font's
+        /// recommended leading (from the Leading entry in the font descriptor).
+        public var normalLineHeight: FontDesign.Unit {
+            ascender - descender + leading
         }
 
         /// Line height at a specific font size
         public func lineHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(lineHeight) * size.value / 1000.0)
+            lineHeight.atSize(size)
+        }
+
+        /// Normal line height at a specific font size (includes leading)
+        public func normalLineHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            normalLineHeight.atSize(size)
         }
 
         /// Ascender at a specific font size
         public func ascender(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(ascender) * size.value / 1000.0)
+            ascender.atSize(size)
         }
 
         /// Descender at a specific font size (negative value)
         public func descender(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(descender) * size.value / 1000.0)
+            descender.atSize(size)
+        }
+
+        /// x-height at a specific font size
+        public func xHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            xHeight.atSize(size)
+        }
+
+        /// Cap height at a specific font size
+        public func capHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            capHeight.atSize(size)
         }
     }
 }
