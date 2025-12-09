@@ -70,23 +70,10 @@ extension ISO_32000.COS.StringValue {
     ///
     /// Characters not in WinAnsiEncoding are replaced with `?`.
     public func asLiteralWinAnsi() -> [UInt8] {
-        var result: [UInt8] = [.ascii.leftParenthesis]
-
-        for scalar in value.unicodeScalars {
-            if let byte = ISO_32000.WinAnsiEncoding.encode(scalar) {
-                if let escaped = ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] {
-                    result.append(contentsOf: escaped)
-                } else {
-                    result.append(byte)
-                }
-            } else {
-                // Not encodable - use question mark
-                result.append(.ascii.questionMark)
-            }
-        }
-
-        result.append(.ascii.rightParenthesis)
-        return result
+        // Encode string to WinAnsi bytes using Annex D
+        let encodedBytes = ISO_32000.WinAnsiEncoding.encodeWithFallback(value.unicodeScalars)
+        // Serialize as PDF literal string using 7.3 canonical function
+        return ISO_32000.`7`.`3`.Table.`3`.literalString(from: encodedBytes)
     }
 
     /// Serialize as hexadecimal string: `<48656C6C6F>`
@@ -178,7 +165,7 @@ extension ISO_32000.COS.StringValue {
     public init<C: Collection>(pdfStringBytes bytes: C) where C.Element == UInt8 {
         switch ISO_32000.PDFDocEncoding.detectEncoding(bytes) {
         case .pdfDocEncoding:
-            self.init(String(pdfDoc: bytes))
+            self.init(String(pdfDoc: bytes, withReplacement: true))
         case .utf16BE:
             // Skip BOM (first 2 bytes) and decode UTF-16BE
             let dataBytes = bytes.dropFirst(2)

@@ -271,9 +271,20 @@ extension ISO_32000.ContentStream {
             emit(.nextLine)
         }
 
-        /// Show text string (Tj)
+        /// Show pre-encoded text bytes (Tj)
+        ///
+        /// This is the primitive form - bytes are emitted directly as a PDF literal string.
+        public mutating func showText(_ bytes: [UInt8]) {
+            emit(.showText(bytes))
+        }
+
+        /// Show text string (Tj) - convenience overload that encodes to WinAnsi
+        ///
+        /// Encodes the string using WinAnsiEncoding (for Standard 14 fonts).
+        /// Characters not in WinAnsiEncoding are replaced with `?`.
         public mutating func showText(_ text: String) {
-            emit(.showText(ISO_32000.COS.StringValue(text)))
+            let bytes = ISO_32000.WinAnsiEncoding.encodeWithFallback(text.unicodeScalars)
+            emit(.showText(bytes))
         }
 
         /// Set text leading (TL)
@@ -413,9 +424,9 @@ extension ISO_32000.ContentStream {
     }
 }
 
-// MARK: - UInt8.Serializable
+// MARK: - Binary.Serializable
 
-extension ISO_32000.ContentStream: UInt8.Serializable {
+extension ISO_32000.ContentStream: Binary.Serializable {
     /// Serialize content stream data to bytes
     ///
     /// Streams the raw content stream data directly to the buffer.

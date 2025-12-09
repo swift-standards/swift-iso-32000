@@ -85,47 +85,22 @@ struct `ISO_32000.Encoding Tests` {
         }
 
         @Test
-        func `Sanitize replaces smart quotes`() {
-            // "Hello "World"" with curly quotes
-            let input = "Hello \u{201C}World\u{201D}"
-            let output = ISO_32000.WinAnsiEncoding.sanitize(input)
-            #expect(output == "Hello \"World\"")
+        func `canEncode returns true for encodable scalars`() {
+            #expect(ISO_32000.WinAnsiEncoding.canEncode(Unicode.Scalar("A")))
+            #expect(ISO_32000.WinAnsiEncoding.canEncode(Unicode.Scalar(0x20AC)!))  // Euro
+            #expect(ISO_32000.WinAnsiEncoding.canEncode(Unicode.Scalar(0x00FC)!))  // u with umlaut
         }
 
         @Test
-        func `Sanitize replaces dashes`() {
-            // Using Unicode em dash and en dash
-            let input = "Hello \u{2014} World \u{2013} Test"
-            let output = ISO_32000.WinAnsiEncoding.sanitize(input)
-            #expect(output == "Hello -- World - Test")
+        func `canEncode returns false for non-encodable scalars`() {
+            #expect(!ISO_32000.WinAnsiEncoding.canEncode(Unicode.Scalar(0x4F60)!))  // Chinese character
+            #expect(!ISO_32000.WinAnsiEncoding.canEncode(Unicode.Scalar(0x1F389)!))  // Emoji
         }
 
         @Test
-        func `Sanitize replaces trademark`() {
-            let input = "Pro\u{2122}"
-            let output = ISO_32000.WinAnsiEncoding.sanitize(input)
-            #expect(output == "Pro(TM)")
-        }
-
-        @Test
-        func `Sanitize complex string`() {
-            // "Hello "World" — Pro™" with curly quotes, em dash, and trademark
-            let input = "Hello \u{201C}World\u{201D} \u{2014} Pro\u{2122}"
-            let output = ISO_32000.WinAnsiEncoding.sanitize(input)
-            #expect(output == "Hello \"World\" -- Pro(TM)")
-        }
-
-        @Test
-        func `canEncode returns true for encodable`() {
-            #expect(ISO_32000.WinAnsiEncoding.canEncode("A"))
-            #expect(ISO_32000.WinAnsiEncoding.canEncode("\u{20AC}"))  // Euro
-            #expect(ISO_32000.WinAnsiEncoding.canEncode("\u{00FC}"))  // u with umlaut
-        }
-
-        @Test
-        func `canEncode returns false for non-encodable`() {
-            #expect(!ISO_32000.WinAnsiEncoding.canEncode("\u{4F60}"))  // Chinese character
-            #expect(!ISO_32000.WinAnsiEncoding.canEncode("\u{1F389}"))  // Emoji
+        func `Collection wrapper isValid`() {
+            let validBytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]  // "Hello"
+            #expect(validBytes.winAnsi.isValid)
         }
     }
 
@@ -539,16 +514,23 @@ struct `ISO_32000.Encoding Tests` {
         }
 
         @Test
-        func `String encoding extension`() {
-            let text = "Hello"
-            let encoded = ISO_32000.WinAnsiEncoding.encode(text)
+        func `Scalar encoding extension`() {
+            let scalars = "Hello".unicodeScalars
+            let encoded = ISO_32000.WinAnsiEncoding.encode(scalars)
             #expect(encoded == [0x48, 0x65, 0x6C, 0x6C, 0x6F])
         }
 
         @Test
-        func `String decoding extension`() {
+        func `String init from bytes`() {
             let bytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]
-            let decoded = ISO_32000.WinAnsiEncoding.decode(bytes)
+            let decoded = String(winAnsi: bytes)
+            #expect(decoded == "Hello")
+        }
+
+        @Test
+        func `String init with replacement from bytes`() {
+            let bytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]
+            let decoded = String(winAnsi: bytes, withReplacement: true)
             #expect(decoded == "Hello")
         }
     }

@@ -89,70 +89,87 @@ extension ISO_32000.Encoding {
     }
 }
 
-// MARK: - String Encoding Extensions
+// MARK: - Byte-Level Encoding Extensions
 
 extension ISO_32000.Encoding {
-    /// Encode a character to a byte
+    /// Encode Unicode scalars to bytes
     ///
-    /// - Parameter character: The character to encode (uses first scalar)
-    /// - Returns: The encoded byte, or `nil` if not encodable
+    /// - Parameter scalars: The Unicode scalars to encode
+    /// - Returns: The encoded bytes, or `nil` if any scalar cannot be encoded
     @inlinable
-    public static func encode(_ character: Character) -> UInt8? {
-        character.unicodeScalars.first.flatMap { encode($0) }
-    }
-
-    /// Encode a string to bytes
-    ///
-    /// - Parameter string: The string to encode
-    /// - Returns: The encoded bytes, or `nil` if any character cannot be encoded
-    @inlinable
-    public static func encode(_ string: String) -> [UInt8]? {
+    public static func encode<Scalars: Sequence>(
+        _ scalars: Scalars
+    ) -> [UInt8]? where Scalars.Element == Unicode.Scalar {
         var result: [UInt8] = []
-        result.reserveCapacity(string.unicodeScalars.count)
-
-        for scalar in string.unicodeScalars {
+        for scalar in scalars {
             guard let byte = encode(scalar) else { return nil }
             result.append(byte)
         }
-
         return result
     }
 
-    /// Decode bytes to a string
+    /// Encode Unicode scalars to bytes with fallback
     ///
-    /// - Parameter bytes: The bytes to decode
-    /// - Returns: The decoded string, using replacement character for undefined bytes
+    /// Scalars that cannot be encoded are replaced with `?` (0x3F).
+    ///
+    /// - Parameter scalars: The Unicode scalars to encode
+    /// - Returns: The encoded bytes (never nil, uses fallback for unencodable scalars)
     @inlinable
-    public static func decode<C: Collection>(_ bytes: C) -> String where C.Element == UInt8 {
-        var result = ""
-        result.reserveCapacity(bytes.count)
-
-        for byte in bytes {
-            if let scalar = decode(byte) {
-                result.unicodeScalars.append(scalar)
-            } else {
-                result.unicodeScalars.append("\u{FFFD}")  // Replacement character
-            }
+    public static func encodeWithFallback<Scalars: Sequence>(
+        _ scalars: Scalars
+    ) -> [UInt8] where Scalars.Element == Unicode.Scalar {
+        var result: [UInt8] = []
+        for scalar in scalars {
+            result.append(encode(scalar) ?? 0x3F)
         }
-
         return result
     }
+}
 
-    /// Decode bytes to a string, returning nil if any byte is undefined
+// MARK: - StringProtocol Extensions (Bytes → String)
+
+extension String {
+    /// Initialize from bytes using a PDF encoding
     ///
-    /// - Parameter bytes: The bytes to decode
-    /// - Returns: The decoded string, or `nil` if any byte is undefined
+    /// Returns `nil` if any byte cannot be decoded.
+    ///
+    /// - Parameters:
+    ///   - encoding: The PDF encoding type to use
+    ///   - bytes: The bytes to decode
     @inlinable
-    public static func decodeStrict<C: Collection>(_ bytes: C) -> String? where C.Element == UInt8 {
-        var result = ""
-        result.reserveCapacity(bytes.count)
-
+    public init?<E: ISO_32000.Encoding, Bytes: Collection>(
+        _ encoding: E.Type,
+        bytes: Bytes
+    ) where Bytes.Element == UInt8 {
+        var scalars = String.UnicodeScalarView()
+        scalars.reserveCapacity(bytes.count)
         for byte in bytes {
-            guard let scalar = decode(byte) else { return nil }
-            result.unicodeScalars.append(scalar)
+            guard let scalar = E.decode(byte) else { return nil }
+            scalars.append(scalar)
         }
+        self.init(scalars)
+    }
 
-        return result
+    /// Initialize from bytes using a PDF encoding, with replacement for invalid bytes
+    ///
+    /// Invalid bytes are replaced with U+FFFD (replacement character).
+    ///
+    /// - Parameters:
+    ///   - encoding: The PDF encoding type to use
+    ///   - bytes: The bytes to decode
+    ///   - withReplacement: Must be `true` to use replacement mode
+    @inlinable
+    public init<E: ISO_32000.Encoding, Bytes: Collection>(
+        _ encoding: E.Type,
+        bytes: Bytes,
+        withReplacement: Bool
+    ) where Bytes.Element == UInt8 {
+        var scalars = String.UnicodeScalarView()
+        scalars.reserveCapacity(bytes.count)
+        for byte in bytes {
+            scalars.append(E.decode(byte) ?? "\u{FFFD}")
+        }
+        self.init(scalars)
     }
 }
 
@@ -164,27 +181,57 @@ extension ISO_32000 {
     /// Glyph names are used in encoding difference arrays and font programs.
     /// These names follow the Adobe Glyph List specification.
     ///
+    /// Glyph names are stored as ASCII bytes (the canonical representation).
+    /// Use `String.init(_:)` to convert to a String when needed.
+    ///
     /// ## Usage
     ///
     /// ```swift
     /// let name = ISO_32000.GlyphName.Euro
-    /// print(name.rawValue)   // "Euro"
-    /// print(name.unicode)    // U+20AC
+    /// print(String(name))   // "Euro"
     /// ```
     ///
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Table D.2 — Latin character set and encodings
-    public struct GlyphName: RawRepresentable, Hashable, Sendable {
-        public let rawValue: String
+    @frozen
+    public struct GlyphName: Hashable, Sendable {
+        /// The glyph name as ASCII bytes (canonical representation)
+        public let bytes: [UInt8]
 
-        public init(rawValue: String) {
-            self.rawValue = rawValue
+        /// Initialize from ASCII bytes
+        @inlinable
+        public init(bytes: [UInt8]) {
+            self.bytes = bytes
         }
 
-        public init(_ name: String) {
-            self.rawValue = name
+        /// Initialize from a static ASCII string literal
+        ///
+        /// This initializer is intended for compile-time constant glyph names.
+        /// The string must contain only ASCII characters.
+        @inlinable
+        public init(_ name: StaticString) {
+            self.bytes = name.withUTF8Buffer { Array($0) }
         }
+    }
+}
+
+// MARK: - GlyphName String Conversion
+
+extension String {
+    /// Initialize a String from a GlyphName
+    ///
+    /// Since glyph names are ASCII, this conversion is always valid.
+    @inlinable
+    public init(_ glyphName: ISO_32000.GlyphName) {
+        self.init(decoding: glyphName.bytes, as: UTF8.self)
+    }
+}
+
+extension ISO_32000.GlyphName: CustomStringConvertible {
+    @inlinable
+    public var description: String {
+        String(self)
     }
 }
 

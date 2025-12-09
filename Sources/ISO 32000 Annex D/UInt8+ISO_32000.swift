@@ -145,26 +145,17 @@ extension UInt8.WinAnsi.Serializable where Context == Void {
 // MARK: - WinAnsi String Conversion
 
 extension String {
-    /// Create a string by decoding WinAnsiEncoding bytes
+    /// Create a string by decoding WinAnsiEncoding bytes with replacement
     ///
     /// Decodes bytes using WinAnsiEncoding (Windows Code Page 1252).
     /// Undefined bytes are replaced with the Unicode replacement character (U+FFFD).
     ///
-    /// - Parameter bytes: The WinAnsiEncoding byte representation
+    /// - Parameters:
+    ///   - winAnsi: The WinAnsiEncoding byte representation
+    ///   - withReplacement: Must be `true` to use replacement mode
     @inlinable
-    public init<Bytes: Collection>(winAnsi bytes: Bytes) where Bytes.Element == UInt8 {
-        self = ISO_32000.WinAnsiEncoding.decode(bytes)
-    }
-
-    /// Create a string by decoding WinAnsiEncoding bytes strictly
-    ///
-    /// Returns `nil` if any byte is undefined in WinAnsiEncoding.
-    ///
-    /// - Parameter bytes: The WinAnsiEncoding byte representation
-    @inlinable
-    public init?<Bytes: Collection>(winAnsiStrict bytes: Bytes) where Bytes.Element == UInt8 {
-        guard let decoded = ISO_32000.WinAnsiEncoding.decodeStrict(bytes) else { return nil }
-        self = decoded
+    public init<Bytes: Collection>(winAnsi bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+        self.init(ISO_32000.WinAnsiEncoding.self, bytes: bytes, withReplacement: withReplacement)
     }
 }
 
@@ -246,17 +237,10 @@ extension UInt8.PDFDoc.Serializable where Context == Void {
 }
 
 extension String {
-    /// Create a string by decoding PDFDocEncoding bytes
+    /// Create a string by decoding PDFDocEncoding bytes with replacement
     @inlinable
-    public init<Bytes: Collection>(pdfDoc bytes: Bytes) where Bytes.Element == UInt8 {
-        self = ISO_32000.PDFDocEncoding.decode(bytes)
-    }
-
-    /// Create a string by decoding PDFDocEncoding bytes strictly
-    @inlinable
-    public init?<Bytes: Collection>(pdfDocStrict bytes: Bytes) where Bytes.Element == UInt8 {
-        guard let decoded = ISO_32000.PDFDocEncoding.decodeStrict(bytes) else { return nil }
-        self = decoded
+    public init<Bytes: Collection>(pdfDoc bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+        self.init(ISO_32000.PDFDocEncoding.self, bytes: bytes, withReplacement: withReplacement)
     }
 }
 
@@ -315,23 +299,18 @@ extension UInt8.Standard {
 
 extension UInt8.Standard.Serializable where Context == Void {
     @inlinable
-    public init<Bytes: Collection>(standard bytes: Bytes) throws(Error) where Bytes.Element == UInt8 {
+    public init<Bytes: Collection>(
+        standard bytes: Bytes
+    ) throws(Error) where Bytes.Element == UInt8 {
         try self.init(standard: bytes, in: ())
     }
 }
 
 extension String {
-    /// Create a string by decoding StandardEncoding bytes
+    /// Create a string by decoding StandardEncoding bytes with replacement
     @inlinable
-    public init<Bytes: Collection>(standard bytes: Bytes) where Bytes.Element == UInt8 {
-        self = ISO_32000.StandardEncoding.decode(bytes)
-    }
-
-    /// Create a string by decoding StandardEncoding bytes strictly
-    @inlinable
-    public init?<Bytes: Collection>(standardStrict bytes: Bytes) where Bytes.Element == UInt8 {
-        guard let decoded = ISO_32000.StandardEncoding.decodeStrict(bytes) else { return nil }
-        self = decoded
+    public init<Bytes: Collection>(standard bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+        self.init(ISO_32000.StandardEncoding.self, bytes: bytes, withReplacement: withReplacement)
     }
 }
 
@@ -396,17 +375,10 @@ extension UInt8.MacRoman.Serializable where Context == Void {
 }
 
 extension String {
-    /// Create a string by decoding MacRomanEncoding bytes
+    /// Create a string by decoding MacRomanEncoding bytes with replacement
     @inlinable
-    public init<Bytes: Collection>(macRoman bytes: Bytes) where Bytes.Element == UInt8 {
-        self = ISO_32000.MacRomanEncoding.decode(bytes)
-    }
-
-    /// Create a string by decoding MacRomanEncoding bytes strictly
-    @inlinable
-    public init?<Bytes: Collection>(macRomanStrict bytes: Bytes) where Bytes.Element == UInt8 {
-        guard let decoded = ISO_32000.MacRomanEncoding.decodeStrict(bytes) else { return nil }
-        self = decoded
+    public init<Bytes: Collection>(macRoman bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+        self.init(ISO_32000.MacRomanEncoding.self, bytes: bytes, withReplacement: withReplacement)
     }
 }
 
@@ -471,17 +443,10 @@ extension UInt8.Symbol.Serializable where Context == Void {
 }
 
 extension String {
-    /// Create a string by decoding SymbolEncoding bytes
+    /// Create a string by decoding SymbolEncoding bytes with replacement
     @inlinable
-    public init<Bytes: Collection>(symbol bytes: Bytes) where Bytes.Element == UInt8 {
-        self = ISO_32000.SymbolEncoding.decode(bytes)
-    }
-
-    /// Create a string by decoding SymbolEncoding bytes strictly
-    @inlinable
-    public init?<Bytes: Collection>(symbolStrict bytes: Bytes) where Bytes.Element == UInt8 {
-        guard let decoded = ISO_32000.SymbolEncoding.decodeStrict(bytes) else { return nil }
-        self = decoded
+    public init<Bytes: Collection>(symbol bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+        self.init(ISO_32000.SymbolEncoding.self, bytes: bytes, withReplacement: withReplacement)
     }
 }
 
@@ -546,17 +511,10 @@ extension UInt8.ZapfDingbats.Serializable where Context == Void {
 }
 
 extension String {
-    /// Create a string by decoding ZapfDingbatsEncoding bytes
+    /// Create a string by decoding ZapfDingbatsEncoding bytes with replacement
     @inlinable
-    public init<Bytes: Collection>(zapfDingbats bytes: Bytes) where Bytes.Element == UInt8 {
-        self = ISO_32000.ZapfDingbatsEncoding.decode(bytes)
-    }
-
-    /// Create a string by decoding ZapfDingbatsEncoding bytes strictly
-    @inlinable
-    public init?<Bytes: Collection>(zapfDingbatsStrict bytes: Bytes) where Bytes.Element == UInt8 {
-        guard let decoded = ISO_32000.ZapfDingbatsEncoding.decodeStrict(bytes) else { return nil }
-        self = decoded
+    public init<Bytes: Collection>(zapfDingbats bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+        self.init(ISO_32000.ZapfDingbatsEncoding.self, bytes: bytes, withReplacement: withReplacement)
     }
 }
 
