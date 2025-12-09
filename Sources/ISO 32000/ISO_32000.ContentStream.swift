@@ -394,6 +394,29 @@ extension ISO_32000.ContentStream {
             emit(.rectangle(x: rect.origin.x, y: rect.origin.y, width: rect.width, height: rect.height))
         }
 
+        /// Append a circle path using 4 cubic Bézier curves
+        ///
+        /// This approximation uses the standard constant k = 0.5522847498 (4/3 * (√2 - 1))
+        /// which provides an excellent approximation of a circle.
+        ///
+        /// - Parameter circle: The circle to draw (from Geometry package)
+        public mutating func circle(_ circle: Geometry<ISO_32000.UserSpace.Unit>.Circle) {
+            let curves = circle.bezierCurves
+            let start = circle.bezierStartPoint
+
+            emit(.moveTo(x: start.x, y: start.y))
+
+            for curve in curves {
+                emit(.curveTo(
+                    x1: curve.control1.x, y1: curve.control1.y,
+                    x2: curve.control2.x, y2: curve.control2.y,
+                    x3: curve.end.x, y3: curve.end.y
+                ))
+            }
+
+            emit(.closePath)
+        }
+
         /// Move text position to a point (Td)
         public mutating func moveText(_ position: ISO_32000.UserSpace.Coordinate) {
             emit(.moveTextPosition(tx: position.x, ty: position.y))

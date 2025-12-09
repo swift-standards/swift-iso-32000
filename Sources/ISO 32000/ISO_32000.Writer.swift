@@ -53,6 +53,12 @@ extension ISO_32000 {
                 fontDict[.subtype] = .name(.type1)
                 fontDict[.baseFont] = .name(font.baseFontName)
 
+                // ZapfDingbats and Symbol have built-in encodings (ISO 32000-2 Annex D)
+                // Other Standard 14 fonts use WinAnsiEncoding for proper glyph mapping
+                if font.family != .zapfDingbats && font.family != .symbol {
+                    fontDict[.encoding] = .name(.winAnsiEncoding)
+                }
+
                 state.objectOffsets[objNum] = buffer.count
                 writeIndirectObject(objNum, object: .dictionary(fontDict), into: &buffer)
             }
