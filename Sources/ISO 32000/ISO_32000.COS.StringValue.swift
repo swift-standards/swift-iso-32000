@@ -63,6 +63,32 @@ extension ISO_32000.COS.StringValue {
         return result
     }
 
+    /// Serialize as literal string using WinAnsiEncoding: `(Hello)`
+    ///
+    /// For use in content streams with Standard 14 fonts, which use
+    /// WinAnsiEncoding rather than PDFDocEncoding.
+    ///
+    /// Characters not in WinAnsiEncoding are replaced with `?`.
+    public func asLiteralWinAnsi() -> [UInt8] {
+        var result: [UInt8] = [.ascii.leftParenthesis]
+
+        for scalar in value.unicodeScalars {
+            if let byte = ISO_32000.WinAnsiEncoding.encode(scalar) {
+                if let escaped = ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] {
+                    result.append(contentsOf: escaped)
+                } else {
+                    result.append(byte)
+                }
+            } else {
+                // Not encodable - use question mark
+                result.append(.ascii.questionMark)
+            }
+        }
+
+        result.append(.ascii.rightParenthesis)
+        return result
+    }
+
     /// Serialize as hexadecimal string: `<48656C6C6F>`
     ///
     /// Uses PDFDocEncoding if all characters are encodable, otherwise

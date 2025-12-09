@@ -307,7 +307,8 @@ extension ISO_32000.ContentStream.Operator {
 
         // Text Showing
         case .showText(let string):
-            buffer.append(contentsOf: string.asLiteral())
+            // Use WinAnsiEncoding for Standard 14 fonts
+            buffer.append(contentsOf: string.asLiteralWinAnsi())
             buffer.append(contentsOf: " Tj".utf8)
 
         // Line Style
