@@ -162,9 +162,10 @@ extension Array where Element == UInt8 {
     /// - Parameters:
     ///   - string: The string to encode
     ///   - withFallback: Must be `true` to use fallback mode
+    ///   - preservingControlChars: If true, control characters (0x00-0x1F) pass through unchanged (default: false)
     @inlinable
-    public init(winAnsi string: some StringProtocol, withFallback: Bool) {
-        self.init(string, encoding: ISO_32000.WinAnsiEncoding.self, withFallback: withFallback)
+    public init(winAnsi string: some StringProtocol, withFallback: Bool, preservingControlChars: Bool = false) {
+        self.init(string, encoding: ISO_32000.WinAnsiEncoding.self, withFallback: withFallback, preservingControlChars: preservingControlChars)
     }
 }
 

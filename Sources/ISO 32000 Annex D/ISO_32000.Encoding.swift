@@ -152,20 +152,30 @@ extension Array where Element == UInt8 {
     /// Initialize bytes by encoding a string using a PDF encoding, with fallback
     ///
     /// Characters that cannot be encoded are replaced with `?` (0x3F).
+    /// Control characters (0x00-0x1F) are preserved as-is when `preservingControlChars` is true,
+    /// allowing the tokenizer to handle newlines, tabs, etc. specially.
     ///
     /// - Parameters:
     ///   - string: The string to encode
     ///   - encoding: The PDF encoding type to use
     ///   - withFallback: Must be `true` to use fallback mode
+    ///   - preservingControlChars: If true, control characters pass through unchanged (default: false)
     @inlinable
     public init<E: ISO_32000.Encoding>(
         _ string: some StringProtocol,
         encoding: E.Type,
-        withFallback: Bool
+        withFallback: Bool,
+        preservingControlChars: Bool = false
     ) {
         var result: [UInt8] = []
         for scalar in string.unicodeScalars {
-            result.append(E.encode(scalar) ?? 0x3F)
+            let value = scalar.value
+            // Preserve control characters (0x00-0x1F) if requested
+            if preservingControlChars && value < 0x20 {
+                result.append(UInt8(value))
+            } else {
+                result.append(E.encode(scalar) ?? 0x3F)
+            }
         }
         self = result
     }
