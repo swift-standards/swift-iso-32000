@@ -106,6 +106,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
 
     /// Divide by a scalar
     @inlinable
+    @_disfavoredOverload
     public static func / (lhs: Self, rhs: Double) -> Self {
         Self(lhs.value / rhs)
     }
@@ -266,11 +267,13 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: FloatingPoint {
     public var isCanonical: Bool { value.isCanonical }
 
     @inlinable
+    @_disfavoredOverload
     public static func / (lhs: Self, rhs: Self) -> Self {
         Self(lhs.value / rhs.value)
     }
 
     @inlinable
+    @_disfavoredOverload
     public static func /= (lhs: inout Self, rhs: Self) {
         lhs.value /= rhs.value
     }
