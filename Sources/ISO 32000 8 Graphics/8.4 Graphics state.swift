@@ -385,9 +385,14 @@ extension ISO_32000.`8`.`4`.Graphics.State.Blend {
 
 extension ISO_32000.`8`.`4`.Graphics.State {
     /// Device namespace.
-    public struct Device {
-        public var independent: Device.Independent
-        public var dependent: Device.Dependent
+    public enum Device {}
+}
+
+extension ISO_32000.`8`.`4`.Graphics.State.Device {
+    /// Combined device state (both independent and dependent).
+    public struct Combined<TextState: Sendable>: Sendable {
+        public var independent: Independent<TextState>
+        public var dependent: Dependent
     }
 }
 
@@ -400,10 +405,14 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
     /// A page description that is intended to be device-independent should not
     /// modify the device-dependent parameters (see `Dependent`).
     ///
+    /// Generic over `TextState` to allow the text state type to be defined
+    /// in Section 9.3 where it belongs per the spec. Use the concrete
+    /// `ISO_32000.GraphicsState` typealias for the integrated version.
+    ///
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 8.4.1, Table 51
-    public struct Independent: Sendable {
+    public struct Independent<TextState: Sendable>: Sendable {
         // MARK: - Transformation
 
         /// Current Transformation Matrix (CTM).
@@ -455,7 +464,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         ///
         /// A set of nine graphics state parameters that pertain only to the
         /// painting of text. See Section 9.3.
-        public var textState: ISO_32000.`8`.`4`.Graphics.State.Text.State
+        public var textState: TextState
 
         // MARK: - Line Style
 
@@ -579,48 +588,29 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
 
         // MARK: - Initializer
 
-        /// Create device-independent graphics state with default initial values.
-        public init() {
-            self.ctm = .identity
-            self.strokingColorSpace = .deviceGray
-            self.nonstrokingColorSpace = .deviceGray
-            self.strokingColor = .gray(0)
-            self.nonstrokingColor = .gray(0)
-            self.textState = ISO_32000.`8`.`4`.Graphics.State.Text.State()
-            self.lineWidth = 1
-            self.lineCap = .butt
-            self.lineJoin = .miter
-            self.miterLimit = 10
-            self.dashPattern = .solid
-            self.renderingIntent = .relativeColorimetric
-            self.strokeAdjustment = false
-            self.blendMode = .normal
-            self.softMask = nil
-            self.strokingAlphaConstant = 1
-            self.nonstrokingAlphaConstant = 1
-            self.alphaSource = false
-            self.blackPointCompensation = .default
-        }
-
-        /// Create device-independent graphics state with custom values.
+        /// Create device-independent graphics state with specified values.
+        ///
+        /// Most parameters have sensible defaults per ISO 32000-2:2020 Table 51.
+        /// The `textState` parameter must be provided as it depends on the
+        /// concrete `TextState` type.
         public init(
-            ctm: ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit>,
+            ctm: ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit> = .identity,
             strokingColorSpace: ISO_32000.`8`.`4`.Graphics.State.ColorSpace = .deviceGray,
             nonstrokingColorSpace: ISO_32000.`8`.`4`.Graphics.State.ColorSpace = .deviceGray,
             strokingColor: ISO_32000.`8`.`4`.Graphics.State.Color = .gray(0),
             nonstrokingColor: ISO_32000.`8`.`4`.Graphics.State.Color = .gray(0),
-            textState: ISO_32000.`8`.`4`.Graphics.State.Text.State,
-            lineWidth: ISO_32000.UserSpace.Unit,
+            textState: TextState,
+            lineWidth: ISO_32000.UserSpace.Unit = 1,
             lineCap: ISO_32000.`8`.`4`.Graphics.State.Line.Cap = .butt,
             lineJoin: ISO_32000.`8`.`4`.Graphics.State.Line.Join = .miter,
-            miterLimit: ISO_32000.UserSpace.Unit,
+            miterLimit: ISO_32000.UserSpace.Unit = 10,
             dashPattern: ISO_32000.`8`.`4`.Graphics.State.Line.Dash.Pattern = .solid,
             renderingIntent: ISO_32000.`8`.`4`.Graphics.State.Rendering.Intent = .relativeColorimetric,
             strokeAdjustment: Bool = false,
             blendMode: ISO_32000.`8`.`4`.Graphics.State.Blend.Mode = .normal,
             softMask: ISO_32000.`8`.`4`.Graphics.State.SoftMask? = nil,
-            strokingAlphaConstant: ISO_32000.UserSpace.Unit,
-            nonstrokingAlphaConstant: ISO_32000.UserSpace.Unit,
+            strokingAlphaConstant: ISO_32000.UserSpace.Unit = 1,
+            nonstrokingAlphaConstant: ISO_32000.UserSpace.Unit = 1,
             alphaSource: Bool = false,
             blackPointCompensation: ISO_32000.`8`.`4`.Graphics.State.BlackPoint.Compensation = .default
         ) {
@@ -925,157 +915,6 @@ extension ISO_32000.`8`.`4`.Graphics.State {
     }
 }
 
-// MARK: - 9.3 Text State Parameters
-
-extension ISO_32000.`8`.`4`.Graphics.State {
-    /// Text namespace.
-    public enum Text {}
-}
-
-extension ISO_32000.`8`.`4`.Graphics.State.Text {
-    /// Text state parameters.
-    ///
-    /// Per ISO 32000-2:2020, Section 9.3, the text state comprises those
-    /// graphics state parameters that only affect text.
-    ///
-    /// ## Reference
-    ///
-    /// ISO 32000-2:2020, Section 9.3
-    public struct State: Sendable {
-        /// Character spacing.
-        ///
-        /// A number expressed in unscaled text space units that shall be added
-        /// to the horizontal or vertical component of the glyph's displacement.
-        ///
-        /// Initial value: 0
-        public var characterSpacing: ISO_32000.UserSpace.Unit
-
-        /// Word spacing.
-        ///
-        /// A number expressed in unscaled text space units that shall be added
-        /// to the horizontal or vertical component of the ASCII SPACE character.
-        ///
-        /// Initial value: 0
-        public var wordSpacing: ISO_32000.UserSpace.Unit
-
-        /// Horizontal scaling.
-        ///
-        /// A number specifying the percentage of the normal width.
-        /// 100 means normal width.
-        ///
-        /// Initial value: 100
-        public var horizontalScaling: ISO_32000.UserSpace.Unit
-
-        /// Leading.
-        ///
-        /// A number expressed in unscaled text space units that shall specify
-        /// the vertical distance between the baselines of adjacent lines of text.
-        ///
-        /// Initial value: 0
-        public var leading: ISO_32000.UserSpace.Unit
-
-        /// Text font reference.
-        ///
-        /// A reference to the font dictionary.
-        /// Must be set before drawing any text.
-        public var font: FontReference?
-
-        /// Text font size.
-        ///
-        /// A number representing the font size in text space units.
-        ///
-        /// Initial value: undefined (must be set)
-        public var fontSize: ISO_32000.UserSpace.Unit?
-
-        /// Text rendering mode.
-        ///
-        /// Determines whether showing text shall cause glyph outlines to be
-        /// stroked, filled, used as a clipping boundary, or some combination.
-        ///
-        /// Initial value: 0 (fill)
-        public var renderingMode: Rendering.Mode
-
-        /// Text rise.
-        ///
-        /// A number expressed in unscaled text space units that shall specify
-        /// the distance to move the baseline up or down from its default location.
-        /// Positive values move the baseline up.
-        ///
-        /// Initial value: 0
-        public var rise: ISO_32000.UserSpace.Unit
-
-        /// Text knockout flag.
-        ///
-        /// (PDF 1.4) Determines the behaviour of overlapping glyphs within a
-        /// text object in the transparent imaging model.
-        ///
-        /// Initial value: true
-        public var knockout: Bool
-
-        /// Create text state with default initial values.
-        public init() {
-            self.characterSpacing = 0
-            self.wordSpacing = 0
-            self.horizontalScaling = 100
-            self.leading = 0
-            self.font = nil
-            self.fontSize = nil
-            self.renderingMode = .fill
-            self.rise = 0
-            self.knockout = true
-        }
-    }
-}
-
-extension ISO_32000.`8`.`4`.Graphics.State.Text {
-    /// Rendering namespace.
-    public enum Rendering {}
-}
-
-extension ISO_32000.`8`.`4`.Graphics.State.Text.Rendering {
-    /// Text rendering mode.
-    ///
-    /// Per ISO 32000-2:2020, Section 9.3.6.
-    public enum Mode: Int, Sendable, Codable, Hashable, CaseIterable {
-        /// Fill text.
-        case fill = 0
-
-        /// Stroke text.
-        case stroke = 1
-
-        /// Fill, then stroke text.
-        case fillStroke = 2
-
-        /// Invisible text.
-        case invisible = 3
-
-        /// Fill text and add to path for clipping.
-        case fillClip = 4
-
-        /// Stroke text and add to path for clipping.
-        case strokeClip = 5
-
-        /// Fill, then stroke text and add to path for clipping.
-        case fillStrokeClip = 6
-
-        /// Add text to path for clipping.
-        case clip = 7
-    }
-}
-
-extension ISO_32000.`8`.`4`.Graphics.State.Text {
-    /// A reference to a font dictionary.
-    public struct FontReference: Sendable, Hashable, Codable {
-        /// The font name (as used in resources).
-        public var name: String
-
-        /// Create a font reference.
-        public init(name: String) {
-            self.name = name
-        }
-    }
-}
-
 // MARK: - 8.4.2 Graphics State Stack
 
 extension ISO_32000.`8`.`4`.Graphics.State {
@@ -1227,33 +1066,27 @@ extension ISO_32000.`8`.`4` {
 
 // MARK: - Equatable Conformances
 
-extension ISO_32000.`8`.`4`.Graphics.State.Device.Independent: Equatable {}
+extension ISO_32000.`8`.`4`.Graphics.State.Device.Independent: Equatable
+where TextState: Equatable {}
 
 extension ISO_32000.`8`.`4`.Graphics.State.Device.Dependent: Equatable {}
-
-extension ISO_32000.`8`.`4`.Graphics.State.Text.State: Equatable {}
 
 extension ISO_32000.`8`.`4`.Graphics.State.Stack: Equatable
 where State: Equatable {}
 
 // MARK: - Hashable Conformances
 
-extension ISO_32000.`8`.`4`.Graphics.State.Device.Independent: Hashable {}
+extension ISO_32000.`8`.`4`.Graphics.State.Device.Independent: Hashable
+where TextState: Hashable {}
 
 extension ISO_32000.`8`.`4`.Graphics.State.Device.Dependent: Hashable {}
-
-extension ISO_32000.`8`.`4`.Graphics.State.Text.State: Hashable {}
 
 extension ISO_32000.`8`.`4`.Graphics.State.Stack: Hashable
 where State: Hashable {}
 
-// MARK: - Codable Conformances
-
-extension ISO_32000.`8`.`4`.Graphics.State.Text.State: Codable {}
-
 // MARK: - Stack Convenience Extensions for Device.Independent
 
-extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent {
+extension ISO_32000.`8`.`4`.Graphics.State.Stack {
 
     // MARK: - Transformation Helpers
 
@@ -1263,7 +1096,9 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.`8`.`4
     ///
     /// - Parameter transform: The transform to concatenate
     @inlinable
-    public mutating func concatenate(_ transform: ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit>) {
+    public mutating func concatenate<TextState>(
+        _ transform: ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit>
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.ctm = current.ctm.concatenating(transform)
     }
 
@@ -1273,7 +1108,10 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.`8`.`4
     ///   - x: Horizontal translation in user space units
     ///   - y: Vertical translation in user space units
     @inlinable
-    public mutating func translate(x: ISO_32000.UserSpace.Unit, y: ISO_32000.UserSpace.Unit) {
+    public mutating func translate<TextState>(
+        x: ISO_32000.UserSpace.Unit,
+        y: ISO_32000.UserSpace.Unit
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         concatenate(.translation(x: x, y: y))
     }
 
@@ -1283,7 +1121,10 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.`8`.`4
     ///   - x: Horizontal scale factor
     ///   - y: Vertical scale factor
     @inlinable
-    public mutating func scale(x: ISO_32000.UserSpace.Unit, y: ISO_32000.UserSpace.Unit) {
+    public mutating func scale<TextState>(
+        x: ISO_32000.UserSpace.Unit,
+        y: ISO_32000.UserSpace.Unit
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         concatenate(.scale(x: x, y: y))
     }
 
@@ -1291,7 +1132,9 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.`8`.`4
     ///
     /// - Parameter angle: Rotation angle in radians
     @inlinable
-    public mutating func rotate(_ angle: Radian) {
+    public mutating func rotate<TextState>(
+        _ angle: Radian
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         let c = ISO_32000.UserSpace.Unit(angle.cos)
         let s = ISO_32000.UserSpace.Unit(angle.sin)
         let rotation = ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit>(
@@ -1301,55 +1144,21 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.`8`.`4
         concatenate(rotation)
     }
 
-    // MARK: - Text State Helpers
-
-    /// Set the font size on the current state.
-    @inlinable
-    public mutating func setFontSize(_ size: ISO_32000.UserSpace.Unit) {
-        current.textState.fontSize = size
-    }
-
-    /// Set the leading (line spacing) on the current state.
-    ///
-    /// Leading is the vertical distance between baselines of adjacent lines.
-    /// Typical value: 1.2 × fontSize for comfortable reading.
-    @inlinable
-    public mutating func setLeading(_ leading: ISO_32000.UserSpace.Unit) {
-        current.textState.leading = leading
-    }
-
-    /// Set the text rise (baseline offset) on the current state.
-    ///
-    /// Positive values move the baseline up (superscript).
-    /// Negative values move the baseline down (subscript).
-    @inlinable
-    public mutating func setRise(_ rise: ISO_32000.UserSpace.Unit) {
-        current.textState.rise = rise
-    }
-
-    /// Set the character spacing on the current state.
-    @inlinable
-    public mutating func setCharacterSpacing(_ spacing: ISO_32000.UserSpace.Unit) {
-        current.textState.characterSpacing = spacing
-    }
-
-    /// Set the word spacing on the current state.
-    @inlinable
-    public mutating func setWordSpacing(_ spacing: ISO_32000.UserSpace.Unit) {
-        current.textState.wordSpacing = spacing
-    }
-
     // MARK: - Color Helpers
 
     /// Set the nonstroking (fill) color on the current state.
     @inlinable
-    public mutating func setFillColor(_ color: ISO_32000.`8`.`4`.Graphics.State.Color) {
+    public mutating func setFillColor<TextState>(
+        _ color: ISO_32000.`8`.`4`.Graphics.State.Color
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.nonstrokingColor = color
     }
 
     /// Set the stroking (stroke) color on the current state.
     @inlinable
-    public mutating func setStrokeColor(_ color: ISO_32000.`8`.`4`.Graphics.State.Color) {
+    public mutating func setStrokeColor<TextState>(
+        _ color: ISO_32000.`8`.`4`.Graphics.State.Color
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.strokingColor = color
     }
 
@@ -1357,25 +1166,33 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.`8`.`4
 
     /// Set the line width on the current state.
     @inlinable
-    public mutating func setLineWidth(_ width: ISO_32000.UserSpace.Unit) {
+    public mutating func setLineWidth<TextState>(
+        _ width: ISO_32000.UserSpace.Unit
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.lineWidth = width
     }
 
     /// Set the line cap style on the current state.
     @inlinable
-    public mutating func setLineCap(_ cap: ISO_32000.`8`.`4`.Graphics.State.Line.Cap) {
+    public mutating func setLineCap<TextState>(
+        _ cap: ISO_32000.`8`.`4`.Graphics.State.Line.Cap
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.lineCap = cap
     }
 
     /// Set the line join style on the current state.
     @inlinable
-    public mutating func setLineJoin(_ join: ISO_32000.`8`.`4`.Graphics.State.Line.Join) {
+    public mutating func setLineJoin<TextState>(
+        _ join: ISO_32000.`8`.`4`.Graphics.State.Line.Join
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.lineJoin = join
     }
 
     /// Set the dash pattern on the current state.
     @inlinable
-    public mutating func setDashPattern(_ pattern: ISO_32000.`8`.`4`.Graphics.State.Line.Dash.Pattern) {
+    public mutating func setDashPattern<TextState>(
+        _ pattern: ISO_32000.`8`.`4`.Graphics.State.Line.Dash.Pattern
+    ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.dashPattern = pattern
     }
 
