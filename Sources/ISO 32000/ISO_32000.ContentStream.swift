@@ -283,7 +283,7 @@ extension ISO_32000.ContentStream {
         /// Encodes the string using WinAnsiEncoding (for Standard 14 fonts).
         /// Characters not in WinAnsiEncoding are replaced with `?`.
         public mutating func showText(_ text: String) {
-            let bytes = ISO_32000.WinAnsiEncoding.encodeWithFallback(text.unicodeScalars)
+            let bytes = [UInt8](winAnsi: text, withFallback: true)
             emit(.showText(bytes))
         }
 
@@ -305,7 +305,7 @@ extension ISO_32000.ContentStream {
         /// Set horizontal scaling (Tz)
         ///
         /// Scale is a percentage (100 = normal).
-        public mutating func setHorizontalScaling(_ scale: Double) {
+        public mutating func setHorizontalScaling(_ scale: Scale<1>) {
             emit(.setHorizontalScaling(scale))
         }
 

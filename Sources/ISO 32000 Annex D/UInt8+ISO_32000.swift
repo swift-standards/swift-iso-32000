@@ -142,20 +142,53 @@ extension UInt8.WinAnsi.Serializable where Context == Void {
     }
 }
 
-// MARK: - WinAnsi String Conversion
+// MARK: - WinAnsi Conversion Convenience
 
-extension String {
-    /// Create a string by decoding WinAnsiEncoding bytes with replacement
+extension Array where Element == UInt8 {
+    /// Encode a string to WinAnsiEncoding bytes
     ///
-    /// Decodes bytes using WinAnsiEncoding (Windows Code Page 1252).
-    /// Undefined bytes are replaced with the Unicode replacement character (U+FFFD).
+    /// Returns `nil` if any character cannot be encoded.
+    ///
+    /// - Parameter string: The string to encode
+    @inlinable
+    public init?(winAnsi string: some StringProtocol) {
+        self.init(string, encoding: ISO_32000.WinAnsiEncoding.self)
+    }
+
+    /// Encode a string to WinAnsiEncoding bytes with fallback
+    ///
+    /// Characters that cannot be encoded are replaced with `?` (0x3F).
     ///
     /// - Parameters:
-    ///   - winAnsi: The WinAnsiEncoding byte representation
+    ///   - string: The string to encode
+    ///   - withFallback: Must be `true` to use fallback mode
+    @inlinable
+    public init(winAnsi string: some StringProtocol, withFallback: Bool) {
+        self.init(string, encoding: ISO_32000.WinAnsiEncoding.self, withFallback: withFallback)
+    }
+}
+
+extension String {
+    /// Decode WinAnsiEncoding bytes to a string
+    ///
+    /// Returns `nil` if any byte is undefined in WinAnsiEncoding.
+    ///
+    /// - Parameter bytes: The WinAnsiEncoding bytes to decode
+    @inlinable
+    public init?<Bytes: Collection>(winAnsi bytes: Bytes) where Bytes.Element == UInt8 {
+        self.init(bytes, encoding: ISO_32000.WinAnsiEncoding.self)
+    }
+
+    /// Decode WinAnsiEncoding bytes to a string with replacement
+    ///
+    /// Undefined bytes are replaced with U+FFFD.
+    ///
+    /// - Parameters:
+    ///   - bytes: The WinAnsiEncoding bytes to decode
     ///   - withReplacement: Must be `true` to use replacement mode
     @inlinable
     public init<Bytes: Collection>(winAnsi bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(ISO_32000.WinAnsiEncoding.self, bytes: bytes, withReplacement: withReplacement)
+        self.init(bytes, encoding: ISO_32000.WinAnsiEncoding.self, withReplacement: withReplacement)
     }
 }
 
@@ -236,11 +269,35 @@ extension UInt8.PDFDoc.Serializable where Context == Void {
     }
 }
 
+// MARK: - PDFDoc Conversion Convenience
+
+extension Array where Element == UInt8 {
+    /// Encode a string to PDFDocEncoding bytes
+    ///
+    /// Returns `nil` if any character cannot be encoded.
+    @inlinable
+    public init?(pdfDoc string: some StringProtocol) {
+        self.init(string, encoding: ISO_32000.PDFDocEncoding.self)
+    }
+
+    /// Encode a string to PDFDocEncoding bytes with fallback
+    @inlinable
+    public init(pdfDoc string: some StringProtocol, withFallback: Bool) {
+        self.init(string, encoding: ISO_32000.PDFDocEncoding.self, withFallback: withFallback)
+    }
+}
+
 extension String {
-    /// Create a string by decoding PDFDocEncoding bytes with replacement
+    /// Decode PDFDocEncoding bytes to a string
+    @inlinable
+    public init?<Bytes: Collection>(pdfDoc bytes: Bytes) where Bytes.Element == UInt8 {
+        self.init(bytes, encoding: ISO_32000.PDFDocEncoding.self)
+    }
+
+    /// Decode PDFDocEncoding bytes to a string with replacement
     @inlinable
     public init<Bytes: Collection>(pdfDoc bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(ISO_32000.PDFDocEncoding.self, bytes: bytes, withReplacement: withReplacement)
+        self.init(bytes, encoding: ISO_32000.PDFDocEncoding.self, withReplacement: withReplacement)
     }
 }
 
@@ -306,11 +363,33 @@ extension UInt8.Standard.Serializable where Context == Void {
     }
 }
 
+// MARK: - Standard Conversion Convenience
+
+extension Array where Element == UInt8 {
+    /// Encode a string to StandardEncoding bytes
+    @inlinable
+    public init?(standard string: some StringProtocol) {
+        self.init(string, encoding: ISO_32000.StandardEncoding.self)
+    }
+
+    /// Encode a string to StandardEncoding bytes with fallback
+    @inlinable
+    public init(standard string: some StringProtocol, withFallback: Bool) {
+        self.init(string, encoding: ISO_32000.StandardEncoding.self, withFallback: withFallback)
+    }
+}
+
 extension String {
-    /// Create a string by decoding StandardEncoding bytes with replacement
+    /// Decode StandardEncoding bytes to a string
+    @inlinable
+    public init?<Bytes: Collection>(standard bytes: Bytes) where Bytes.Element == UInt8 {
+        self.init(bytes, encoding: ISO_32000.StandardEncoding.self)
+    }
+
+    /// Decode StandardEncoding bytes to a string with replacement
     @inlinable
     public init<Bytes: Collection>(standard bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(ISO_32000.StandardEncoding.self, bytes: bytes, withReplacement: withReplacement)
+        self.init(bytes, encoding: ISO_32000.StandardEncoding.self, withReplacement: withReplacement)
     }
 }
 
@@ -374,11 +453,33 @@ extension UInt8.MacRoman.Serializable where Context == Void {
     }
 }
 
+// MARK: - MacRoman Conversion Convenience
+
+extension Array where Element == UInt8 {
+    /// Encode a string to MacRomanEncoding bytes
+    @inlinable
+    public init?(macRoman string: some StringProtocol) {
+        self.init(string, encoding: ISO_32000.MacRomanEncoding.self)
+    }
+
+    /// Encode a string to MacRomanEncoding bytes with fallback
+    @inlinable
+    public init(macRoman string: some StringProtocol, withFallback: Bool) {
+        self.init(string, encoding: ISO_32000.MacRomanEncoding.self, withFallback: withFallback)
+    }
+}
+
 extension String {
-    /// Create a string by decoding MacRomanEncoding bytes with replacement
+    /// Decode MacRomanEncoding bytes to a string
+    @inlinable
+    public init?<Bytes: Collection>(macRoman bytes: Bytes) where Bytes.Element == UInt8 {
+        self.init(bytes, encoding: ISO_32000.MacRomanEncoding.self)
+    }
+
+    /// Decode MacRomanEncoding bytes to a string with replacement
     @inlinable
     public init<Bytes: Collection>(macRoman bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(ISO_32000.MacRomanEncoding.self, bytes: bytes, withReplacement: withReplacement)
+        self.init(bytes, encoding: ISO_32000.MacRomanEncoding.self, withReplacement: withReplacement)
     }
 }
 
@@ -442,11 +543,33 @@ extension UInt8.Symbol.Serializable where Context == Void {
     }
 }
 
+// MARK: - Symbol Conversion Convenience
+
+extension Array where Element == UInt8 {
+    /// Encode a string to SymbolEncoding bytes
+    @inlinable
+    public init?(symbol string: some StringProtocol) {
+        self.init(string, encoding: ISO_32000.SymbolEncoding.self)
+    }
+
+    /// Encode a string to SymbolEncoding bytes with fallback
+    @inlinable
+    public init(symbol string: some StringProtocol, withFallback: Bool) {
+        self.init(string, encoding: ISO_32000.SymbolEncoding.self, withFallback: withFallback)
+    }
+}
+
 extension String {
-    /// Create a string by decoding SymbolEncoding bytes with replacement
+    /// Decode SymbolEncoding bytes to a string
+    @inlinable
+    public init?<Bytes: Collection>(symbol bytes: Bytes) where Bytes.Element == UInt8 {
+        self.init(bytes, encoding: ISO_32000.SymbolEncoding.self)
+    }
+
+    /// Decode SymbolEncoding bytes to a string with replacement
     @inlinable
     public init<Bytes: Collection>(symbol bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(ISO_32000.SymbolEncoding.self, bytes: bytes, withReplacement: withReplacement)
+        self.init(bytes, encoding: ISO_32000.SymbolEncoding.self, withReplacement: withReplacement)
     }
 }
 
@@ -510,11 +633,33 @@ extension UInt8.ZapfDingbats.Serializable where Context == Void {
     }
 }
 
+// MARK: - ZapfDingbats Conversion Convenience
+
+extension Array where Element == UInt8 {
+    /// Encode a string to ZapfDingbatsEncoding bytes
+    @inlinable
+    public init?(zapfDingbats string: some StringProtocol) {
+        self.init(string, encoding: ISO_32000.ZapfDingbatsEncoding.self)
+    }
+
+    /// Encode a string to ZapfDingbatsEncoding bytes with fallback
+    @inlinable
+    public init(zapfDingbats string: some StringProtocol, withFallback: Bool) {
+        self.init(string, encoding: ISO_32000.ZapfDingbatsEncoding.self, withFallback: withFallback)
+    }
+}
+
 extension String {
-    /// Create a string by decoding ZapfDingbatsEncoding bytes with replacement
+    /// Decode ZapfDingbatsEncoding bytes to a string
+    @inlinable
+    public init?<Bytes: Collection>(zapfDingbats bytes: Bytes) where Bytes.Element == UInt8 {
+        self.init(bytes, encoding: ISO_32000.ZapfDingbatsEncoding.self)
+    }
+
+    /// Decode ZapfDingbatsEncoding bytes to a string with replacement
     @inlinable
     public init<Bytes: Collection>(zapfDingbats bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(ISO_32000.ZapfDingbatsEncoding.self, bytes: bytes, withReplacement: withReplacement)
+        self.init(bytes, encoding: ISO_32000.ZapfDingbatsEncoding.self, withReplacement: withReplacement)
     }
 }
 

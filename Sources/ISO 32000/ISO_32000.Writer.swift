@@ -360,9 +360,9 @@ extension ISO_32000 {
     }
 }
 
-// MARK: - UInt8.Serializable
+// MARK: - Binary.Serializable
 
-extension ISO_32000.Document: UInt8.Serializable {
+extension ISO_32000.Document: Binary.Serializable {
     /// Serialize a PDF document to bytes
     ///
     /// Uses a default Writer without compression.

@@ -351,9 +351,22 @@ extension ISO_32000.`9`.`6`.Font {
 // MARK: - Text Measurement
 
 extension ISO_32000.`9`.`6`.Font {
-    /// Calculate string width at a specific font size
-    public func stringWidth(_ text: String, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-        metrics.stringWidth(text, atSize: size)
+    /// Calculate width of a String at a specific font size
+    public func width(of text: String, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        metrics.width(of: text, atSize: size)
+    }
+
+    /// WinAnsi encoding operations on this font
+    public var winAnsi: WinAnsi { WinAnsi(font: self) }
+
+    /// WinAnsi encoding namespace for font
+    public struct WinAnsi: Sendable {
+        let font: ISO_32000.`9`.`6`.Font
+
+        /// Calculate width of WinAnsi-encoded bytes at a specific font size
+        public func width<Bytes: Collection>(of bytes: Bytes, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit where Bytes.Element == UInt8 {
+            font.metrics.winAnsi.width(of: bytes, atSize: size)
+        }
     }
 }
 

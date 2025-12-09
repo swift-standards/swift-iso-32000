@@ -134,7 +134,7 @@ extension ISO_32000.ContentStream {
 
         /// Set horizontal scaling (scale Tz)
         /// This is a percentage (100 = normal), dimensionless
-        case setHorizontalScaling(Double)
+        case setHorizontalScaling(Scale<1>)
 
         /// Set text rise (rise Ts)
         case setTextRise(ISO_32000.UserSpace.Y)
@@ -166,8 +166,11 @@ extension ISO_32000.ContentStream {
 
         // MARK: - Text Showing (Section 9.4.3)
 
-        /// Show text string (string Tj)
-        case showText(ISO_32000.COS.StringValue)
+        /// Show text (bytes Tj)
+        ///
+        /// Takes pre-encoded bytes (e.g., WinAnsiEncoding for Standard 14 fonts).
+        /// The bytes are serialized as a PDF literal string with proper escaping.
+        case showText([UInt8])
 
         // MARK: - Line Style (Section 8.4.3)
 
@@ -198,136 +201,286 @@ extension ISO_32000.ContentStream.Operator {
         switch self {
         // Graphics State
         case .saveState:
-            buffer.append(contentsOf: "q".utf8)
+            buffer.append(.ascii.q)
 
         case .restoreState:
-            buffer.append(contentsOf: "Q".utf8)
+            buffer.append(.ascii.Q)
 
         case .transform(let a, let b, let c, let d, let e, let f):
-            buffer.append(contentsOf: "\(a.formatted(.pdf)) \(b.formatted(.pdf)) \(c.formatted(.pdf)) \(d.formatted(.pdf)) \(e.formatted(.pdf)) \(f.formatted(.pdf)) cm".utf8)
+            a.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            b.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            c.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            d.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            e.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            f.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.c, .ascii.m])
 
         // Color
         case .setStrokeGray(let gray):
-            buffer.append(contentsOf: "\(gray.formatted(.pdf)) G".utf8)
+            gray.pdf.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.G])
 
         case .setFillGray(let gray):
-            buffer.append(contentsOf: "\(gray.formatted(.pdf)) g".utf8)
+            gray.pdf.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.g])
 
         case .setStrokeRGB(let r, let g, let b):
-            buffer.append(contentsOf: "\(r.formatted(.pdf)) \(g.formatted(.pdf)) \(b.formatted(.pdf)) RG".utf8)
+            r.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            g.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            b.pdf.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.R, .ascii.G])
 
         case .setFillRGB(let r, let g, let b):
-            buffer.append(contentsOf: "\(r.formatted(.pdf)) \(g.formatted(.pdf)) \(b.formatted(.pdf)) rg".utf8)
+            r.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            g.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            b.pdf.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.r, .ascii.g])
 
         case .setStrokeCMYK(let c, let m, let y, let k):
-            buffer.append(contentsOf: "\(c.formatted(.pdf)) \(m.formatted(.pdf)) \(y.formatted(.pdf)) \(k.formatted(.pdf)) K".utf8)
+            c.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            m.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            y.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            k.pdf.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.K])
 
         case .setFillCMYK(let c, let m, let y, let k):
-            buffer.append(contentsOf: "\(c.formatted(.pdf)) \(m.formatted(.pdf)) \(y.formatted(.pdf)) \(k.formatted(.pdf)) k".utf8)
+            c.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            m.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            y.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            k.pdf.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.k])
 
         // Path Construction
         case .moveTo(let x, let y):
-            buffer.append(contentsOf: "\(x.formatted(.pdf)) \(y.formatted(.pdf)) m".utf8)
+            x.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            y.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.m])
 
         case .lineTo(let x, let y):
-            buffer.append(contentsOf: "\(x.formatted(.pdf)) \(y.formatted(.pdf)) l".utf8)
+            x.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            y.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.l])
 
         case .curveTo(let x1, let y1, let x2, let y2, let x3, let y3):
-            buffer.append(contentsOf: "\(x1.formatted(.pdf)) \(y1.formatted(.pdf)) \(x2.formatted(.pdf)) \(y2.formatted(.pdf)) \(x3.formatted(.pdf)) \(y3.formatted(.pdf)) c".utf8)
+            x1.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            y1.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            x2.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            y2.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            x3.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            y3.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.c])
 
         case .rectangle(let x, let y, let width, let height):
-            buffer.append(contentsOf: "\(x.formatted(.pdf)) \(y.formatted(.pdf)) \(width.formatted(.pdf)) \(height.formatted(.pdf)) re".utf8)
+            x.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            y.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            width.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            height.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.r, .ascii.e])
 
         case .closePath:
-            buffer.append(contentsOf: "h".utf8)
+            buffer.append(.ascii.h)
 
         // Path Painting
         case .stroke:
-            buffer.append(contentsOf: "S".utf8)
+            buffer.append(.ascii.S)
 
         case .closeAndStroke:
-            buffer.append(contentsOf: "s".utf8)
+            buffer.append(.ascii.s)
 
         case .fill:
-            buffer.append(contentsOf: "f".utf8)
+            buffer.append(.ascii.f)
 
         case .fillEvenOdd:
-            buffer.append(contentsOf: "f*".utf8)
+            buffer.append(contentsOf: [.ascii.f, .ascii.asterisk])
 
         case .fillAndStroke:
-            buffer.append(contentsOf: "B".utf8)
+            buffer.append(.ascii.B)
 
         case .endPath:
-            buffer.append(contentsOf: "n".utf8)
+            buffer.append(.ascii.n)
 
         // Clipping
         case .clip:
-            buffer.append(contentsOf: "W".utf8)
+            buffer.append(.ascii.W)
 
         case .clipEvenOdd:
-            buffer.append(contentsOf: "W*".utf8)
+            buffer.append(contentsOf: [.ascii.W, .ascii.asterisk])
 
         // Text State
         case .beginText:
-            buffer.append(contentsOf: "BT".utf8)
+            buffer.append(contentsOf: [.ascii.B, .ascii.T])
 
         case .endText:
-            buffer.append(contentsOf: "ET".utf8)
+            buffer.append(contentsOf: [.ascii.E, .ascii.T])
 
         case .setFont(let name, let size):
-            buffer.append(contentsOf: "/\(name.rawValue) \(size.formatted(.pdf)) Tf".utf8)
+            buffer.append(.ascii.forwardSlash)
+            buffer.append(contentsOf: name.rawValue.utf8)
+            buffer.append(.ascii.space)
+            size.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.f])
 
         case .setTextLeading(let leading):
-            buffer.append(contentsOf: "\(leading.formatted(.pdf)) TL".utf8)
+            leading.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.L])
 
         case .setCharacterSpacing(let spacing):
-            buffer.append(contentsOf: "\(spacing.formatted(.pdf)) Tc".utf8)
+            spacing.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.c])
 
         case .setWordSpacing(let spacing):
-            buffer.append(contentsOf: "\(spacing.formatted(.pdf)) Tw".utf8)
+            spacing.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.w])
 
         case .setHorizontalScaling(let scale):
-            buffer.append(contentsOf: "\(scale.formatted(.pdf)) Tz".utf8)
+            scale.value.pdf.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.z])
 
         case .setTextRise(let rise):
-            buffer.append(contentsOf: "\(rise.formatted(.pdf)) Ts".utf8)
+            rise.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.s])
 
         // Text Positioning
         case .moveTextPosition(let tx, let ty):
-            buffer.append(contentsOf: "\(tx.formatted(.pdf)) \(ty.formatted(.pdf)) Td".utf8)
+            tx.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            ty.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.d])
 
         case .moveTextPositionWithLeading(let tx, let ty):
-            buffer.append(contentsOf: "\(tx.formatted(.pdf)) \(ty.formatted(.pdf)) TD".utf8)
+            tx.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            ty.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.D])
 
         case .setTextMatrix(let a, let b, let c, let d, let e, let f):
-            buffer.append(contentsOf: "\(a.formatted(.pdf)) \(b.formatted(.pdf)) \(c.formatted(.pdf)) \(d.formatted(.pdf)) \(e.formatted(.pdf)) \(f.formatted(.pdf)) Tm".utf8)
+            a.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            b.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            c.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            d.pdf.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            e.serialize(into: &buffer)
+            buffer.append(.ascii.space)
+            f.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.m])
 
         case .nextLine:
-            buffer.append(contentsOf: "T*".utf8)
+            buffer.append(contentsOf: [.ascii.T, .ascii.asterisk])
 
         // Text Showing
-        case .showText(let string):
-            // Use WinAnsiEncoding for Standard 14 fonts
-            buffer.append(contentsOf: string.asLiteralWinAnsi())
-            buffer.append(contentsOf: " Tj".utf8)
+        case .showText(let bytes):
+            // Serialize pre-encoded bytes as PDF literal string
+            ISO_32000.`7`.`3`.Table.`3`.serializeLiteralString(bytes, into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.j])
 
         // Line Style
         case .setLineWidth(let width):
-            buffer.append(contentsOf: "\(width.formatted(.pdf)) w".utf8)
+            width.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.w])
 
         case .setLineCap(let cap):
-            buffer.append(contentsOf: "\(cap.rawValue) J".utf8)
+            cap.rawValue.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.J])
 
         case .setLineJoin(let join):
-            buffer.append(contentsOf: "\(join.rawValue) j".utf8)
+            join.rawValue.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.j])
 
         case .setMiterLimit(let limit):
-            buffer.append(contentsOf: "\(limit.formatted(.pdf)) M".utf8)
+            limit.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.M])
 
         case .setDashPattern(let array, let phase):
-            let arrayStr = array.map { $0.formatted(.pdf) }.joined(separator: " ")
-            buffer.append(contentsOf: "[\(arrayStr)] \(phase.formatted(.pdf)) d".utf8)
+            buffer.append(.ascii.leftSquareBracket)
+            for (index, value) in array.enumerated() {
+                if index > 0 { buffer.append(.ascii.space) }
+                value.serialize(into: &buffer)
+            }
+            buffer.append(contentsOf: [.ascii.rightSquareBracket, .ascii.space])
+            phase.serialize(into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.d])
         }
     }
 }
 
+// MARK: - PDF Number Serialization for Geometry Types
+
+extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: Binary.Serializable {
+    /// Serialize UserSpace.Unit to PDF number format
+    ///
+    /// Delegates to `Double.pdf.serialize(into:)` for PDF-specific formatting.
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        value.value.pdf.serialize(into: &buffer)
+    }
+}
+
+extension Geometry.X: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+    /// Serialize Geometry.X to PDF number format
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        value.value.serialize(into: &buffer)
+    }
+}
+
+extension Geometry.Y: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+    /// Serialize Geometry.Y to PDF number format
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        value.value.serialize(into: &buffer)
+    }
+}
+
+extension Geometry.Width: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+    /// Serialize Geometry.Width to PDF number format
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        value.value.serialize(into: &buffer)
+    }
+}
+
+extension Geometry.Height: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+    /// Serialize Geometry.Height to PDF number format
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == UInt8 {
+        value.value.serialize(into: &buffer)
+    }
+}

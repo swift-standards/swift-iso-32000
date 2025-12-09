@@ -14,7 +14,7 @@
 
 public import ISO_32000_Shared
 public import INCITS_4_1986
-public import Standards
+import Standards
 public import Formatting
 import IEEE_754
 
@@ -56,6 +56,49 @@ extension ISO_32000.`7`.`3`.Table.`3` {
         .ascii.rightParenthesis: [.ascii.backslash, .ascii.rightParenthesis], // \)
         .ascii.backslash: [.ascii.backslash, .ascii.backslash],               // \\
     ]
+
+    /// Serialize pre-encoded bytes as a PDF literal string.
+    ///
+    /// This is the canonical function for creating PDF literal strings from
+    /// already-encoded bytes (e.g., WinAnsiEncoding bytes for content streams).
+    ///
+    /// Output format: `(bytes with escaping)`
+    ///
+    /// - Parameters:
+    ///   - bytes: Pre-encoded bytes to serialize
+    ///   - buffer: Output buffer to append to
+    @inlinable
+    public static func serializeLiteralString<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+        _ bytes: Bytes,
+        into buffer: inout Buffer
+    ) where Bytes.Element == UInt8, Buffer.Element == UInt8 {
+        buffer.append(.ascii.leftParenthesis)
+        for byte in bytes {
+            if let escaped = escapeTable[byte] {
+                buffer.append(contentsOf: escaped)
+            } else {
+                buffer.append(byte)
+            }
+        }
+        buffer.append(.ascii.rightParenthesis)
+    }
+
+    /// Create a PDF literal string from pre-encoded bytes.
+    ///
+    /// This is the canonical function for creating PDF literal strings from
+    /// already-encoded bytes (e.g., WinAnsiEncoding bytes for content streams).
+    ///
+    /// - Parameter bytes: Pre-encoded bytes to serialize
+    /// - Returns: PDF literal string bytes including delimiters and escaping
+    @inlinable
+    public static func literalString<Bytes: Collection>(
+        from bytes: Bytes
+    ) -> [UInt8] where Bytes.Element == UInt8 {
+        var result: [UInt8] = []
+        result.reserveCapacity(bytes.count + 2)
+        serializeLiteralString(bytes, into: &result)
+        return result
+    }
 }
 
 // MARK: - 7.3.3 Numeric Objects
@@ -775,12 +818,12 @@ extension ISO_32000.`7`.`3`.COS {
     }
 }
 
-// MARK: - UInt8.Serializable Conformances
+// MARK: - Binary.Serializable Conformances
 
-extension ISO_32000.`7`.`3`.COS.Object: UInt8.Serializable {
+extension ISO_32000.`7`.`3`.COS.Object: Binary.Serializable {
     /// Serialize a COS object to PDF syntax
     ///
-    /// Conforms to `UInt8.Serializable` for streaming output.
+    /// Conforms to `Binary.Serializable` for streaming output.
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ object: Self,
         into buffer: inout Buffer
@@ -789,7 +832,7 @@ extension ISO_32000.`7`.`3`.COS.Object: UInt8.Serializable {
     }
 }
 
-extension ISO_32000.`7`.`3`.COS.Dictionary: UInt8.Serializable {
+extension ISO_32000.`7`.`3`.COS.Dictionary: Binary.Serializable {
     /// Serialize a PDF Dictionary to bytes
     ///
     /// Format: `<< /Key1 Value1 /Key2 Value2 >>`
@@ -812,7 +855,7 @@ extension ISO_32000.`7`.`3`.COS.Dictionary: UInt8.Serializable {
     }
 }
 
-extension ISO_32000.`7`.`3`.`5`.Name: UInt8.Serializable {
+extension ISO_32000.`7`.`3`.`5`.Name: Binary.Serializable {
     /// Serialize a PDF Name to bytes
     ///
     /// Names are serialized with a leading solidus: `/Name`
@@ -855,7 +898,7 @@ extension ISO_32000.`7`.`3`.`5`.Name: UInt8.Serializable {
     }
 }
 
-extension ISO_32000.`7`.`3`.COS.StringValue: UInt8.Serializable {
+extension ISO_32000.`7`.`3`.COS.StringValue: Binary.Serializable {
     /// Serialize a PDF String to bytes
     ///
     /// Strings are serialized as literal strings: `(Hello)`
@@ -875,7 +918,7 @@ extension ISO_32000.`7`.`3`.COS.StringValue: UInt8.Serializable {
     }
 }
 
-extension ISO_32000.`7`.`3`.`8`.Stream: UInt8.Serializable {
+extension ISO_32000.`7`.`3`.`8`.Stream: Binary.Serializable {
     /// Serialize a PDF Stream to bytes
     ///
     /// Format:
@@ -899,12 +942,111 @@ extension ISO_32000.`7`.`3`.`8`.Stream: UInt8.Serializable {
     }
 }
 
-extension ISO_32000.`7`.`3`.`10`.IndirectReference: UInt8.Serializable {
+extension ISO_32000.`7`.`3`.`10`.IndirectReference: Binary.Serializable {
     /// Serialize an indirect reference: `12 0 R`
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ ref: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == UInt8 {
         buffer.append(contentsOf: "\(ref.objectNumber) \(ref.generation) R".utf8)
+    }
+}
+
+// MARK: - PDF Number Serialization (Namespace Pattern)
+
+extension Double {
+    /// PDF serialization namespace
+    ///
+    /// Provides PDF-specific number serialization following ISO 32000-2:2020 Section 7.3.3.
+    ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// var buffer: [UInt8] = []
+    /// (72.5).pdf.serialize(into: &buffer)
+    /// // buffer contains [0x37, 0x32, 0x2E, 0x35] ("72.5")
+    /// ```
+    public var pdf: ISO_32000.`7`.`3`.`3`.PDFNumber {
+        ISO_32000.`7`.`3`.`3`.PDFNumber(value: self)
+    }
+}
+
+extension ISO_32000.`7`.`3`.`3` {
+    /// PDF number serialization wrapper
+    ///
+    /// Provides bytes-canonical serialization for Double values following
+    /// ISO 32000-2:2020 Section 7.3.3 (Numeric objects).
+    ///
+    /// ## Format Rules
+    ///
+    /// - Integers output without decimal point (e.g., `42` not `42.0`)
+    /// - Reals output with decimal point, trailing zeros stripped
+    /// - Never uses exponential notation
+    /// - Maximum 5 decimal places
+    /// - Non-finite values (infinity, NaN) output as `0`
+    public struct PDFNumber: Sendable {
+        public let value: Double
+
+        /// Maximum decimal places for real numbers (per Annex C recommendations)
+        private static let maxDecimalPlaces = 5
+
+        /// Multiplier for extracting fractional digits (10^maxDecimalPlaces)
+        private static let multiplier: Double = 100_000
+
+        /// Serialize this PDF number directly to bytes
+        ///
+        /// - Parameter buffer: The buffer to append ASCII bytes to
+        public func serialize<Buffer: RangeReplaceableCollection>(
+            into buffer: inout Buffer
+        ) where Buffer.Element == UInt8 {
+            // Handle special cases (PDF doesn't support infinity/NaN)
+            guard value.isFinite else {
+                buffer.append(INCITS_4_1986.GraphicCharacters.`0`)
+                return
+            }
+
+            // Check if value is effectively an integer
+            let rounded = value.rounded()
+            if value == rounded && abs(value) < Double(Int64.max) {
+                Int64(value).serialize(into: &buffer)
+                return
+            }
+
+            // Handle negative numbers
+            let absValue: Double
+            if value < 0 {
+                buffer.append(INCITS_4_1986.GraphicCharacters.hyphen)
+                absValue = -value
+            } else {
+                absValue = value
+            }
+
+            // Split into integer and fractional parts
+            let intPart = Int64(absValue)
+            let fracPart = absValue - Double(intPart)
+
+            // Serialize integer part
+            intPart.serialize(into: &buffer)
+
+            // Calculate fractional digits (up to 5 decimal places)
+            let fracDigits = Int64((fracPart * Self.multiplier).rounded())
+
+            if fracDigits != 0 {
+                buffer.append(INCITS_4_1986.GraphicCharacters.period)
+                // Serialize fractional digits with leading zeros, then strip trailing zeros
+                var fracValue = fracDigits
+                var digits: [UInt8] = []
+                let digit0 = INCITS_4_1986.GraphicCharacters.`0`
+                for _ in 0..<5 {
+                    digits.insert(digit0 + UInt8(fracValue % 10), at: 0)
+                    fracValue /= 10
+                }
+                // Strip trailing zeros
+                while digits.last == digit0 {
+                    digits.removeLast()
+                }
+                buffer.append(contentsOf: digits)
+            }
+        }
     }
 }

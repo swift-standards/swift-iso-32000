@@ -126,7 +126,52 @@ extension ISO_32000.Encoding {
     }
 }
 
-// MARK: - StringProtocol Extensions (Bytes → String)
+// MARK: - String → Bytes (Encoding)
+
+extension Array where Element == UInt8 {
+    /// Initialize bytes by encoding a string using a PDF encoding
+    ///
+    /// Returns `nil` if any character cannot be encoded.
+    ///
+    /// - Parameters:
+    ///   - string: The string to encode
+    ///   - encoding: The PDF encoding type to use
+    @inlinable
+    public init?<E: ISO_32000.Encoding>(
+        _ string: some StringProtocol,
+        encoding: E.Type
+    ) {
+        var result: [UInt8] = []
+        for scalar in string.unicodeScalars {
+            guard let byte = E.encode(scalar) else { return nil }
+            result.append(byte)
+        }
+        self = result
+    }
+
+    /// Initialize bytes by encoding a string using a PDF encoding, with fallback
+    ///
+    /// Characters that cannot be encoded are replaced with `?` (0x3F).
+    ///
+    /// - Parameters:
+    ///   - string: The string to encode
+    ///   - encoding: The PDF encoding type to use
+    ///   - withFallback: Must be `true` to use fallback mode
+    @inlinable
+    public init<E: ISO_32000.Encoding>(
+        _ string: some StringProtocol,
+        encoding: E.Type,
+        withFallback: Bool
+    ) {
+        var result: [UInt8] = []
+        for scalar in string.unicodeScalars {
+            result.append(E.encode(scalar) ?? 0x3F)
+        }
+        self = result
+    }
+}
+
+// MARK: - Bytes → String (Decoding)
 
 extension String {
     /// Initialize from bytes using a PDF encoding
@@ -134,12 +179,12 @@ extension String {
     /// Returns `nil` if any byte cannot be decoded.
     ///
     /// - Parameters:
-    ///   - encoding: The PDF encoding type to use
     ///   - bytes: The bytes to decode
+    ///   - encoding: The PDF encoding type to use
     @inlinable
     public init?<E: ISO_32000.Encoding, Bytes: Collection>(
-        _ encoding: E.Type,
-        bytes: Bytes
+        _ bytes: Bytes,
+        encoding: E.Type
     ) where Bytes.Element == UInt8 {
         var scalars = String.UnicodeScalarView()
         scalars.reserveCapacity(bytes.count)
@@ -155,13 +200,13 @@ extension String {
     /// Invalid bytes are replaced with U+FFFD (replacement character).
     ///
     /// - Parameters:
-    ///   - encoding: The PDF encoding type to use
     ///   - bytes: The bytes to decode
+    ///   - encoding: The PDF encoding type to use
     ///   - withReplacement: Must be `true` to use replacement mode
     @inlinable
     public init<E: ISO_32000.Encoding, Bytes: Collection>(
-        _ encoding: E.Type,
-        bytes: Bytes,
+        _ bytes: Bytes,
+        encoding: E.Type,
         withReplacement: Bool
     ) where Bytes.Element == UInt8 {
         var scalars = String.UnicodeScalarView()
