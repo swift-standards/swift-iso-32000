@@ -1,3 +1,474 @@
 // ISO 32000-2:2020, 14.10 Web capture
 
 import ISO_32000_Shared
+
+//14.10 Web capture
+//14.10.1 General
+//The features described in this clause are deprecated with PDF 2.0.
+//The information in the Web Capture data structures enables PDF processors to perform the following
+//operations:
+//• Save locally and preserve the visual appearance of material from the Web
+//• Retrieve additional material from the Web and add it to an existing PDF file
+//• Update or modify existing material previously captured from the Web
+//• Find source information for material captured from the Web, such as the URL (if any) from which
+//it was captured
+//• Find all material in a PDF file that was generated from a given URL
+//• Find all material in a PDF file that matches a given digital identifier (MD5 hash)
+//The information needed to perform these operations shall be recorded in two data structures in the
+//PDF file:
+//• The Web Capture information dictionary, which shall hold document-level information related to
+//Web Capture.
+//• The Web Capture content database, which shall hold a complete registry of the source content
+//resources retrieved by Web Capture and where it came from.
+//NOTE The Web Capture content database enables the capturing process to avoid downloading material
+//that is already present in the PDF file.
+//802 © ISO 2020 – All rights reserved
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//14.10.2 Web capture information dictionary
+//The optional SpiderInfo entry in the document catalog dictionary (see 7.7.2, "Document catalog
+//dictionary"), if present, shall hold Web Capture information dictionary. “Table 386 — Entries in the
+//Web Capture information dictionary” shows the entries in a web capture information dictionary.
+//Table 386 — Entries in the Web Capture information dictionary
+//Key Type Value
+//V number (Required) The Web Capture version number. The version number shall be
+//1.0 in a conforming PDF file.
+//This value shall be a single real number, not a major and minor version
+//number.
+//EXAMPLE A version number of 1.2 would be considered greater than 1.15.
+//C array (Optional) An array of indirect references to Web Capture command
+//dictionaries (see 14.10.5.3, "Command dictionaries") describing commands
+//that were used in building the PDF file. The commands shall appear in the
+//array in the order in which they were executed in building the PDF file.
+//14.10.3 Content database
+//14.10.3.1 General
+//When a PDF file, or part of a PDF file, is built from a content resource stored in another format, such as
+//an HTML page, the resulting PDF file (or portion thereof) may contain content from more than the
+//single content resources. Conversely, since many content formats do not have static pagination, a
+//single content resource may give rise to multiple PDF pages.
+//To keep track of the correspondence between PDF content and the resources from which the content
+//was derived, a PDF file may contain a content database that maps URLs and digital identifiers to PDF
+//objects such as pages and XObjects.
+//NOTE By looking up digital identifiers in the database, Web Capture can determine whether newly
+//downloaded content is identical to content already retrieved from a different URL. Thus, it can
+//perform optimisations such as storing only one copy of an image that is referenced by multiple
+//HTML pages.
+//Web Capture’s content database shall be organised into content sets. Each content set shall be a
+//dictionary holding information about a group of related PDF objects generated from the same source
+//data. A content set shall have for the value of its S (subtype) entry either the value SPS, for a page set,
+//or SIS, for an image set.
+//The mapping from a source content resource to a content set in a PDF document may be saved in the
+//PDF file. The mapping may be an association from the resource's URL to the content set, stored in the
+//PDF document's URLS name tree. The mapping may also be an association from a digital identifier
+//(14.10.3.3, "Digital identifiers") generated from resource's data to the content set, stored in the PDF
+//document's IDS name tree. Both associations may be present in the PDF file.
+//© ISO 2020 – All rights reserved 803
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//"Figure 114 — Simple Web Capture file structure" shows a simple web capture PDF file structure.
+//Docume nt catalog
+//Dictionary
+//Namedictiona ry
+//Name t ree
+//URLS IDS
+//http://www.iso.org/ 904B
+//Page set
+//Page Page Page
+//Figure 114 — Simple Web Capture file structure
+//Entries in the URLS and IDS name trees may refer to an array of content sets or a single content set. If
+//the entry is an array, the content sets need not have the same subtype; the array may include both page
+//sets and image sets.
+//"Figure 115 — Complex Web Capture file structure" shows a complex web capture PDF file structure.
+//804 © ISO 2020 – All rights reserved
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//Docume nt catalog
+//Dictionary
+//Names di ctionary
+//Name t ree
+//Array
+//URLS IDS
+//http://www.iso.org/getPD F.gif
+//Content set a rray
+//Page set Image set
+//Page ImageXObject
+//Figure 115 — Complex Web Capture file structure
+//14.10.3.2 URL strings
+//URLs associated with Web Capture content sets shall be reduced to a predictable, canonical form
+//before being used as keys in the URLS name tree.
+//The following steps describe how to perform this reduction, using terminology from Internet RFC 3986.
+//This algorithm shall be applied for HTTP, FTP, and file URLs:
+//Algorithm: URL strings
+//a) If the URL is relative, it shall be converted into an absolute URL.
+//b) If the URL contains one or more NUMBER SIGN (02h3) characters, it shall be truncated before the first
+//NUMBER SIGN.
+//c) Any uppercase ASCII characters within the scheme section of the URL shall be replaced with the
+//corresponding lowercase ASCII characters.
+//d) If there is a host section, any uppercase ASCII characters therein shall be converted to lowercase ASCII.
+//© ISO 2020 – All rights reserved 805
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//e) If the scheme is file and the host is localhost, the host section shall be removed.
+//f) If there is a port section and the port is the default port for the given protocol (80 for HTTP or 21 for
+//FTP), the port section shall be removed.
+//g) If the path section contains PERIOD (2Eh) ( . ) or DOUBLE PERIOD ( .. ) subsequences, transform the path
+//as described in section 5.2 of Internet RFC 3986.
+//NOTE Because the PERCENT SIGN (25h) is unsafe according to Internet RFC 3986 and is also the escape
+//character for encoded characters, a URL with unencoded characters cannot be distinguished
+//from one with encoded characters. For example, it is impossible to decide whether the sequence
+//%00 represents a single encoded null character or a sequence of three unencoded characters.
+//Hence, no number of encoding or decoding passes on a URL can ever cause it to reach a stable
+//state. Empirically, URLs embedded in HTML files have unsafe characters encoded with one
+//encoding pass, and Web servers perform one decoding pass on received paths (though CGI
+//scripts can make their own decisions).
+//Canonical URLs are thus assumed to have undergone one and only one encoding pass. A URL whose
+//initial encoding state is known can be safely transformed into a URL that has undergone only one
+//encoding pass.
+//14.10.3.3 Digital identifiers
+//Digital identifiers, used to associate source content resources with content sets by the IDS name tree,
+//shall be generated using the MD5 message-digest algorithm (Internet RFC 1321).
+//NOTE 1 The exact data passed to the algorithm depends on the type of content set and the nature of the
+//identifier being calculated.
+//For a page set, the source data shall be passed to the MD5 algorithm first, followed by strings
+//representing the digital identifiers of any auxiliary data files (such as images) referenced in the source
+//data, in the order in which they are first referenced. If an auxiliary file is referenced more than once, its
+//identifier shall be passed only the first time. The resulting string shall be used as the digital identifier
+//for the source content resource.
+//NOTE 2 This sequence produces a composite identifier representing the visual appearance of the pages
+//in the page set.
+//NOTE 3 Two HTML source files that are identical, but for which the referenced images contain different
+//data — for example, if they have been generated by a script or are pointed to by relative URLs —
+//do not produce the same identifier.
+//When the source data is a PDF file, the identifier shall be generated solely from the contents of that file;
+//there shall be no auxiliary data.
+//A page set may also have a text identifier, calculated by applying the MD5 algorithm to just the text
+//present in the source data.
+//EXAMPLE 1 For an HTML file the text identifier is based solely on the text between markup tags; no images are used in
+//the calculation.
+//For an image set, the digital identifier shall be calculated by passing the source data for the original
+//image to the MD5 algorithm.
+//806 © ISO 2020 – All rights reserved
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//EXAMPLE 2 The identifier for an image set created from a GIF image is calculated from the contents of the GIF.
+//14.10.3.4 Unique name generation
+//In generating PDF pages from a data source, items such as hypertext links and HTML form fields are
+//converted into corresponding named destinations and interactive form fields. These items shall be
+//given names that do not conflict with those of other such items in the PDF file.
+//NOTE As used here, the term name refers to a string, not a PDF name object.
+//Furthermore, when updating an existing PDF file, a PDF processor shall ensure that each destination or
+//field is given a unique name that shall be derived from its original name but constructed so that it
+//avoids conflicts with similarly named items elsewhere.
+//The unique name shall be formed by appending an encoded form of the page set’s digital identifier
+//string to the original name of the destination or field. The identifier string shall be encoded to remove
+//characters that have special meaning in destinations and fields. The characters listed in the first
+//column of "Table 387 — Characters with special meaning in destinations and fields and their byte
+//values" have special meaning and shall be encoded using the corresponding byte values from the
+//second column of "Table 387 — Characters with special meaning in destinations and fields and their
+//byte values"
+//.
+//Table 387 — Characters with special meaning in destinations and fields and their byte values
+//Character Byte value Escape sequence
+//(nul) 0x00 \0 (0x5c 0x30)
+//. (PERIOD) 0x2e \p (0x5c 0x70)
+//\ (backslash) 0x5c \\ (0x5c 0x5c)
+//EXAMPLE Since the PERIOD character (2Eh) is used as the field separator in interactive form field names, it does not
+//appear in the identifier portion of the unique name.
+//If the name is used for an interactive form field, there is an additional encoding to ensure uniqueness
+//and compatibility with interactive forms. Each byte in the source string, encoded as described
+//previously, shall be replaced by two bytes in the destination string. The first byte in each pair is 65
+//(corresponding to the ASCII character A) plus the high-order 4 bits of the source byte; the second byte
+//is 65 plus the low-order 4 bits of the source byte.
+//14.10.4 Content sets
+//14.10.4.1 General
+//A Web Capture content set is a dictionary describing a set of PDF objects generated from the same
+//source data. It may include information common to all the objects in the set as well as about the set
+//itself. "Table 388 — Entries common to all Web Capture content sets" defines the contents of this type
+//of dictionary.
+//© ISO 2020 – All rights reserved 807
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//14.10.4.2 Page sets
+//A page set is a content set containing a group of PDF page objects generated from a common source,
+//such as an HTML file. The pages shall be listed in the O array of the page set dictionary (see "Table 388
+//— Entries common to all Web Capture content sets") in the same order in which they were initially
+//added to the PDF file. A single page object shall not belong to more than one page set. "Table 389 —
+//Additional entries specific to a Web Capture page set" defines the content set dictionary entries specific
+//to Page Sets.
+//The TID (text identifier) entry may be used to store an identifier generated from the text of the pages
+//belonging to the page set (see 14.10.3.3, "Digital identifiers"). A text identifier may not be appropriate
+//for some page sets (such as those with no text) and may be omitted in these cases.
+//EXAMPLE This identifier can be used to determine whether the text of a document has changed.
+//Table 388 — Entries common to all Web Capture content sets
+//Key Type Value
+//Type name (Optional) The type of PDF object that this dictionary describes; if present, shall
+//be SpiderContentSet for a Web Capture content set.
+//S name (Required) The subtype of content set that this dictionary describes. The value
+//shall be one of:
+//SPS ("Spider page set") A page set
+//SIS ("Spider image set") An image set
+//ID byte string (Required) The digital identifier of the content set (see Digital identifiers").
+//O array (Required) An array of indirect references to the objects belonging to the
+//content set. The order of objects in the array is restricted when the content set
+//subtype (S entry) is SPS (see 14.10.4.2, "Page sets").
+//SI dictionary
+//or array
+//(Required) A source information dictionary (see 14.10.5, "Source information")
+//or an array of such dictionaries, describing the sources from which the objects
+//belonging to the content set were created.
+//CT ASCII
+//string
+//(Optional) The content type, an ASCII string characterising the source from
+//which the objects belonging to the content set were created. The string shall
+//conform to the content type specification described in Internet RFC 2045.
+//EXAMPLE For a page set consisting of a group of PDF pages created from an
+//HTML file, the content type would be text/html.
+//TS date (Optional) A timestamp giving the date and time at which the content set was
+//created.
+//Table 389 — Additional entries specific to a Web Capture page set
+//Key Type Value
+//S name (Required) The subtype of content set that this dictionary describes; shall
+//be SPS.
+//808 © ISO 2020 – All rights reserved
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//Key Type Value
+//T text string (Optional) The title of the page set, a human-readable text string.
+//TID byte string (Optional) A text identifier generated from the text of the page set, as
+//described in 14.10.3.3, "Digital identifiers"
+//.
+//14.10.4.3 Image sets
+//An image set is a content set containing a group of image XObjects generated from a common source,
+//such as multiple frames of an animated GIF image. A single XObject shall not belong to more than one
+//image set.
+//"Table 390 — Additional entries specific to a Web Capture image set" shows the content set dictionary
+//entries specific to Image Sets.
+//Table 390 — Additional entries specific to a Web Capture image set
+//Key Type Value
+//S name (Required) The subtype of content set that this dictionary describes; shall be SIS.
+//R integer or
+//array
+//(Required) The reference counts for the image XObjects belonging to the image set. For
+//an image set containing a single XObject, the value shall be the integer reference count
+//for that XObject. For an image set containing multiple XObjects, the value shall be an
+//array of reference counts parallel to the O array (see "Table 388 — Entries common to
+//all Web Capture content sets"); that is, each element in the R array shall hold the
+//reference count for the image XObject at the corresponding position in the O array.
+//Each image XObject in an image set has a reference count indicating the number of PDF pages referring
+//to that XObject. The reference count shall be incremented whenever Web Capture creates a new page
+//referring to the XObject (including copies of already existing pages) and decremented whenever such a
+//page is destroyed. The reference count shall be incremented or decremented only once per page,
+//regardless of the number of times the XObject may be referenced by that page. If the reference count
+//reaches 0, it shall be assumed that there are no remaining pages referring to the XObject and that the
+//XObject can be removed from the image set’s O array. When removing an XObject from the O array of
+//an image set, the corresponding entry in the R array shall be removed also.
+//14.10.5 Source information
+//14.10.5.1 General
+//The SI entry in a content set dictionary (see "Table 388 — Entries common to all Web Capture content
+//sets") shall contain one or more source information dictionaries, (see "Table 391 — Entries in a source
+//information dictionary") each containing information about the locations from which the source data
+//for the content set was retrieved.
+//© ISO 2020 – All rights reserved 809
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//Table 391 — Entries in a source information dictionary
+//Key Type Value
+//AU ASCII string
+//or
+//dictionary
+//(Required) An ASCII string or URL alias dictionary (see 14.10.5.2, "URL alias
+//dictionaries") which shall identify the URLs from which the source data were
+//retrieved.
+//TS date (Optional) A timestamp which, if present, shall contain the most recent date
+//and time at which the content set’s contents were known to be up to date with
+//the source data.
+//E date (Optional) An expiration stamp which, if present, shall contain the date and
+//time at which the content set’s contents is out of date with the source data.
+//S integer (Optional) A code which, if present, shall indicate the type of form submission,
+//if any, by which the source data were accessed (see 12.7.6.2, "Submit-form
+//action"). If present, the value of the S entry shall be 0, 1, or 2, in accordance
+//with the following meanings:
+//0 Not accessed by means of a form submission
+//1 Accessed by means of an HTTP GET request
+//2 Accessed by means of an HTTP POST request
+//This entry may be present only in source information dictionaries associated
+//with page sets. Default value: 0.
+//C dictionary (Optional; if present, shall be an indirect reference) A command dictionary (see
+//14.10.5.3, "Command dictionaries") describing the command that caused the
+//source data to be retrieved. This entry may be present only in source
+//information dictionaries associated with page sets.
+//A content set's SI entry may contain a single source information dictionary. However, a PDF processor
+//may attempt to detect situations in which the same source data has been located via two or more
+//distinct URLs. If a processor detects such a situation, it may generate a single content set from the
+//source data, containing a single copy of the relevant PDF pages or image XObjects. In this case, the SI
+//entry shall be an array containing one source information dictionary for each distinct URL from which
+//the original source content was found.
+//The determination that distinct URLs produce the same source data shall be made by comparing digital
+//identifiers for the source data.
+//A source information dictionary’s AU (aliased URLs) entry shall identify the URLs from which the
+//source data were retrieved. If there is only one such URL, the v value of this entry may be a string. If
+//multiple URLs map to the same location through redirection, the AU value shall be a URL alias
+//dictionary (see 14.10.5.2, "URL alias dictionaries").
+//NOTE 1 For PDF file size efficiency, the entire URL alias dictionary (excluding the URL strings) can be
+//represented as a direct object because its internal structure is never shared or externally
+//referenced.
+//The TS (timestamp) entry allows each source location associated with a content set to have its own
+//timestamp.
+//810 © ISO 2020 – All rights reserved
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//NOTE 2 This is necessary because the timestamp in the content set dictionary (see "Table 388 — Entries
+//common to all Web Capture content sets") merely refers to the creation date of the content set. A
+//hypothetical "Update Content Set" command could reset the timestamp in the source
+//information dictionary to the current time if it found that the source data had not changed since
+//the timestamp was last set.
+//The E (expiration) entry specifies an expiration date for each source location associated with a content set. If the
+//current date and time are later than those specified, the contents of the content set is out of date with respect to
+//the original source.
+//14.10.5.2 URL alias dictionaries
+//When a URL is accessed via HTTP, a response header may be returned indicating that the requested
+//data are at a different URL. This redirection process may be repeated in turn at the new URL and can
+//potentially continue indefinitely. It is not uncommon to find multiple URLs that all lead eventually to
+//the same destination through one or more redirections. A URL alias dictionary represents such a set of
+//URL chains leading to a common destination. "Table 392 — Entries in a URL alias dictionary" shows
+//the contents of this type of dictionary.
+//Table 392 — Entries in a URL alias dictionary
+//Key Type Value
+//U ASCII
+//string
+//(Required) The destination URL to which all of the chains specified by the C entry lead.
+//C array (Optional) An array of one or more arrays of strings, each representing a chain of URLs
+//leading to the common destination specified by U.
+//The C (chains) entry may be omitted if the URL alias dictionary contains only one URL. If C is present,
+//its value shall be an array of arrays, each representing a chain of URLs leading to the common
+//destination. Within each chain, the URLs shall be stored as ASCII strings in the order in which they
+//occur in the redirection sequence. The common destination (the last URL in a chain) may be omitted,
+//since it is already identified by the U entry.
+//14.10.5.3 Command dictionaries
+//A Web Capture command dictionary represents a command executed by Web Capture to retrieve one or
+//more pieces of source data that were used to create new pages or modify existing pages. The entries in
+//this dictionary represent parameters that were originally specified interactively by the user who
+//requested that the Web content be captured. This information is recorded so that the command can
+//subsequently be repeated to update the captured content. "Table 393 — Entries in a Web Capture
+//command dictionary" shows the contents of this type of dictionary.
+//Table 393 — Entries in a Web Capture command dictionary
+//Key Type Value
+//URL ASCII string (Required) The initial URL from which source data were requested.
+//© ISO 2020 – All rights reserved 811
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//Key Type Value
+//L integer (Optional) The number of levels of pages retrieved from the initial URL. Default
+//value: 1.
+//F integer (Optional) A set of flags specifying various characteristics of the command (see
+//"Table 393 — Entries in a Web Capture command dictionary"). Default value: 0.
+//P string or stream (Optional) Data that was posted to the URL.
+//CT ASCII string (Optional) A content type describing the data posted to the URL. Default value:
+//application/x-www-form-urlencoded.
+//H string (Optional) Additional HTTP request headers sent to the URL.
+//S dictionary (Optional) A command settings dictionary containing settings used in the
+//conversion process (see 14.10.5.4, "Command settings").
+//The URL entry shall contain the initial URL for the retrieval command. The L (levels) entry shall
+//contain the number of levels of the hyperlinked URL hierarchy to follow from this URL, creating PDF
+//pages from the retrieved material. If the L entry is omitted, its value shall be assumed to be 1, denoting
+//retrieval of the initial URL only.
+//The value of the command dictionary’s F entry shall be an integer that shall be interpreted as an array
+//of flags specifying various characteristics of the command. The flags shall be interpreted as defined in
+//"Table 394 — Web Capture command flags". Only those flags defined in "Table 394 — Web Capture
+//command flags" may be set to 1; all other flags shall be 0. Flags not defined in "Table 394 — Web
+//Capture command flags" are reserved for future use, and shall not be used by a PDF processor.
+//NOTE 1 The low-order bit of the flags value is referred to as being at bit-position 1.
+//Table 394 — Web Capture command flags
+//Bit position Name Meaning
+//1 SameSite If set, pages were retrieved only from the host specified in the initial URL.
+//2 SamePath If set, pages were retrieved only from the path specified in the initial URL.
+//3 Submit If set, the command represents a form submission.
+//The SamePath flag shall be set if the retrieval of source content was restricted to source content in the
+//same path as specified in the initial URL. Source content is in the same path if its scheme and network
+//location components (as defined in Internet RFC 3986) match those of the initial URL and its path
+//component matches up to and including the last forward slash (/) character in the initial URL.
+//EXAMPLE 1 the URL http://www.iso.org/fiddle/faddle/foo.html is considered to be in the same path as the initial URL
+//812 © ISO 2020 – All rights reserved
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//http://www.iso.org/fiddle/initial.html.
+//The comparison shall be case-insensitive for the scheme and network location components and case-
+//sensitive for the path component.
+//The Submit flag shall be set when the command represents a form submission. If no P (posted data)
+//entry is present, the submitted data shall be encoded in the URL (an HTTP GET request). If P is present,
+//the command shall be an HTTP POST request. In this case, the value of the Submit flag shall be ignored.
+//NOTE 2 If the posted data are small enough, they can be represented by a string. For large amounts of
+//data, a stream needs to be used because it can be compressed.
+//The CT (content type) entry shall only be present for POST requests. It shall describe the content type
+//of the posted data, as described in Internet RFC 2045.
+//The H (headers) entry, if present, shall specify additional HTTP request headers that were sent in the
+//request for the URL. Each header line in the string shall be terminated with a CARRIAGE RETURN and a
+//LINE FEED, as in this example:
+//EXAMPLE 2 (Referer: http://frumble.com\015\012From:veeble@frotz.com\015\012)
+//The HTTP request header format is specified in Internet RFC 7231.
+//The S (settings) entry specifies a command settings dictionary (see 14.10.5.4, "Command settings").
+//Holding settings specific to the conversion engines.
+//14.10.5.4 Command settings
+//The S (settings) entry in a command dictionary, if present, shall contain a command settings dictionary,
+//which holds settings for conversion engines that shall be used in converting the results of the
+//command to PDF. "Table 395 — Entries in a Web Capture command settings dictionary" shows the
+//contents of this type of dictionary. If this entry is omitted, default values are assumed. Command
+//settings dictionaries may be shared by any command dictionaries that use the same settings.
+//Table 395 — Entries in a Web Capture command settings dictionary
+//Key Type Value
+//G dictionary (Optional) A dictionary containing global conversion engine settings relevant to all
+//conversion engines. If this entry is absent, default settings shall be used.
+//C dictionary (Optional) Settings for specific conversion engines. Each key in this dictionary is the
+//internal name of a conversion engine. The associated value is a dictionary containing
+//the settings associated with that conversion engine. If the settings for a particular
+//conversion engine are not found in the dictionary, default settings shall be used.
+//Each key in the C dictionary represents the internal name of a conversion engine, which shall be a
+//name object of the following form (without any spaces):
+///company:product:version:contentType
+//where
+//© ISO 2020 – All rights reserved 813
+//Sold by the PDF Association to 17781 | December 3, 2025 |
+//Single user only, copying and networking prohibited.
+//ISO 32000-2:2020(E)
+//• company denotes the name (or abbreviation) of the company that created the conversion
+//engine.
+//• product denotes the name of the conversion engine. This field may be left blank, but the
+//trailing COLON character (3Ah) is still required.
+//• version denotes the version of the conversion engine.
+//• contentType denotes an identifier for the content type the associated settings. shall be used
+//because some converters may handle multiple content types.
+//EXAMPLE /ADBE:H2PDF:1.0:HTML
+//All fields in the internal name are case-sensitive. The company field shall conform to the naming
+//guidelines described in Annex E, "Extending PDF". The values of the other fields shall be unrestricted,
+//except that they shall not contain a COLON.
+//The directed graph of PDF objects rooted by the command settings dictionary shall be entirely self-
+//contained; that is, it shall not contain any object referred to from elsewhere in the PDF file.
+//NOTE This facilitates the operation of making a deep copy of a command settings dictionary without
+//explicit knowledge of the settings it can contain.
+//14.10.6 Object attributes related to web capture
+//A given page object or image XObject may belong to at most one Web Capture content set, called its
+//parent content set. However, the object shall not have direct pointer to its parent content set. Such a
+//pointer may present problems for an application that traces all pointers from an object to determine
+//what resources the object depends on. Instead, the object’s ID entry (see "Table 31 — Entries in a page
+//object" and "Table 87 — Additional entries specific to an image dictionary") contains the digital
+//identifier of the parent content set, which shall be used to locate the parent content set using the IDS
+//name tree in the document’s name dictionary. (If the IDS entry for the identifier contains an array of
+//content sets, the parent may be found by searching the array for the content set whose O entry
+//includes the child object.)
+//In the course of creating PDF pages from HTML files, Web Capture frequently scales the contents down
+//to fit on fixed-sized pages. The PZ (preferred zoom) entry in a page object (see 7.7.3.3, "Page objects")
+//specifies a magnification factor by which the page may be scaled to undo the downscaling and view the
+//page at its original size. That is, when the page is viewed at the preferred magnification factor, one unit
+//in default user space corresponds to one original source pixel.
+
