@@ -191,6 +191,17 @@ extension ISO_32000.ContentStream {
 
         /// Set dash pattern ([array] phase d)
         case setDashPattern(array: [ISO_32000.UserSpace.Width], phase: ISO_32000.UserSpace.Width)
+
+        // MARK: - Marked Content (Section 14.6)
+
+        /// Begin marked-content sequence (/tag BMC)
+        case beginMarkedContent(tag: ISO_32000.COS.Name)
+
+        /// Begin marked-content sequence with property list (/tag <<...>> BDC)
+        case beginMarkedContentWithProperties(tag: ISO_32000.COS.Name, properties: ISO_32000.COS.Dictionary)
+
+        /// End marked-content sequence (EMC)
+        case endMarkedContent
     }
 }
 
@@ -430,6 +441,22 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: [.ascii.rightSquareBracket, .ascii.space])
             phase.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.d])
+
+        // Marked Content
+        case .beginMarkedContent(let tag):
+            buffer.append(.ascii.forwardSlash)
+            buffer.append(contentsOf: tag.rawValue.utf8)
+            buffer.append(contentsOf: [.ascii.space, .ascii.B, .ascii.M, .ascii.C])
+
+        case .beginMarkedContentWithProperties(let tag, let properties):
+            buffer.append(.ascii.forwardSlash)
+            buffer.append(contentsOf: tag.rawValue.utf8)
+            buffer.append(.ascii.space)
+            ISO_32000.COS.Dictionary.serialize(properties, into: &buffer)
+            buffer.append(contentsOf: [.ascii.space, .ascii.B, .ascii.D, .ascii.C])
+
+        case .endMarkedContent:
+            buffer.append(contentsOf: [.ascii.E, .ascii.M, .ascii.C])
         }
     }
 }

@@ -354,6 +354,30 @@ extension ISO_32000.ContentStream {
             emit(.setDashPattern(array: array, phase: phase))
         }
 
+        // MARK: - Marked Content Operators (Section 14.6)
+
+        /// Begin marked-content sequence (BMC)
+        ///
+        /// Use this for simple structure tags without properties.
+        public mutating func beginMarkedContent(tag: ISO_32000.COS.Name) {
+            emit(.beginMarkedContent(tag: tag))
+        }
+
+        /// Begin marked-content sequence with properties (BDC)
+        ///
+        /// Use this when the structure element has attributes (e.g., RowSpan, ColSpan).
+        public mutating func beginMarkedContent(
+            tag: ISO_32000.COS.Name,
+            properties: ISO_32000.COS.Dictionary
+        ) {
+            emit(.beginMarkedContentWithProperties(tag: tag, properties: properties))
+        }
+
+        /// End marked-content sequence (EMC)
+        public mutating func endMarkedContent() {
+            emit(.endMarkedContent)
+        }
+
         // MARK: - UserSpace Type Overloads
 
         /// Set transformation matrix from an AffineTransform (cm)

@@ -198,7 +198,7 @@ extension ISO_32000.Table.Row {
 extension ISO_32000.Table.Header {
     public typealias Cell = ISO_32000.TH
 }
- 
+
 // MARK: - TH Nested Types
 
 extension ISO_32000.`14`.`8`.`4`.`8`.`3`.TH {
