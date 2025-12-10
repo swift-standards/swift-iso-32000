@@ -13,13 +13,13 @@ struct `ISO_32000.Table Tests` {
 
     @Test
     func `Table with summary`() {
-        let table = ISO_32000.`14`.`8`.`4`.`8`.`3`.Table(summary: "Sales data for Q4 2024")
+        let table = ISO_32000.Table(summary: "Sales data for Q4 2024")
         #expect(table.summary == "Sales data for Q4 2024")
     }
 
     @Test
     func `Table without summary`() {
-        let table = ISO_32000.`14`.`8`.`4`.`8`.`3`.Table()
+        let table = ISO_32000.Table()
         #expect(table.summary == nil)
     }
 
@@ -35,7 +35,7 @@ struct `ISO_32000.Table Tests` {
 
     @Test
     func `TH with default values`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH()
+        let header = ISO_32000.TH()
         #expect(header.row.span == 1)
         #expect(header.col.span == 1)
         #expect(header.headers.isEmpty)
@@ -45,51 +45,51 @@ struct `ISO_32000.Table Tests` {
 
     @Test
     func `TH spanning multiple rows`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(row: .init(span: 3))
+        let header = ISO_32000.TH(row: .init(span: 3))
         #expect(header.row.span == 3)
         #expect(header.col.span == 1)
     }
 
     @Test
     func `TH spanning multiple columns`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(col: .init(span: 4))
+        let header = ISO_32000.TH(col: .init(span: 4))
         #expect(header.row.span == 1)
         #expect(header.col.span == 4)
     }
 
     @Test
     func `TH with row scope`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(scope: .row)
+        let header = ISO_32000.TH(scope: .row)
         #expect(header.scope == .row)
     }
 
     @Test
     func `TH with column scope`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(scope: .column)
+        let header = ISO_32000.TH(scope: .column)
         #expect(header.scope == .column)
     }
 
     @Test
     func `TH with both scope`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(scope: .both)
+        let header = ISO_32000.TH(scope: .both)
         #expect(header.scope == .both)
     }
 
     @Test
     func `TH with headers association`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(headers: ["h1", "h2", "h3"])
+        let header = ISO_32000.TH(headers: ["h1", "h2", "h3"])
         #expect(header.headers == ["h1", "h2", "h3"])
     }
 
     @Test
     func `TH with short form (PDF 2.0)`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(short: "Qty")
+        let header = ISO_32000.TH(short: "Qty")
         #expect(header.short == "Qty")
     }
 
     @Test
     func `TH fully configured`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(
+        let header = ISO_32000.TH(
             row: .init(span: 2),
             col: .init(span: 3),
             headers: ["region-header"],
@@ -107,7 +107,7 @@ struct `ISO_32000.Table Tests` {
 
     @Test
     func `TD with default values`() {
-        let cell = ISO_32000.`14`.`8`.`4`.`8`.`3`.TD()
+        let cell = ISO_32000.TD()
         #expect(cell.row.span == 1)
         #expect(cell.col.span == 1)
         #expect(cell.headers.isEmpty)
@@ -115,19 +115,19 @@ struct `ISO_32000.Table Tests` {
 
     @Test
     func `TD spanning multiple rows`() {
-        let cell = ISO_32000.`14`.`8`.`4`.`8`.`3`.TD(row: .init(span: 2))
+        let cell = ISO_32000.TD(row: .init(span: 2))
         #expect(cell.row.span == 2)
     }
 
     @Test
     func `TD spanning multiple columns`() {
-        let cell = ISO_32000.`14`.`8`.`4`.`8`.`3`.TD(col: .init(span: 5))
+        let cell = ISO_32000.TD(col: .init(span: 5))
         #expect(cell.col.span == 5)
     }
 
     @Test
     func `TD with headers association`() {
-        let cell = ISO_32000.`14`.`8`.`4`.`8`.`3`.TD(headers: ["name-header", "date-header"])
+        let cell = ISO_32000.TD(headers: ["name-header", "date-header"])
         #expect(cell.headers == ["name-header", "date-header"])
     }
 
@@ -135,20 +135,20 @@ struct `ISO_32000.Table Tests` {
 
     @Test
     func `THead creation`() {
-        let thead = ISO_32000.`14`.`8`.`4`.`8`.`3`.THead()
-        #expect(thead == ISO_32000.`14`.`8`.`4`.`8`.`3`.THead())
+        let thead = ISO_32000.THead()
+        #expect(thead == ISO_32000.THead())
     }
 
     @Test
     func `TBody creation`() {
-        let tbody = ISO_32000.`14`.`8`.`4`.`8`.`3`.TBody()
-        #expect(tbody == ISO_32000.`14`.`8`.`4`.`8`.`3`.TBody())
+        let tbody = ISO_32000.TBody()
+        #expect(tbody == ISO_32000.TBody())
     }
 
     @Test
     func `TFoot creation`() {
-        let tfoot = ISO_32000.`14`.`8`.`4`.`8`.`3`.TFoot()
-        #expect(tfoot == ISO_32000.`14`.`8`.`4`.`8`.`3`.TFoot())
+        let tfoot = ISO_32000.TFoot()
+        #expect(tfoot == ISO_32000.TFoot())
     }
 }
 
@@ -159,14 +159,14 @@ struct `ISO_32000.TH.Scope Tests` {
 
     @Test
     func `Scope raw values match spec`() {
-        #expect(ISO_32000.`14`.`8`.`4`.`8`.`3`.TH.Scope.row.rawValue == "Row")
-        #expect(ISO_32000.`14`.`8`.`4`.`8`.`3`.TH.Scope.column.rawValue == "Column")
-        #expect(ISO_32000.`14`.`8`.`4`.`8`.`3`.TH.Scope.both.rawValue == "Both")
+        #expect(ISO_32000.TH.Scope.row.rawValue == "Row")
+        #expect(ISO_32000.TH.Scope.column.rawValue == "Column")
+        #expect(ISO_32000.TH.Scope.both.rawValue == "Both")
     }
 
     @Test
     func `Scope allCases`() {
-        let cases = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH.Scope.allCases
+        let cases = ISO_32000.TH.Scope.allCases
         #expect(cases.count == 3)
         #expect(cases.contains(.row))
         #expect(cases.contains(.column))
@@ -193,7 +193,7 @@ struct `ISO_32000.Table.Hashable Tests` {
 
     @Test
     func `Table is Hashable`() {
-        var set: Set<ISO_32000.`14`.`8`.`4`.`8`.`3`.Table> = []
+        var set: Set<ISO_32000.Table> = []
         set.insert(.init(summary: "test"))
         set.insert(.init(summary: "test"))
         #expect(set.count == 1)
@@ -201,7 +201,7 @@ struct `ISO_32000.Table.Hashable Tests` {
 
     @Test
     func `TH is Hashable`() {
-        var set: Set<ISO_32000.`14`.`8`.`4`.`8`.`3`.TH> = []
+        var set: Set<ISO_32000.TH> = []
         set.insert(.init(scope: .row))
         set.insert(.init(scope: .row))
         #expect(set.count == 1)
@@ -209,7 +209,7 @@ struct `ISO_32000.Table.Hashable Tests` {
 
     @Test
     func `TD is Hashable`() {
-        var set: Set<ISO_32000.`14`.`8`.`4`.`8`.`3`.TD> = []
+        var set: Set<ISO_32000.TD> = []
         set.insert(.init(col: .init(span: 2)))
         set.insert(.init(col: .init(span: 2)))
         #expect(set.count == 1)
@@ -223,13 +223,13 @@ struct `ISO_32000.Table.Serialization Tests` {
 
     @Test
     func `TH serializes to PDF bytes`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH(
+        let header = ISO_32000.TH(
             col: .init(span: 2),
             scope: .column
         )
 
         var buffer: [UInt8] = []
-        ISO_32000.`14`.`8`.`4`.`8`.`3`.TH.serialize(header, into: &buffer)
+        ISO_32000.TH.serialize(header, into: &buffer)
 
         let output = String(bytes: buffer, encoding: .utf8)!
         #expect(output.contains("/S /TH"))
@@ -239,13 +239,13 @@ struct `ISO_32000.Table.Serialization Tests` {
 
     @Test
     func `TD serializes to PDF bytes`() {
-        let cell = ISO_32000.`14`.`8`.`4`.`8`.`3`.TD(
+        let cell = ISO_32000.TD(
             row: .init(span: 3),
             headers: ["h1"]
         )
 
         var buffer: [UInt8] = []
-        ISO_32000.`14`.`8`.`4`.`8`.`3`.TD.serialize(cell, into: &buffer)
+        ISO_32000.TD.serialize(cell, into: &buffer)
 
         let output = String(bytes: buffer, encoding: .utf8)!
         #expect(output.contains("/S /TD"))
@@ -255,10 +255,10 @@ struct `ISO_32000.Table.Serialization Tests` {
 
     @Test
     func `Table with summary serializes`() {
-        let table = ISO_32000.`14`.`8`.`4`.`8`.`3`.Table(summary: "Test table")
+        let table = ISO_32000.Table(summary: "Test table")
 
         var buffer: [UInt8] = []
-        ISO_32000.`14`.`8`.`4`.`8`.`3`.Table.serialize(table, into: &buffer)
+        ISO_32000.Table.serialize(table, into: &buffer)
 
         let output = String(bytes: buffer, encoding: .utf8)!
         #expect(output.contains("/S /Table"))
@@ -267,10 +267,10 @@ struct `ISO_32000.Table.Serialization Tests` {
 
     @Test
     func `TH default values omit optional attributes`() {
-        let header = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH()
+        let header = ISO_32000.TH()
 
         var buffer: [UInt8] = []
-        ISO_32000.`14`.`8`.`4`.`8`.`3`.TH.serialize(header, into: &buffer)
+        ISO_32000.TH.serialize(header, into: &buffer)
 
         let output = String(bytes: buffer, encoding: .utf8)!
         // Default span=1 should be omitted

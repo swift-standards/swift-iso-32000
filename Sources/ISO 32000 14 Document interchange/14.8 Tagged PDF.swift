@@ -83,21 +83,21 @@ extension ISO_32000.`14`.`8`.`4`.`8`.`3` {
     /// ISO 32000-2:2020, Table 371 — Table standard structure types
     public struct TH: Sendable, Hashable {
         /// Row attributes (Table 384)
-        public var row: Row
+        public var row: TH.Row
         /// Col attributes (Table 384)
-        public var col: Col
+        public var col: TH.Col
         /// Headers (Table 384) — IDs of associated header cells
         public var headers: [String]
         /// Scope (Table 384) — Row, Column, or Both (nil = implicit)
-        public var scope: Scope?
+        public var scope: TH.Scope?
         /// Short (Table 384, PDF 2.0) — short form of header content
         public var short: String?
 
         public init(
-            row: Row = Row(),
-            col: Col = Col(),
+            row: TH.Row = Row(),
+            col: TH.Col = Col(),
             headers: [String] = [],
-            scope: Scope? = nil,
+            scope: TH.Scope? = nil,
             short: String? = nil
         ) {
             self.row = row
@@ -174,6 +174,31 @@ extension ISO_32000.`14`.`8`.`4`.`8`.`3` {
     }
 }
 
+extension ISO_32000 {
+    public typealias Table = ISO_32000.`14`.`8`.`4`.`8`.`3`.Table
+    public typealias TR = ISO_32000.`14`.`8`.`4`.`8`.`3`.TR
+    public typealias TH = ISO_32000.`14`.`8`.`4`.`8`.`3`.TH
+    public typealias TD = ISO_32000.`14`.`8`.`4`.`8`.`3`.TD
+    public typealias THead = ISO_32000.`14`.`8`.`4`.`8`.`3`.THead
+    public typealias TBody = ISO_32000.`14`.`8`.`4`.`8`.`3`.TBody
+    public typealias TFoot = ISO_32000.`14`.`8`.`4`.`8`.`3`.TFoot
+}
+
+extension ISO_32000.Table {
+    public typealias Row = ISO_32000.TR
+    public typealias Header = ISO_32000.THead
+    public typealias Body = ISO_32000.TBody
+    public typealias Footer = ISO_32000.TFoot
+}
+
+extension ISO_32000.Table.Row {
+    public typealias Cell = ISO_32000.TD
+}
+
+extension ISO_32000.Table.Header {
+    public typealias Cell = ISO_32000.TH
+}
+ 
 // MARK: - TH Nested Types
 
 extension ISO_32000.`14`.`8`.`4`.`8`.`3`.TH {
