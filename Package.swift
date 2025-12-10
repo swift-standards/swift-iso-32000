@@ -29,9 +29,9 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swift-standards/swift-standards", from: "0.1.0"),
-        .package(url: "https://github.com/swift-standards/swift-iso-9899", from: "0.1.0"),
-        .package(url: "https://github.com/swift-standards/swift-ieee-754", from: "0.1.0"),
-        .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.1.0"),
+        .package(url: "https://github.com/swift-standards/swift-iso-9899", from: "0.2.2"),
+        .package(url: "https://github.com/swift-standards/swift-ieee-754", from: "0.3.3"),
+        .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.3"),
         .package(url: "https://github.com/swift-standards/swift-rfc-1950", from: "0.1.0"),
         .package(url: "https://github.com/swift-standards/swift-iec-61966", from: "0.1.0"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0"),
