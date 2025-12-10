@@ -90,7 +90,11 @@ let package = Package(
         ),
         .target(
             name: "ISO 32000 14 Document interchange",
-            dependencies: ["ISO 32000 Shared", "ISO 32000 7 Syntax"]
+            dependencies: [
+                "ISO 32000 Shared",
+                "ISO 32000 7 Syntax",
+                .product(name: "Standards", package: "swift-standards"),
+            ]
         ),
         .target(
             name: "ISO 32000 Annex D",

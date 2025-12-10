@@ -534,6 +534,31 @@ extension ISO_32000.`7`.`3`.`5`.Name {
     public static let a = Self(__unchecked: (), rawValue: "A")
     public static let s = Self(__unchecked: (), rawValue: "S")
     public static let uri = Self(__unchecked: (), rawValue: "URI")
+
+    // Table 371 — Table structure type names (14.8.4.8.3)
+    public static let table = Self(__unchecked: (), rawValue: "Table")
+    public static let tr = Self(__unchecked: (), rawValue: "TR")
+    public static let th = Self(__unchecked: (), rawValue: "TH")
+    public static let td = Self(__unchecked: (), rawValue: "TD")
+    public static let thead = Self(__unchecked: (), rawValue: "THead")
+    public static let tbody = Self(__unchecked: (), rawValue: "TBody")
+    public static let tfoot = Self(__unchecked: (), rawValue: "TFoot")
+
+    // Table 372 — Caption structure type name (14.8.4.8.4)
+    public static let caption = Self(__unchecked: (), rawValue: "Caption")
+
+    // Table 384 — Standard table attribute names (14.8.5.7)
+    public static let rowSpan = Self(__unchecked: (), rawValue: "RowSpan")
+    public static let colSpan = Self(__unchecked: (), rawValue: "ColSpan")
+    public static let headers = Self(__unchecked: (), rawValue: "Headers")
+    public static let scope = Self(__unchecked: (), rawValue: "Scope")
+    public static let summary = Self(__unchecked: (), rawValue: "Summary")
+    public static let short = Self(__unchecked: (), rawValue: "Short")
+
+    // Table 384 — Scope attribute values
+    public static let row = Self(__unchecked: (), rawValue: "Row")
+    public static let column = Self(__unchecked: (), rawValue: "Column")
+    public static let both = Self(__unchecked: (), rawValue: "Both")
 }
 
 // MARK: - 7.3.8 Stream Objects
