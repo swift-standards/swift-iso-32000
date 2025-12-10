@@ -253,8 +253,10 @@ extension ISO_32000.ContentStream {
         }
 
         /// Move to next line with leading (TD)
-        public mutating func moveTextWithLeading(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y)
-        {
+        public mutating func moveTextWithLeading(
+            x: ISO_32000.UserSpace.X,
+            y: ISO_32000.UserSpace.Y
+        ) {
             emit(.moveTextPositionWithLeading(tx: x, ty: y))
         }
 

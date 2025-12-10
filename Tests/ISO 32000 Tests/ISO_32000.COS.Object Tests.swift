@@ -191,7 +191,7 @@ struct `ISO_32000.COS.Object Tests` {
         if case .array(let elements) = obj {
             #expect(elements.count == 3)
             #expect(elements[0] == .integer(1))
-            if case .real(_) = elements[1] {
+            if case .real = elements[1] {
                 // pass
             } else {
                 Issue.record("Expected real at index 1")

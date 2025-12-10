@@ -137,8 +137,7 @@ extension ISO_32000.COS.StringValue {
         var escapeCount = 0
         for scalar in value.unicodeScalars {
             if let byte = ISO_32000.PDFDocEncoding.encode(scalar),
-                ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] != nil
-            {
+                ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] != nil {
                 escapeCount += 1
             }
         }

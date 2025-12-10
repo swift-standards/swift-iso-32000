@@ -13,7 +13,7 @@ struct `ISO_32000.COS.Dictionary Tests` {
     func `Creates empty dictionary`() {
         let dict: ISO_32000.COS.Dictionary = [:]
         #expect(dict.isEmpty)
-        #expect(dict.count == 0)
+        #expect(dict.isEmpty)
     }
 
     @Test

@@ -229,7 +229,7 @@ struct `ISO_32000.Writer Tests` {
         let pdf = writer.write(document)
 
         let path = try PDFOutput.write(pdf, name: "iso32000-simple")
-        #expect(pdf.count > 0)
+        #expect(!pdf.isEmpty)
         print("PDF written to: \(path)")
     }
 
@@ -249,7 +249,7 @@ struct `ISO_32000.Writer Tests` {
             contentBuilder.showText(
                 "\(pdfFont.baseFontName.rawValue): The quick brown fox jumps over the lazy dog."
             )
-            y = y - 30
+            y -= 30
             contentBuilder.moveText(x: -72, y: 0)
         }
 
@@ -268,7 +268,7 @@ struct `ISO_32000.Writer Tests` {
         let pdf = writer.write(document)
 
         let path = try PDFOutput.write(pdf, name: "iso32000-standard14-fonts")
-        #expect(pdf.count > 0)
+        #expect(!pdf.isEmpty)
         print("PDF written to: \(path)")
     }
 }

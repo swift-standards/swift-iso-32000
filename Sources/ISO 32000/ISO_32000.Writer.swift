@@ -165,8 +165,8 @@ extension ISO_32000 {
                 // Font resources
                 if !page.resources.fonts.isEmpty {
                     var fontResourceDict = COS.Dictionary()
-                    for name in page.resources.fonts.keys.sorted(by: { $0.rawValue < $1.rawValue })
-                    {
+                    for name in page.resources.fonts.keys
+                        .sorted(by: { $0.rawValue < $1.rawValue }) {
                         if let ref = fontRefs[name] {
                             fontResourceDict[name] = .reference(ref)
                         }

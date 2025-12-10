@@ -274,7 +274,10 @@ extension ISO_32000.`7`.`3`.`5` {
 
         /// Creates a name without validation (internal use only)
         @usableFromInline
-        init(__unchecked: Void, rawValue: String) {
+        init(
+            __unchecked: Void,
+            rawValue: String
+        ) {
             self.rawValue = rawValue
         }
 
@@ -302,6 +305,107 @@ extension ISO_32000.`7`.`3`.`5` {
 
             self.init(__unchecked: (), rawValue: rawValue)
         }
+    }
+}
+extension ISO_32000.`7`.`3`.`5`.Name {
+    @inlinable
+    public static var f1: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F1"
+        )
+    }
+
+    @inlinable
+    public static var f2: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F2"
+        )
+    }
+    @inlinable
+    public static var f3: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F3"
+        )
+    }
+    @inlinable
+    public static var f4: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F4"
+        )
+    }
+    @inlinable
+    public static var f5: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F5"
+        )
+    }
+    @inlinable
+    public static var f6: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F6"
+        )
+    }
+    @inlinable
+    public static var f7: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F7"
+        )
+    }
+    @inlinable
+    public static var f8: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F8"
+        )
+    }
+    @inlinable
+    public static var f9: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F9"
+        )
+    }
+    @inlinable
+    public static var f10: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F10"
+        )
+    }
+    @inlinable
+    public static var f11: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F11"
+        )
+    }
+    @inlinable
+    public static var f12: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F12"
+        )
+    }
+    @inlinable
+    public static var f13: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F13"
+        )
+    }
+    @inlinable
+    public static var f14: Self {
+        .init(
+            __unchecked: (),
+            rawValue: "F14"
+        )
     }
 }
 
@@ -589,13 +693,13 @@ extension ISO_32000.`7`.`3`.COS {
     ///
     /// ISO 32000-2:2020, Section 7.3.7 — Dictionary objects
     public struct Dictionary: Sendable, Hashable {
-        public var storage: Swift.Dictionary<Name, Object>
+        public var storage: [Name: Object]
 
         public init() {
             self.storage = [:]
         }
 
-        public init(_ storage: Swift.Dictionary<Name, Object>) {
+        public init(_ storage: [Name: Object]) {
             self.storage = storage
         }
 

@@ -3,24 +3,24 @@
 public import ISO_32000_Annex_D
 public import ISO_32000_Shared
 
-//9 Text
-//9.1 General
-//This clause describes the special facilities in PDF for dealing with text — specifically, for representing
-//characters with glyphs from fonts. A glyph is a graphical shape and is subject to all graphical
-//manipulations, such as coordinate transformation. Because of the importance of text in most page
-//descriptions, PDF provides higher-level facilities to describe, select, and render glyphs conveniently
-//and efficiently.
-//The first subclause is a general description of how glyphs from fonts are painted on the page.
-//Subsequent subclauses cover these topics in detail:
-//Text state. A subset of the graphics state parameters pertain to text, including parameters that select
-//the font, scale the glyphs to an appropriate size, and accomplish other graphical effects.
-//Text objects and operators. The text operators specify the glyphs to be painted, represented by string
-//objects whose values shall be interpreted as sequences of character codes. A text object encloses a
-//sequence of text operators and associated parameters.
-//Font data structures. Font dictionaries and associated data structures provide information that a PDF
-//processor needs to interpret the text and position the glyphs properly. The definitions of the glyphs
-//themselves shall be contained in font programs, which may be embedded in the PDF file, built into a
-//PDF processor, or obtained from an external font program.
+// 9 Text
+// 9.1 General
+// This clause describes the special facilities in PDF for dealing with text — specifically, for representing
+// characters with glyphs from fonts. A glyph is a graphical shape and is subject to all graphical
+// manipulations, such as coordinate transformation. Because of the importance of text in most page
+// descriptions, PDF provides higher-level facilities to describe, select, and render glyphs conveniently
+// and efficiently.
+// The first subclause is a general description of how glyphs from fonts are painted on the page.
+// Subsequent subclauses cover these topics in detail:
+// Text state. A subset of the graphics state parameters pertain to text, including parameters that select
+// the font, scale the glyphs to an appropriate size, and accomplish other graphical effects.
+// Text objects and operators. The text operators specify the glyphs to be painted, represented by string
+// objects whose values shall be interpreted as sequences of character codes. A text object encloses a
+// sequence of text operators and associated parameters.
+// Font data structures. Font dictionaries and associated data structures provide information that a PDF
+// processor needs to interpret the text and position the glyphs properly. The definitions of the glyphs
+// themselves shall be contained in font programs, which may be embedded in the PDF file, built into a
+// PDF processor, or obtained from an external font program.
 
 extension ISO_32000 {
     /// A text element combining content bytes with text state.
