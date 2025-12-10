@@ -22,7 +22,9 @@ extension ISO_32000.Graphics.State {
     /// Device-independent graphics state parameters (Table 51).
     ///
     /// Concrete type using `ISO_32000.Text.State` for text state.
-    public typealias DeviceIndependent = ISO_32000.`8`.`4`.Graphics.State.Device.Independent<ISO_32000.Text.State>
+    public typealias DeviceIndependent = ISO_32000.`8`.`4`.Graphics.State.Device.Independent<
+        ISO_32000.Text.State
+    >
 
     /// Device-dependent graphics state parameters (Table 52).
     ///

@@ -1,6 +1,7 @@
 // ISO_32000.COS.serialize Tests.swift
 
 import Testing
+
 @testable import ISO_32000
 
 @Suite
@@ -169,7 +170,7 @@ struct `ISO_32000.COS.serialize Tests` {
         let dict: ISO_32000.COS.Dictionary = [
             .type: .name(.page),
             .author: .string("Test"),
-            .count: .integer(1)
+            .count: .integer(1),
         ]
         ISO_32000.COS.serialize(.dictionary(dict), into: &buffer)
         let result = String(decoding: buffer, as: UTF8.self)

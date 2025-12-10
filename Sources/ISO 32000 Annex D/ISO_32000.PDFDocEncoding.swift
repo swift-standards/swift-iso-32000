@@ -50,30 +50,30 @@ extension ISO_32000 {
         /// - SR: Unicode codepoint that may require special representation in XML
         public static let decodeTable: [Unicode.Scalar?] = [
             // 0x00-0x17: Control characters (undefined - marked U in spec)
-            nil,         // 0x00 NULL (U)
-            nil,         // 0x01 START OF HEADING (U)
-            nil,         // 0x02 START OF TEXT (U)
-            nil,         // 0x03 END OF TEXT (U)
-            nil,         // 0x04 END OF TEXT (U) - note: typo in spec, should be EOT
-            nil,         // 0x05 END OF TRANSMISSION (U)
-            nil,         // 0x06 ACKNOWLEDGE (U)
-            nil,         // 0x07 BELL (U)
-            nil,         // 0x08 BACKSPACE (U)
+            nil,  // 0x00 NULL (U)
+            nil,  // 0x01 START OF HEADING (U)
+            nil,  // 0x02 START OF TEXT (U)
+            nil,  // 0x03 END OF TEXT (U)
+            nil,  // 0x04 END OF TEXT (U) - note: typo in spec, should be EOT
+            nil,  // 0x05 END OF TRANSMISSION (U)
+            nil,  // 0x06 ACKNOWLEDGE (U)
+            nil,  // 0x07 BELL (U)
+            nil,  // 0x08 BACKSPACE (U)
             "\u{0009}",  // 0x09 CHARACTER TABULATION (SR)
             "\u{000A}",  // 0x0A LINE FEED (SR)
-            nil,         // 0x0B LINE TABULATION (U)
-            nil,         // 0x0C FORM FEED (U)
+            nil,  // 0x0B LINE TABULATION (U)
+            nil,  // 0x0C FORM FEED (U)
             "\u{000D}",  // 0x0D CARRIAGE RETURN (SR)
-            nil,         // 0x0E SHIFT OUT (U)
-            nil,         // 0x0F SHIFT IN (U)
-            nil,         // 0x10 DATA LINK ESCAPE (U)
-            nil,         // 0x11 DEVICE CONTROL ONE (U)
-            nil,         // 0x12 DEVICE CONTROL TWO (U)
-            nil,         // 0x13 DEVICE CONTROL THREE (U)
-            nil,         // 0x14 DEVICE CONTROL FOUR (U)
-            nil,         // 0x15 NEGATIVE ACKNOWLEDGE (U)
-            nil,         // 0x16 SYNCHRONOUS IDLE (U)
-            nil,         // 0x17 END OF TRANSMISSION BLOCK (U)
+            nil,  // 0x0E SHIFT OUT (U)
+            nil,  // 0x0F SHIFT IN (U)
+            nil,  // 0x10 DATA LINK ESCAPE (U)
+            nil,  // 0x11 DEVICE CONTROL ONE (U)
+            nil,  // 0x12 DEVICE CONTROL TWO (U)
+            nil,  // 0x13 DEVICE CONTROL THREE (U)
+            nil,  // 0x14 DEVICE CONTROL FOUR (U)
+            nil,  // 0x15 NEGATIVE ACKNOWLEDGE (U)
+            nil,  // 0x16 SYNCHRONOUS IDLE (U)
+            nil,  // 0x17 END OF TRANSMISSION BLOCK (U)
 
             // 0x18-0x1F: Diacritical marks (unique to PDFDocEncoding)
             "\u{02D8}",  // 0x18 BREVE
@@ -185,7 +185,7 @@ extension ISO_32000 {
             "\u{007C}",  // 0x7C VERTICAL LINE
             "\u{007D}",  // 0x7D RIGHT CURLY BRACKET
             "\u{007E}",  // 0x7E TILDE
-            nil,         // 0x7F Undefined
+            nil,  // 0x7F Undefined
 
             // 0x80-0x9F: Typography characters
             "\u{2022}",  // 0x80 BULLET (note: differs from WinAnsi which has Euro)
@@ -219,7 +219,7 @@ extension ISO_32000 {
             "\u{0153}",  // 0x9C LATIN SMALL LIGATURE OE
             "\u{0161}",  // 0x9D LATIN SMALL LETTER S WITH CARON
             "\u{017E}",  // 0x9E LATIN SMALL LETTER Z WITH CARON
-            nil,         // 0x9F Undefined
+            nil,  // 0x9F Undefined
 
             // 0xA0-0xBF: Latin supplement (with PDFDocEncoding differences)
             "\u{20AC}",  // 0xA0 EURO SIGN (note: differs from Latin-1 which has NBSP)
@@ -235,7 +235,7 @@ extension ISO_32000 {
             "\u{00AA}",  // 0xAA FEMININE ORDINAL INDICATOR
             "\u{00AB}",  // 0xAB LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
             "\u{00AC}",  // 0xAC NOT SIGN
-            nil,         // 0xAD Undefined (note: Latin-1 has SOFT HYPHEN)
+            nil,  // 0xAD Undefined (note: Latin-1 has SOFT HYPHEN)
             "\u{00AE}",  // 0xAE REGISTERED SIGN
             "\u{00AF}",  // 0xAF MACRON
             "\u{00B0}",  // 0xB0 DEGREE SIGN

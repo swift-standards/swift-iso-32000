@@ -1,6 +1,7 @@
 // ISO_32000.COS.Name Tests.swift
 
 import Testing
+
 @testable import ISO_32000
 
 @Suite
@@ -139,8 +140,14 @@ struct `ISO_32000.COS.Name Tests` {
     @Test
     func `Error descriptions are informative`() {
         #expect(ISO_32000.COS.Name.Error.empty.description == "Name cannot be empty")
-        #expect(ISO_32000.COS.Name.Error.containsNullByte.description == "Name cannot contain null bytes")
-        #expect(ISO_32000.COS.Name.Error.containsWhitespace.description == "Name cannot contain whitespace")
+        #expect(
+            ISO_32000.COS.Name.Error.containsNullByte.description
+                == "Name cannot contain null bytes"
+        )
+        #expect(
+            ISO_32000.COS.Name.Error.containsWhitespace.description
+                == "Name cannot contain whitespace"
+        )
         #expect(ISO_32000.COS.Name.Error.tooLong(200).description.contains("200 bytes"))
     }
 }

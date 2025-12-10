@@ -1,8 +1,8 @@
 // ISO_32000.ContentStream.swift
 
+public import Geometry
 import ISO_9899
 import Standards
-public import Geometry
 
 extension ISO_32000 {
     /// PDF Content Stream
@@ -160,9 +160,12 @@ extension ISO_32000.ContentStream {
 
         /// Append a cubic Bezier curve (c)
         public mutating func curveTo(
-            x1: ISO_32000.UserSpace.X, y1: ISO_32000.UserSpace.Y,
-            x2: ISO_32000.UserSpace.X, y2: ISO_32000.UserSpace.Y,
-            x3: ISO_32000.UserSpace.X, y3: ISO_32000.UserSpace.Y
+            x1: ISO_32000.UserSpace.X,
+            y1: ISO_32000.UserSpace.Y,
+            x2: ISO_32000.UserSpace.X,
+            y2: ISO_32000.UserSpace.Y,
+            x3: ISO_32000.UserSpace.X,
+            y3: ISO_32000.UserSpace.Y
         ) {
             emit(.curveTo(x1: x1, y1: y1, x2: x2, y2: y2, x3: x3, y3: y3))
         }
@@ -250,7 +253,8 @@ extension ISO_32000.ContentStream {
         }
 
         /// Move to next line with leading (TD)
-        public mutating func moveTextWithLeading(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y) {
+        public mutating func moveTextWithLeading(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y)
+        {
             emit(.moveTextPositionWithLeading(tx: x, ty: y))
         }
 
@@ -260,8 +264,12 @@ extension ISO_32000.ContentStream {
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
         ///   - e, f: Translation in user space units
         public mutating func setTextMatrix(
-            a: Double, b: Double, c: Double, d: Double,
-            e: ISO_32000.UserSpace.X, f: ISO_32000.UserSpace.Y
+            a: Double,
+            b: Double,
+            c: Double,
+            d: Double,
+            e: ISO_32000.UserSpace.X,
+            f: ISO_32000.UserSpace.Y
         ) {
             emit(.setTextMatrix(a: a, b: b, c: c, d: d, e: e, f: f))
         }
@@ -337,7 +345,10 @@ extension ISO_32000.ContentStream {
         }
 
         /// Set dash pattern (d)
-        public mutating func setDashPattern(array: [ISO_32000.UserSpace.Width], phase: ISO_32000.UserSpace.Width) {
+        public mutating func setDashPattern(
+            array: [ISO_32000.UserSpace.Width],
+            phase: ISO_32000.UserSpace.Width
+        ) {
             emit(.setDashPattern(array: array, phase: phase))
         }
 
@@ -348,12 +359,23 @@ extension ISO_32000.ContentStream {
         /// Note: AffineTransform's a,b,c,d are dimensionless coefficients (stored as UserSpace.Unit
         /// for type uniformity), while tx,ty are actual spatial translations.
         public mutating func transform(_ t: ISO_32000.UserSpace.AffineTransform) {
-            emit(.transform(a: t.a.value, b: t.b.value, c: t.c.value, d: t.d.value, e: t.tx, f: t.ty))
+            emit(
+                .transform(a: t.a.value, b: t.b.value, c: t.c.value, d: t.d.value, e: t.tx, f: t.ty)
+            )
         }
 
         /// Rotate by angle in radians (convenience wrapper for cm)
         public mutating func rotate(_ angle: Radian) {
-            emit(.transform(a: angle.cos, b: angle.sin, c: -angle.sin, d: angle.cos, e: .init(0), f: .init(0)))
+            emit(
+                .transform(
+                    a: angle.cos,
+                    b: angle.sin,
+                    c: -angle.sin,
+                    d: angle.cos,
+                    e: .init(0),
+                    f: .init(0)
+                )
+            )
         }
 
         /// Rotate by angle in degrees (convenience wrapper for cm)
@@ -382,16 +404,28 @@ extension ISO_32000.ContentStream {
             control2: ISO_32000.UserSpace.Coordinate,
             end: ISO_32000.UserSpace.Coordinate
         ) {
-            emit(.curveTo(
-                x1: control1.x, y1: control1.y,
-                x2: control2.x, y2: control2.y,
-                x3: end.x, y3: end.y
-            ))
+            emit(
+                .curveTo(
+                    x1: control1.x,
+                    y1: control1.y,
+                    x2: control2.x,
+                    y2: control2.y,
+                    x3: end.x,
+                    y3: end.y
+                )
+            )
         }
 
         /// Append a rectangle (re)
         public mutating func rectangle(_ rect: ISO_32000.UserSpace.Rectangle) {
-            emit(.rectangle(x: rect.origin.x, y: rect.origin.y, width: rect.width, height: rect.height))
+            emit(
+                .rectangle(
+                    x: rect.origin.x,
+                    y: rect.origin.y,
+                    width: rect.width,
+                    height: rect.height
+                )
+            )
         }
 
         /// Append a circle path using 4 cubic Bézier curves
@@ -407,11 +441,16 @@ extension ISO_32000.ContentStream {
             emit(.moveTo(x: start.x, y: start.y))
 
             for curve in curves {
-                emit(.curveTo(
-                    x1: curve.control1.x, y1: curve.control1.y,
-                    x2: curve.control2.x, y2: curve.control2.y,
-                    x3: curve.end.x, y3: curve.end.y
-                ))
+                emit(
+                    .curveTo(
+                        x1: curve.control1.x,
+                        y1: curve.control1.y,
+                        x2: curve.control2.x,
+                        y2: curve.control2.y,
+                        x3: curve.end.x,
+                        y3: curve.end.y
+                    )
+                )
             }
 
             emit(.closePath)
@@ -424,7 +463,16 @@ extension ISO_32000.ContentStream {
 
         /// Set text matrix from an AffineTransform (Tm)
         public mutating func setTextMatrix(_ t: ISO_32000.UserSpace.AffineTransform) {
-            emit(.setTextMatrix(a: t.a.value, b: t.b.value, c: t.c.value, d: t.d.value, e: t.tx, f: t.ty))
+            emit(
+                .setTextMatrix(
+                    a: t.a.value,
+                    b: t.b.value,
+                    c: t.c.value,
+                    d: t.d.value,
+                    e: t.tx,
+                    f: t.ty
+                )
+            )
         }
     }
 }

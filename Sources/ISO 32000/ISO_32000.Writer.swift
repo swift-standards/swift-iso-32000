@@ -109,7 +109,7 @@ extension ISO_32000 {
                         annotDict[.border] = .array([
                             .integer(0),
                             .integer(0),
-                            .real(linkAnnot.borderWidth.value)
+                            .real(linkAnnot.borderWidth.value),
                         ])
 
                         // URI action
@@ -165,7 +165,8 @@ extension ISO_32000 {
                 // Font resources
                 if !page.resources.fonts.isEmpty {
                     var fontResourceDict = COS.Dictionary()
-                    for name in page.resources.fonts.keys.sorted(by: { $0.rawValue < $1.rawValue }) {
+                    for name in page.resources.fonts.keys.sorted(by: { $0.rawValue < $1.rawValue })
+                    {
                         if let ref = fontRefs[name] {
                             fontResourceDict[name] = .reference(ref)
                         }
@@ -176,7 +177,7 @@ extension ISO_32000 {
                 // ProcSet
                 resourcesDict[.procSet] = .array([
                     .name(.pdf),
-                    .name(.text)
+                    .name(.text),
                 ])
 
                 pageDict[.resources] = .dictionary(resourcesDict)

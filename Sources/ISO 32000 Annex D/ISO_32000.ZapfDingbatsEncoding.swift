@@ -152,7 +152,7 @@ extension ISO_32000 {
             "\u{275C}",  // 0x7C (174) a98 - ❜
             "\u{275D}",  // 0x7D (175) a99 - ❝
             "\u{275E}",  // 0x7E (176) a100 - ❞
-            nil,         // 0x7F undefined
+            nil,  // 0x7F undefined
 
             // 0x80-0x9F: Undefined
             nil, nil, nil, nil, nil, nil, nil, nil,
@@ -161,7 +161,7 @@ extension ISO_32000 {
             nil, nil, nil, nil, nil, nil, nil, nil,
 
             // 0xA0-0xBF: Hearts, arrows, and circled numbers
-            nil,         // 0xA0 undefined
+            nil,  // 0xA0 undefined
             "\u{2761}",  // 0xA1 (241) a101 - ❡
             "\u{2762}",  // 0xA2 (242) a102 - ❢
             "\u{2763}",  // 0xA3 (243) a103 - ❣
@@ -251,7 +251,7 @@ extension ISO_32000 {
             "\u{27AF}",  // 0xEF (357) a182 - ➯
 
             // 0xF0-0xFF: Final arrows
-            nil,         // 0xF0 undefined
+            nil,  // 0xF0 undefined
             "\u{27B1}",  // 0xF1 (361) a201 - ➱
             "\u{27B2}",  // 0xF2 (362) a183 - ➲
             "\u{27B3}",  // 0xF3 (363) a184 - ➳
@@ -266,7 +266,7 @@ extension ISO_32000 {
             "\u{27BC}",  // 0xFC (374) a189 - ➼
             "\u{27BD}",  // 0xFD (375) a190 - ➽
             "\u{27BE}",  // 0xFE (376) a191 - ➾
-            nil,         // 0xFF undefined
+            nil,  // 0xFF undefined
         ]
 
         // MARK: - Encode Table

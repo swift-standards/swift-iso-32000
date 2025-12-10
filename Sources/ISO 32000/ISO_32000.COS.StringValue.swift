@@ -2,8 +2,8 @@
 // StringValue base is defined in Section 7.3.
 // This file adds encoding-aware extensions using Annex D.
 
-import ISO_32000_Annex_D
 import ISO_32000_7_Syntax
+import ISO_32000_Annex_D
 
 // MARK: - PDFDocEncoding Support (Annex D)
 
@@ -137,7 +137,8 @@ extension ISO_32000.COS.StringValue {
         var escapeCount = 0
         for scalar in value.unicodeScalars {
             if let byte = ISO_32000.PDFDocEncoding.encode(scalar),
-               ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] != nil {
+                ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] != nil
+            {
                 escapeCount += 1
             }
         }

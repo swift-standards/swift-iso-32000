@@ -2,8 +2,9 @@
 // Unit tests for ISO 32000-2:2020 Annex D - Character sets and encodings
 
 import Foundation
-import Testing
 import ISO_32000_Shared
+import Testing
+
 @testable import ISO_32000_Annex_D
 
 @Suite
@@ -464,7 +465,7 @@ struct `ISO_32000.Encoding Tests` {
             // StandardEncoding: 0x27 = RIGHT SINGLE QUOTATION MARK
             // WinAnsiEncoding: 0x27 = APOSTROPHE (ASCII)
             #expect(ISO_32000.StandardEncoding.decode(0x27) == "\u{2019}")  // U+2019
-            #expect(ISO_32000.WinAnsiEncoding.decode(0x27) == "'")   // U+0027
+            #expect(ISO_32000.WinAnsiEncoding.decode(0x27) == "'")  // U+0027
         }
 
         @Test

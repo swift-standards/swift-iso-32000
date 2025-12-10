@@ -219,4 +219,3 @@ extension Collection where Element == UInt8 {
     @inlinable
     public var zapfDingbats: ISO_32000.ZapfDingbats<Self> { .init(self) }
 }
-

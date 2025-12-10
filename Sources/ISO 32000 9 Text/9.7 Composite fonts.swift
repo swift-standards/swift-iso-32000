@@ -2,7 +2,6 @@
 
 import ISO_32000_Shared
 
-
 //9.7 Composite fonts
 //9.7.1 General
 //A composite font, also called a Type 0 font, is one whose glyphs are obtained from a font-like object

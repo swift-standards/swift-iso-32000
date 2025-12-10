@@ -64,9 +64,12 @@ extension ISO_32000.`9`.`4` {
         ///   - e: Horizontal translation (default 0)
         ///   - f: Vertical translation (default 0)
         public init(
-            a: Double = 1, b: Double = 0,
-            c: Double = 0, d: Double = 1,
-            e: Double = 0, f: Double = 0
+            a: Double = 1,
+            b: Double = 0,
+            c: Double = 0,
+            d: Double = 1,
+            e: Double = 0,
+            f: Double = 0
         ) {
             self.a = a
             self.b = b
@@ -161,9 +164,12 @@ extension ISO_32000.`9`.`4` {
 
             // Build the font size/scaling matrix
             let fontMatrix = Matrix(
-                a: fontSize * th, b: 0,
-                c: 0, d: fontSize,
-                e: 0, f: rise
+                a: fontSize * th,
+                b: 0,
+                c: 0,
+                d: fontSize,
+                e: 0,
+                f: rise
             )
 
             // Concatenate: fontMatrix × Tm × CTM
@@ -270,7 +276,6 @@ extension ISO_32000.Text {
     /// TJ array element
     public typealias TJElement = ISO_32000.`9`.`4`.TJElement
 }
-
 
 //9.4 Text objects
 //9.4.1 General

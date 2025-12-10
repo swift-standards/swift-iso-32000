@@ -1,6 +1,7 @@
 // ISO_32000.COS.Dictionary Tests.swift
 
 import Testing
+
 @testable import ISO_32000
 
 @Suite
@@ -19,7 +20,7 @@ struct `ISO_32000.COS.Dictionary Tests` {
     func `Creates dictionary with initial entries`() throws {
         let dict: ISO_32000.COS.Dictionary = [
             .type: .name(.catalog),
-            .pages: .integer(5)
+            .pages: .integer(5),
         ]
         #expect(dict.count == 2)
         #expect(dict[.type] == .name(.catalog))
@@ -71,7 +72,7 @@ struct `ISO_32000.COS.Dictionary Tests` {
     func `Keys collection`() throws {
         let dict: ISO_32000.COS.Dictionary = [
             .type: .name(.page),
-            .parent: .reference(ISO_32000.COS.IndirectReference(objectNumber: 2, generation: 0))
+            .parent: .reference(ISO_32000.COS.IndirectReference(objectNumber: 2, generation: 0)),
         ]
         let keys = Array(dict.keys)
         #expect(keys.count == 2)
@@ -83,7 +84,7 @@ struct `ISO_32000.COS.Dictionary Tests` {
     func `Values collection`() throws {
         let dict: ISO_32000.COS.Dictionary = [
             .count: .integer(5),
-            .length: .integer(100)
+            .length: .integer(100),
         ]
         let values = Array(dict.values)
         #expect(values.count == 2)
@@ -96,7 +97,7 @@ struct `ISO_32000.COS.Dictionary Tests` {
         let dict: ISO_32000.COS.Dictionary = [
             .type: .name(.page),
             .author: .string(ISO_32000.COS.StringValue("Test")),
-            .count: .integer(1)
+            .count: .integer(1),
         ]
         let sorted = dict.sortedEntries
         #expect(sorted[0].key == .author)

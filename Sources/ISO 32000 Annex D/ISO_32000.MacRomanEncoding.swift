@@ -141,7 +141,7 @@ extension ISO_32000 {
             "\u{007C}",  // 0x7C (174) bar
             "\u{007D}",  // 0x7D (175) braceright
             "\u{007E}",  // 0x7E (176) asciitilde
-            nil,         // 0x7F undefined
+            nil,  // 0x7F undefined
 
             // 0x80-0x8F: Extended characters
             "\u{00C4}",  // 0x80 (200) Adieresis
@@ -193,25 +193,25 @@ extension ISO_32000 {
             "\u{2122}",  // 0xAA (252) trademark
             "\u{00B4}",  // 0xAB (253) acute
             "\u{00A8}",  // 0xAC (254) dieresis
-            nil,         // 0xAD undefined
+            nil,  // 0xAD undefined
             "\u{00C6}",  // 0xAE (256) AE
             "\u{00D8}",  // 0xAF (257) Oslash
 
             // 0xB0-0xBF: More symbols
-            nil,         // 0xB0 undefined
+            nil,  // 0xB0 undefined
             "\u{00B1}",  // 0xB1 (261) plusminus
-            nil,         // 0xB2 undefined
-            nil,         // 0xB3 undefined
+            nil,  // 0xB2 undefined
+            nil,  // 0xB3 undefined
             "\u{00A5}",  // 0xB4 (264) yen
             "\u{00B5}",  // 0xB5 (265) mu
-            nil,         // 0xB6 undefined
-            nil,         // 0xB7 undefined
-            nil,         // 0xB8 undefined
-            nil,         // 0xB9 undefined
-            nil,         // 0xBA undefined
+            nil,  // 0xB6 undefined
+            nil,  // 0xB7 undefined
+            nil,  // 0xB8 undefined
+            nil,  // 0xB9 undefined
+            nil,  // 0xBA undefined
             "\u{00AA}",  // 0xBB (273) ordfeminine
             "\u{00BA}",  // 0xBC (274) ordmasculine
-            nil,         // 0xBD undefined
+            nil,  // 0xBD undefined
             "\u{00E6}",  // 0xBE (276) ae
             "\u{00F8}",  // 0xBF (277) oslash
 
@@ -219,10 +219,10 @@ extension ISO_32000 {
             "\u{00BF}",  // 0xC0 (300) questiondown
             "\u{00A1}",  // 0xC1 (301) exclamdown
             "\u{00AC}",  // 0xC2 (302) logicalnot
-            nil,         // 0xC3 undefined
+            nil,  // 0xC3 undefined
             "\u{0192}",  // 0xC4 (304) florin
-            nil,         // 0xC5 undefined
-            nil,         // 0xC6 undefined
+            nil,  // 0xC5 undefined
+            nil,  // 0xC6 undefined
             "\u{00AB}",  // 0xC7 (307) guillemotleft
             "\u{00BB}",  // 0xC8 (310) guillemotright
             "\u{2026}",  // 0xC9 (311) ellipsis
@@ -241,7 +241,7 @@ extension ISO_32000 {
             "\u{2018}",  // 0xD4 (324) quoteleft
             "\u{2019}",  // 0xD5 (325) quoteright
             "\u{00F7}",  // 0xD6 (326) divide
-            nil,         // 0xD7 undefined
+            nil,  // 0xD7 undefined
             "\u{00FF}",  // 0xD8 (330) ydieresis
             "\u{0178}",  // 0xD9 (331) Ydieresis
             "\u{2044}",  // 0xDA (332) fraction
@@ -270,7 +270,7 @@ extension ISO_32000 {
             "\u{00D4}",  // 0xEF (357) Ocircumflex
 
             // 0xF0-0xFF: Final characters
-            nil,         // 0xF0 undefined
+            nil,  // 0xF0 undefined
             "\u{00D2}",  // 0xF1 (361) Ograve
             "\u{00DA}",  // 0xF2 (362) Uacute
             "\u{00DB}",  // 0xF3 (363) Ucircumflex

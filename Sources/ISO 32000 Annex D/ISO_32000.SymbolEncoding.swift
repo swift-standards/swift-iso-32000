@@ -143,7 +143,7 @@ extension ISO_32000 {
             "\u{007C}",  // 0x7C (174) bar
             "\u{007D}",  // 0x7D (175) braceright
             "\u{223C}",  // 0x7E (176) similar (~)
-            nil,         // 0x7F undefined
+            nil,  // 0x7F undefined
 
             // 0x80-0x9F: Undefined
             nil, nil, nil, nil, nil, nil, nil, nil,
@@ -242,7 +242,7 @@ extension ISO_32000 {
             "\u{23AA}",  // 0xEF (357) braceex
 
             // 0xF0-0xFF: Integral, angle right, etc.
-            nil,         // 0xF0 undefined
+            nil,  // 0xF0 undefined
             "\u{232A}",  // 0xF1 (361) angleright (〉)
             "\u{222B}",  // 0xF2 (362) integral (∫)
             "\u{2320}",  // 0xF3 (363) integraltp (⌠)
@@ -257,7 +257,7 @@ extension ISO_32000 {
             "\u{23AB}",  // 0xFC (374) bracerighttp
             "\u{23AC}",  // 0xFD (375) bracerightmid
             "\u{23AD}",  // 0xFE (376) bracerightbt
-            nil,         // 0xFF undefined
+            nil,  // 0xFF undefined
         ]
 
         // MARK: - Encode Table

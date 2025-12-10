@@ -148,7 +148,7 @@ extension ISO_32000 {
             "\u{007C}",  // 0x7C (174) bar
             "\u{007D}",  // 0x7D (175) braceright
             "\u{007E}",  // 0x7E (176) asciitilde
-            nil,         // 0x7F undefined
+            nil,  // 0x7F undefined
 
             // 0x80-0x9F: Undefined in StandardEncoding
             nil, nil, nil, nil, nil, nil, nil, nil,
@@ -157,7 +157,7 @@ extension ISO_32000 {
             nil, nil, nil, nil, nil, nil, nil, nil,
 
             // 0xA0-0xBF: Extended characters
-            nil,         // 0xA0 undefined
+            nil,  // 0xA0 undefined
             "\u{00A1}",  // 0xA1 (241) exclamdown
             "\u{00A2}",  // 0xA2 (242) cent
             "\u{00A3}",  // 0xA3 (243) sterling
@@ -175,12 +175,12 @@ extension ISO_32000 {
             "\u{FB02}",  // 0xAF (257) fl ligature
 
             // 0xB0-0xBF: More extended characters
-            nil,         // 0xB0 undefined
+            nil,  // 0xB0 undefined
             "\u{2013}",  // 0xB1 (261) endash
             "\u{2020}",  // 0xB2 (262) dagger
             "\u{2021}",  // 0xB3 (263) daggerdbl
             "\u{00B7}",  // 0xB4 (264) periodcentered
-            nil,         // 0xB5 undefined
+            nil,  // 0xB5 undefined
             "\u{00B6}",  // 0xB6 (266) paragraph
             "\u{2022}",  // 0xB7 (267) bullet
             "\u{201A}",  // 0xB8 (270) quotesinglbase
@@ -189,11 +189,11 @@ extension ISO_32000 {
             "\u{00BB}",  // 0xBB (273) guillemotright
             "\u{2026}",  // 0xBC (274) ellipsis
             "\u{2030}",  // 0xBD (275) perthousand
-            nil,         // 0xBE undefined
+            nil,  // 0xBE undefined
             "\u{00BF}",  // 0xBF (277) questiondown
 
             // 0xC0-0xCF: Diacritical marks and special
-            nil,         // 0xC0 undefined
+            nil,  // 0xC0 undefined
             "\u{0060}",  // 0xC1 (301) grave
             "\u{00B4}",  // 0xC2 (302) acute
             "\u{02C6}",  // 0xC3 (303) circumflex
@@ -202,10 +202,10 @@ extension ISO_32000 {
             "\u{02D8}",  // 0xC6 (306) breve
             "\u{02D9}",  // 0xC7 (307) dotaccent
             "\u{00A8}",  // 0xC8 (310) dieresis
-            nil,         // 0xC9 undefined
+            nil,  // 0xC9 undefined
             "\u{02DA}",  // 0xCA (312) ring
             "\u{00B8}",  // 0xCB (313) cedilla
-            nil,         // 0xCC undefined
+            nil,  // 0xCC undefined
             "\u{02DD}",  // 0xCD (315) hungarumlaut
             "\u{02DB}",  // 0xCE (316) ogonek
             "\u{02C7}",  // 0xCF (317) caron
@@ -216,9 +216,9 @@ extension ISO_32000 {
             nil, nil, nil, nil, nil, nil, nil, nil,
 
             // 0xE0-0xEF: AE, OE, Oslash, etc.
-            nil,         // 0xE0 undefined
+            nil,  // 0xE0 undefined
             "\u{00C6}",  // 0xE1 (341) AE
-            nil,         // 0xE2 undefined
+            nil,  // 0xE2 undefined
             "\u{00AA}",  // 0xE3 (343) ordfeminine
             nil, nil, nil, nil,
             "\u{0141}",  // 0xE8 (350) Lslash
@@ -228,7 +228,7 @@ extension ISO_32000 {
             nil, nil, nil, nil,
 
             // 0xF0-0xFF: ae, oe, oslash, etc.
-            nil,         // 0xF0 undefined
+            nil,  // 0xF0 undefined
             "\u{00E6}",  // 0xF1 (361) ae
             nil, nil, nil,
             "\u{0131}",  // 0xF5 (365) dotlessi

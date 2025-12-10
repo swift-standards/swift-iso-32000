@@ -2,8 +2,8 @@
 // Object is defined in Section 7.3 and re-exported via COS typealias.
 // This file provides additional COS.Object convenience initializers.
 
-import ISO_32000_8_Graphics
 public import Geometry
+import ISO_32000_8_Graphics
 
 // MARK: - Rectangle Conversions
 
@@ -19,7 +19,7 @@ extension ISO_32000.COS.Object {
             .real(rect.llx.value.value),
             .real(rect.lly.value.value),
             .real(rect.urx.value.value),
-            .real(rect.ury.value.value)
+            .real(rect.ury.value.value),
         ])
     }
 
@@ -31,7 +31,7 @@ extension ISO_32000.COS.Object {
             .real(rect.llx.value),
             .real(rect.lly.value),
             .real(rect.urx.value),
-            .real(rect.ury.value)
+            .real(rect.ury.value),
         ])
     }
 }

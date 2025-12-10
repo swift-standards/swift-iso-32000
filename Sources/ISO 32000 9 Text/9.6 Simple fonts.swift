@@ -8,9 +8,9 @@
 //   9.6.5  TrueType fonts
 //   9.6.6  Type 3 fonts
 
-public import ISO_32000_Shared
 public import ISO_32000_7_Syntax
 public import ISO_32000_8_Graphics
+public import ISO_32000_Shared
 
 extension ISO_32000.`9` {
     /// ISO 32000-2:2020, 9.6 Simple fonts
@@ -144,7 +144,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Helvetica Bold
         public static let bold = ISO_32000.`9`.`6`.Font(
             baseFontName: .helveticaBold,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F2"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F2"),
             metrics: .helveticaBold,
             isMonospaced: false,
             weight: .bold,
@@ -155,7 +155,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Helvetica Oblique
         public static let oblique = ISO_32000.`9`.`6`.Font(
             baseFontName: .helveticaOblique,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F3"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F3"),
             metrics: .helvetica,
             isMonospaced: false,
             weight: .regular,
@@ -166,7 +166,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Helvetica Bold Oblique
         public static let boldOblique = ISO_32000.`9`.`6`.Font(
             baseFontName: .helveticaBoldOblique,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F4"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F4"),
             metrics: .helveticaBold,
             isMonospaced: false,
             weight: .bold,
@@ -182,7 +182,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Times Roman (regular)
         public static let regular = ISO_32000.`9`.`6`.Font(
             baseFontName: .timesRoman,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F5"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F5"),
             metrics: .timesRoman,
             isMonospaced: false,
             weight: .regular,
@@ -193,7 +193,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Times Bold
         public static let bold = ISO_32000.`9`.`6`.Font(
             baseFontName: .timesBold,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F6"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F6"),
             metrics: .timesBold,
             isMonospaced: false,
             weight: .bold,
@@ -204,7 +204,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Times Italic
         public static let italic = ISO_32000.`9`.`6`.Font(
             baseFontName: .timesItalic,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F7"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F7"),
             metrics: .timesRoman,
             isMonospaced: false,
             weight: .regular,
@@ -215,7 +215,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Times Bold Italic
         public static let boldItalic = ISO_32000.`9`.`6`.Font(
             baseFontName: .timesBoldItalic,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F8"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F8"),
             metrics: .timesBold,
             isMonospaced: false,
             weight: .bold,
@@ -231,7 +231,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Courier Regular
         public static let regular = ISO_32000.`9`.`6`.Font(
             baseFontName: .courier,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F9"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F9"),
             metrics: .courier,
             isMonospaced: true,
             weight: .regular,
@@ -242,7 +242,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Courier Bold
         public static let bold = ISO_32000.`9`.`6`.Font(
             baseFontName: .courierBold,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F10"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F10"),
             metrics: .courier,
             isMonospaced: true,
             weight: .bold,
@@ -253,7 +253,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Courier Oblique
         public static let oblique = ISO_32000.`9`.`6`.Font(
             baseFontName: .courierOblique,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F11"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F11"),
             metrics: .courier,
             isMonospaced: true,
             weight: .regular,
@@ -264,7 +264,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Courier Bold Oblique
         public static let boldOblique = ISO_32000.`9`.`6`.Font(
             baseFontName: .courierBoldOblique,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F12"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F12"),
             metrics: .courier,
             isMonospaced: true,
             weight: .bold,
@@ -280,7 +280,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// Symbol font
         public static let regular = ISO_32000.`9`.`6`.Font(
             baseFontName: .symbol,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F13"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F13"),
             metrics: .symbol,
             isMonospaced: false,
             weight: .regular,
@@ -296,7 +296,7 @@ extension ISO_32000.`9`.`6`.Font {
         /// ZapfDingbats font
         public static let regular = ISO_32000.`9`.`6`.Font(
             baseFontName: .zapfDingbats,
-            resourceName: try! ISO_32000.`7`.`3`.COS.Name( "F14"),
+            resourceName: try! ISO_32000.`7`.`3`.COS.Name("F14"),
             metrics: .zapfDingbats,
             isMonospaced: false,
             weight: .regular,
@@ -352,7 +352,10 @@ extension ISO_32000.`9`.`6`.Font {
 
 extension ISO_32000.`9`.`6`.Font {
     /// Calculate width of a String at a specific font size
-    public func width(of text: String, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+    public func width(
+        of text: String,
+        atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+    ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
         metrics.width(of: text, atSize: size)
     }
 
@@ -364,7 +367,10 @@ extension ISO_32000.`9`.`6`.Font {
         let font: ISO_32000.`9`.`6`.Font
 
         /// Calculate width of WinAnsi-encoded bytes at a specific font size
-        public func width<Bytes: Collection>(of bytes: Bytes, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit where Bytes.Element == UInt8 {
+        public func width<Bytes: Collection>(
+            of bytes: Bytes,
+            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit where Bytes.Element == UInt8 {
             font.metrics.winAnsi.width(of: bytes, atSize: size)
         }
     }
@@ -380,9 +386,7 @@ extension ISO_32000.`9`.`6`.Font {
         style: Style = .normal
     ) -> ISO_32000.`9`.`6`.Font? {
         standard14.first { font in
-            font.family == family &&
-            font.weight == weight &&
-            font.style == style
+            font.family == family && font.weight == weight && font.style == style
         }
     }
 
@@ -404,9 +408,6 @@ extension ISO_32000.`9`.`6`.Font {
         Self.find(family: family, weight: .regular, style: .normal) ?? self
     }
 }
-
-
-
 
 //9.6 Simple fonts
 //9.6.1 General

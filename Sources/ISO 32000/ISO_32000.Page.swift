@@ -1,7 +1,7 @@
 // ISO_32000.Page.swift
 
-import ISO_32000_8_Graphics
 public import Geometry
+import ISO_32000_8_Graphics
 
 extension ISO_32000 {
     /// A PDF page

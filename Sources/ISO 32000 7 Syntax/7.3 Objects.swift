@@ -12,11 +12,11 @@
 //   7.3.9  Null object
 //   7.3.10 Indirect objects
 
-public import ISO_32000_Shared
-public import INCITS_4_1986
-import Standards
 public import Formatting
 import IEEE_754
+public import INCITS_4_1986
+public import ISO_32000_Shared
+import Standards
 
 extension ISO_32000.`7` {
     /// ISO 32000-2:2020, 7.3 Objects
@@ -47,14 +47,14 @@ extension ISO_32000.`7`.`3`.Table.`3` {
     /// Per Section 7.3.4.2:
     /// > Within a literal string, the REVERSE SOLIDUS is used as an escape character.
     public static let escapeTable: [UInt8: [UInt8]] = [
-        .ascii.lf: [.ascii.backslash, .ascii.n],     // \n
-        .ascii.cr: [.ascii.backslash, .ascii.r],     // \r
-        .ascii.htab: [.ascii.backslash, .ascii.t],   // \t
-        .ascii.bs: [.ascii.backslash, .ascii.b],     // \b
-        .ascii.ff: [.ascii.backslash, .ascii.f],     // \f
-        .ascii.leftParenthesis: [.ascii.backslash, .ascii.leftParenthesis],   // \(
-        .ascii.rightParenthesis: [.ascii.backslash, .ascii.rightParenthesis], // \)
-        .ascii.backslash: [.ascii.backslash, .ascii.backslash],               // \\
+        .ascii.lf: [.ascii.backslash, .ascii.n],  // \n
+        .ascii.cr: [.ascii.backslash, .ascii.r],  // \r
+        .ascii.htab: [.ascii.backslash, .ascii.t],  // \t
+        .ascii.bs: [.ascii.backslash, .ascii.b],  // \b
+        .ascii.ff: [.ascii.backslash, .ascii.f],  // \f
+        .ascii.leftParenthesis: [.ascii.backslash, .ascii.leftParenthesis],  // \(
+        .ascii.rightParenthesis: [.ascii.backslash, .ascii.rightParenthesis],  // \)
+        .ascii.backslash: [.ascii.backslash, .ascii.backslash],  // \\
     ]
 
     /// Serialize pre-encoded bytes as a PDF literal string.
@@ -68,7 +68,10 @@ extension ISO_32000.`7`.`3`.Table.`3` {
     ///   - bytes: Pre-encoded bytes to serialize
     ///   - buffer: Output buffer to append to
     @inlinable
-    public static func serializeLiteralString<Bytes: Collection, Buffer: RangeReplaceableCollection>(
+    public static func serializeLiteralString<
+        Bytes: Collection,
+        Buffer: RangeReplaceableCollection
+    >(
         _ bytes: Bytes,
         into buffer: inout Buffer
     ) where Bytes.Element == UInt8, Buffer.Element == UInt8 {
@@ -319,7 +322,8 @@ extension ISO_32000.`7`.`3`.`5`.Name.Error: CustomStringConvertible {
         case .empty:
             return "Name cannot be empty"
         case .tooLong(let count):
-            return "Name too long: \(count) bytes (max \(ISO_32000.`7`.`3`.`5`.Name.Limits.maxLength))"
+            return
+                "Name too long: \(count) bytes (max \(ISO_32000.`7`.`3`.`5`.Name.Limits.maxLength))"
         case .containsNullByte:
             return "Name cannot contain null bytes"
         case .containsWhitespace:
@@ -380,7 +384,10 @@ extension ISO_32000.`7`.`3`.`5`.Name {
     public static let helvetica = Self(__unchecked: (), rawValue: "Helvetica")
     public static let helveticaBold = Self(__unchecked: (), rawValue: "Helvetica-Bold")
     public static let helveticaOblique = Self(__unchecked: (), rawValue: "Helvetica-Oblique")
-    public static let helveticaBoldOblique = Self(__unchecked: (), rawValue: "Helvetica-BoldOblique")
+    public static let helveticaBoldOblique = Self(
+        __unchecked: (),
+        rawValue: "Helvetica-BoldOblique"
+    )
     public static let timesRoman = Self(__unchecked: (), rawValue: "Times-Roman")
     public static let timesBold = Self(__unchecked: (), rawValue: "Times-Bold")
     public static let timesItalic = Self(__unchecked: (), rawValue: "Times-Italic")
@@ -621,7 +628,9 @@ extension ISO_32000.`7`.`3`.COS {
 }
 
 extension ISO_32000.`7`.`3`.COS.Dictionary: ExpressibleByDictionaryLiteral {
-    public init(dictionaryLiteral elements: (ISO_32000.`7`.`3`.COS.Name, ISO_32000.`7`.`3`.COS.Object)...) {
+    public init(
+        dictionaryLiteral elements: (ISO_32000.`7`.`3`.COS.Name, ISO_32000.`7`.`3`.COS.Object)...
+    ) {
         self.storage = .init(uniqueKeysWithValues: elements)
     }
 }

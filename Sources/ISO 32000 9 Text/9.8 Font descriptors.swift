@@ -5,9 +5,9 @@
 //   9.8.2  Font descriptor flags
 //   9.8.3  Font metrics
 
-public import ISO_32000_Shared
 public import ISO_32000_8_Graphics
 import ISO_32000_Annex_D
+public import ISO_32000_Shared
 
 extension ISO_32000.`9` {
     /// ISO 32000-2:2020, 9.8 Font descriptors
@@ -67,7 +67,9 @@ extension ISO_32000.`9`.`8`.FontDesign {
         /// - Parameter fontSize: The font size in user space units
         /// - Returns: The measurement in user space units
         @inlinable
-        public func atSize(_ fontSize: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        public func atSize(
+            _ fontSize: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
             ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(value) * fontSize.value / 1000.0)
         }
     }
@@ -226,7 +228,10 @@ extension ISO_32000.`9`.`8` {
         }
 
         /// Calculate width of a String at a specific font size
-        public func width(of text: String, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        public func width(
+            of text: String,
+            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
             width(of: text).atSize(size)
         }
 
@@ -238,7 +243,8 @@ extension ISO_32000.`9`.`8` {
             let metrics: Metrics
 
             /// Calculate width of WinAnsi-encoded bytes in font design units
-            public func width<Bytes: Collection>(of bytes: Bytes) -> FontDesign.Unit where Bytes.Element == UInt8 {
+            public func width<Bytes: Collection>(of bytes: Bytes) -> FontDesign.Unit
+            where Bytes.Element == UInt8 {
                 var total: FontDesign.Unit = 0
                 for byte in bytes {
                     if let scalar = ISO_32000.WinAnsiEncoding.decode(byte) {
@@ -249,7 +255,10 @@ extension ISO_32000.`9`.`8` {
             }
 
             /// Calculate width of WinAnsi-encoded bytes at a specific font size
-            public func width<Bytes: Collection>(of bytes: Bytes, atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit where Bytes.Element == UInt8 {
+            public func width<Bytes: Collection>(
+                of bytes: Bytes,
+                atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+            ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit where Bytes.Element == UInt8 {
                 width(of: bytes).atSize(size)
             }
         }
@@ -270,32 +279,44 @@ extension ISO_32000.`9`.`8` {
         }
 
         /// Line height at a specific font size
-        public func lineHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        public func lineHeight(
+            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
             lineHeight.atSize(size)
         }
 
         /// Normal line height at a specific font size (includes leading)
-        public func normalLineHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        public func normalLineHeight(
+            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
             normalLineHeight.atSize(size)
         }
 
         /// Ascender at a specific font size
-        public func ascender(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        public func ascender(
+            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
             ascender.atSize(size)
         }
 
         /// Descender at a specific font size (negative value)
-        public func descender(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        public func descender(
+            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
             descender.atSize(size)
         }
 
         /// x-height at a specific font size
-        public func xHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        public func xHeight(
+            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
             xHeight.atSize(size)
         }
 
         /// Cap height at a specific font size
-        public func capHeight(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+        public func capHeight(
+            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
             capHeight.atSize(size)
         }
 
@@ -326,7 +347,9 @@ extension ISO_32000.`9`.`8` {
             }
 
             /// Glyph width at a specific font size
-            public func width(atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+            public func width(
+                atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+            ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
                 width.atSize(size)
             }
         }
@@ -370,14 +393,14 @@ extension ISO_32000.`9`.`8`.Metrics {
             0x201A: 222,  // quotesinglbase (WinAnsi 0x82)
             0x0192: 556,  // florin (WinAnsi 0x83)
             0x201E: 333,  // quotedblbase (WinAnsi 0x84)
-            0x2026: 1000, // ellipsis (WinAnsi 0x85)
+            0x2026: 1000,  // ellipsis (WinAnsi 0x85)
             0x2020: 556,  // dagger (WinAnsi 0x86)
             0x2021: 556,  // daggerdbl (WinAnsi 0x87)
             0x02C6: 333,  // circumflex (WinAnsi 0x88)
-            0x2030: 1000, // perthousand (WinAnsi 0x89)
+            0x2030: 1000,  // perthousand (WinAnsi 0x89)
             0x0160: 667,  // Scaron (WinAnsi 0x8A)
             0x2039: 333,  // guilsinglleft (WinAnsi 0x8B)
-            0x0152: 1000, // OE (WinAnsi 0x8C)
+            0x0152: 1000,  // OE (WinAnsi 0x8C)
             0x017D: 611,  // Zcaron (WinAnsi 0x8E)
 
             // Quotes and punctuation
@@ -387,9 +410,9 @@ extension ISO_32000.`9`.`8`.Metrics {
             0x201D: 333,  // quotedblright (WinAnsi 0x94)
             0x2022: 350,  // bullet (WinAnsi 0x95) *** KEY FOR LIST MARKERS ***
             0x2013: 556,  // endash (WinAnsi 0x96)
-            0x2014: 1000, // emdash (WinAnsi 0x97)
+            0x2014: 1000,  // emdash (WinAnsi 0x97)
             0x02DC: 333,  // tilde (WinAnsi 0x98)
-            0x2122: 1000, // trademark (WinAnsi 0x99)
+            0x2122: 1000,  // trademark (WinAnsi 0x99)
             0x0161: 500,  // scaron (WinAnsi 0x9A)
             0x203A: 333,  // guilsinglright (WinAnsi 0x9B)
             0x0153: 944,  // oe (WinAnsi 0x9C)
@@ -432,7 +455,7 @@ extension ISO_32000.`9`.`8`.Metrics {
 
             // Uppercase accented (192-223)
             0x00C0: 667, 0x00C1: 667, 0x00C2: 667, 0x00C3: 667, 0x00C4: 667, 0x00C5: 667,  // À-Å
-            0x00C6: 1000, // Æ
+            0x00C6: 1000,  // Æ
             0x00C7: 722,  // Ç
             0x00C8: 667, 0x00C9: 667, 0x00CA: 667, 0x00CB: 667,  // È-Ë
             0x00CC: 278, 0x00CD: 278, 0x00CE: 278, 0x00CF: 278,  // Ì-Ï
@@ -577,8 +600,6 @@ extension ISO_32000.`9`.`8`.Metrics {
         xHeight: 0
     )
 }
-
-
 
 //9.9 Embedded font programs
 //9.9.1 General

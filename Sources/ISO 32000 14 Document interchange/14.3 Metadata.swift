@@ -5,8 +5,8 @@
 //   14.3.2  Metadata streams
 //   14.3.3  Document information dictionary
 
-public import ISO_32000_Shared
 public import ISO_32000_7_Syntax
+public import ISO_32000_Shared
 
 extension ISO_32000.`14` {
     /// ISO 32000-2:2020, 14.3 Metadata

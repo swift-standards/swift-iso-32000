@@ -5,8 +5,8 @@
 //  Created by Coen ten Thije Boonkkamp on 05/12/2025.
 //
 
-import ISO_32000_Shared
 import ISO_32000_12_Interactive_features
+import ISO_32000_Shared
 
 extension ISO_32000 {
     /// Text decoration options

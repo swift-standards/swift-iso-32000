@@ -1,7 +1,7 @@
 // ISO_32000.ContentStream.Operator.swift
 
-import Geometry
 import Formatting
+import Geometry
 import ISO_32000_7_Syntax
 
 extension ISO_32000.ContentStream {
@@ -68,9 +68,12 @@ extension ISO_32000.ContentStream {
 
         /// Append cubic Bezier curve (x1 y1 x2 y2 x3 y3 c)
         case curveTo(
-            x1: ISO_32000.UserSpace.X, y1: ISO_32000.UserSpace.Y,
-            x2: ISO_32000.UserSpace.X, y2: ISO_32000.UserSpace.Y,
-            x3: ISO_32000.UserSpace.X, y3: ISO_32000.UserSpace.Y
+            x1: ISO_32000.UserSpace.X,
+            y1: ISO_32000.UserSpace.Y,
+            x2: ISO_32000.UserSpace.X,
+            y2: ISO_32000.UserSpace.Y,
+            x3: ISO_32000.UserSpace.X,
+            y3: ISO_32000.UserSpace.Y
         )
 
         /// Append rectangle (x y width height re)
@@ -465,7 +468,8 @@ extension Geometry.Y: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.
     }
 }
 
-extension Geometry.Width: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+extension Geometry.Width: Binary.Serializable
+where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
     /// Serialize Geometry.Width to PDF number format
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ value: Self,
@@ -475,7 +479,8 @@ extension Geometry.Width: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.
     }
 }
 
-extension Geometry.Height: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+extension Geometry.Height: Binary.Serializable
+where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
     /// Serialize Geometry.Height to PDF number format
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ value: Self,

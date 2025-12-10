@@ -8,13 +8,13 @@ extension ISO_32000 {
     public struct Document: Sendable {
         /// PDF version
         public var version: Version
-        
+
         /// Document metadata
         public var info: Info?
-        
+
         /// Document pages
         public var pages: [Page]
-        
+
         /// Create a document
         public init(
             version: Version = .default,

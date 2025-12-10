@@ -10,8 +10,8 @@
 //   9.3.7  Text rise
 //   9.3.8  Text knockout
 
-public import ISO_32000_Shared
 public import ISO_32000_8_Graphics
+public import ISO_32000_Shared
 
 extension ISO_32000.`9` {
     /// ISO 32000-2:2020, 9.3 Text state parameters and operators
@@ -107,7 +107,7 @@ extension ISO_32000.Text {
         ///
         /// Initial value: true
         public var knockout: Bool
-        
+
         public init(
             characterSpacing: ISO_32000.UserSpace.Unit = 0,
             wordSpacing: ISO_32000.UserSpace.Unit = 0,

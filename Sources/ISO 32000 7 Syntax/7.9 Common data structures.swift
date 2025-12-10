@@ -82,7 +82,8 @@ extension ISO_32000.`7`.`9`.`4`.Date: CustomStringConvertible {
             }
             return s
         }
-        return "D:\(pad(year, width: 4))\(pad(month, width: 2))\(pad(day, width: 2))\(pad(hour, width: 2))\(pad(minute, width: 2))\(pad(second, width: 2))"
+        return
+            "D:\(pad(year, width: 4))\(pad(month, width: 2))\(pad(day, width: 2))\(pad(hour, width: 2))\(pad(minute, width: 2))\(pad(second, width: 2))"
     }
 }
 

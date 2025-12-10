@@ -4,8 +4,8 @@
 // that holds current graphics control parameters. These parameters define the global
 // framework within which the graphics operators execute.
 
-public import ISO_32000_Shared
 public import Geometry
+public import ISO_32000_Shared
 
 extension ISO_32000.`8` {
     /// ISO 32000-2:2020, 8.4 Graphics state
@@ -230,7 +230,7 @@ extension ISO_32000.`8`.`4`.Graphics.State {
     /// Black point namespace.
     public struct BlackPoint {
         public var compensation: Compensation
-        
+
         public init(compensation: Compensation) {
             self.compensation = compensation
         }
@@ -267,7 +267,7 @@ extension ISO_32000.`8`.`4`.Graphics.State {
     /// Blend namespace.
     public struct Blend {
         public var mode: Blend.Mode
-        
+
         public init(
             mode: Blend.Mode
         ) {
@@ -605,14 +605,16 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
             lineJoin: ISO_32000.`8`.`4`.Graphics.State.Line.Join = .miter,
             miterLimit: ISO_32000.UserSpace.Unit = 10,
             dashPattern: ISO_32000.`8`.`4`.Graphics.State.Line.Dash.Pattern = .solid,
-            renderingIntent: ISO_32000.`8`.`4`.Graphics.State.Rendering.Intent = .relativeColorimetric,
+            renderingIntent: ISO_32000.`8`.`4`.Graphics.State.Rendering.Intent =
+                .relativeColorimetric,
             strokeAdjustment: Bool = false,
             blendMode: ISO_32000.`8`.`4`.Graphics.State.Blend.Mode = .normal,
             softMask: ISO_32000.`8`.`4`.Graphics.State.SoftMask? = nil,
             strokingAlphaConstant: ISO_32000.UserSpace.Unit = 1,
             nonstrokingAlphaConstant: ISO_32000.UserSpace.Unit = 1,
             alphaSource: Bool = false,
-            blackPointCompensation: ISO_32000.`8`.`4`.Graphics.State.BlackPoint.Compensation = .default
+            blackPointCompensation: ISO_32000.`8`.`4`.Graphics.State.BlackPoint.Compensation =
+                .default
         ) {
             self.ctm = ctm
             self.strokingColorSpace = strokingColorSpace
@@ -1138,8 +1140,12 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
         let c = ISO_32000.UserSpace.Unit(angle.cos)
         let s = ISO_32000.UserSpace.Unit(angle.sin)
         let rotation = ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit>(
-            a: c, b: s, c: -s, d: c,
-            tx: .init(0), ty: .init(0)
+            a: c,
+            b: s,
+            c: -s,
+            d: c,
+            tx: .init(0),
+            ty: .init(0)
         )
         concatenate(rotation)
     }
@@ -1223,4 +1229,3 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
         f(self)
     }
 }
-

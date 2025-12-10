@@ -46,10 +46,10 @@ extension ISO_32000 {
         /// Octal values converted to decimal indices.
         public static let decodeTable: [Unicode.Scalar?] = [
             // 0x00-0x1F: Control characters (undefined in WinAnsi for PDF)
-            nil, nil, nil, nil, nil, nil, nil, nil,                         // 0x00-0x07
-            nil, nil, nil, nil, nil, nil, nil, nil,                         // 0x08-0x0F
-            nil, nil, nil, nil, nil, nil, nil, nil,                         // 0x10-0x17
-            nil, nil, nil, nil, nil, nil, nil, nil,                         // 0x18-0x1F
+            nil, nil, nil, nil, nil, nil, nil, nil,  // 0x00-0x07
+            nil, nil, nil, nil, nil, nil, nil, nil,  // 0x08-0x0F
+            nil, nil, nil, nil, nil, nil, nil, nil,  // 0x10-0x17
+            nil, nil, nil, nil, nil, nil, nil, nil,  // 0x18-0x1F
 
             // 0x20-0x3F: ASCII punctuation and digits
             "\u{0020}",  // 0x20 space
@@ -151,11 +151,11 @@ extension ISO_32000 {
             "\u{007C}",  // 0x7C bar
             "\u{007D}",  // 0x7D braceright
             "\u{007E}",  // 0x7E asciitilde
-            nil,         // 0x7F undefined
+            nil,  // 0x7F undefined
 
             // 0x80-0x9F: Extended Latin (Windows-specific)
             "\u{20AC}",  // 0x80 Euro (added PDF 1.3)
-            nil,         // 0x81 undefined
+            nil,  // 0x81 undefined
             "\u{201A}",  // 0x82 quotesinglbase
             "\u{0192}",  // 0x83 florin
             "\u{201E}",  // 0x84 quotedblbase
@@ -167,10 +167,10 @@ extension ISO_32000 {
             "\u{0160}",  // 0x8A Scaron
             "\u{2039}",  // 0x8B guilsinglleft
             "\u{0152}",  // 0x8C OE
-            nil,         // 0x8D undefined
+            nil,  // 0x8D undefined
             "\u{017D}",  // 0x8E Zcaron (added PDF 1.3)
-            nil,         // 0x8F undefined
-            nil,         // 0x90 undefined
+            nil,  // 0x8F undefined
+            nil,  // 0x90 undefined
             "\u{2018}",  // 0x91 quoteleft
             "\u{2019}",  // 0x92 quoteright
             "\u{201C}",  // 0x93 quotedblleft
@@ -183,7 +183,7 @@ extension ISO_32000 {
             "\u{0161}",  // 0x9A scaron
             "\u{203A}",  // 0x9B guilsinglright
             "\u{0153}",  // 0x9C oe
-            nil,         // 0x9D undefined
+            nil,  // 0x9D undefined
             "\u{017E}",  // 0x9E zcaron (added PDF 1.3)
             "\u{0178}",  // 0x9F Ydieresis
 
@@ -449,4 +449,3 @@ extension ISO_32000 {
         }
     }
 }
-

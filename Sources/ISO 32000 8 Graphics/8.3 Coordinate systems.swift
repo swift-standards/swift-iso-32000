@@ -1,7 +1,7 @@
 // ISO 32000-2:2020, 8.3 Coordinate systems
 
-public import ISO_32000_Shared
 public import Geometry
+public import ISO_32000_Shared
 
 extension ISO_32000.`8` {
     /// ISO 32000-2:2020, 8.3 Coordinate systems
@@ -94,12 +94,14 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: AdditiveArithmetic {
 extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
     /// Multiply by a scalar
     @inlinable
+    @_disfavoredOverload
     public static func * (lhs: Self, rhs: Double) -> Self {
         Self(lhs.value * rhs)
     }
 
     /// Multiply scalar by unit
     @inlinable
+    @_disfavoredOverload
     public static func * (lhs: Double, rhs: Self) -> Self {
         Self(lhs * rhs.value)
     }
@@ -113,6 +115,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
 
     /// Negate
     @inlinable
+    @_disfavoredOverload
     public static prefix func - (value: Self) -> Self {
         Self(-value.value)
     }
@@ -349,8 +352,16 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: BinaryFloatingPoint {
     public var significandBitPattern: RawSignificand { value.significandBitPattern }
 
     @inlinable
-    public init(sign: FloatingPointSign, exponentBitPattern: RawExponent, significandBitPattern: RawSignificand) {
-        self.value = Double(sign: sign, exponentBitPattern: exponentBitPattern, significandBitPattern: significandBitPattern)
+    public init(
+        sign: FloatingPointSign,
+        exponentBitPattern: RawExponent,
+        significandBitPattern: RawSignificand
+    ) {
+        self.value = Double(
+            sign: sign,
+            exponentBitPattern: exponentBitPattern,
+            significandBitPattern: significandBitPattern
+        )
     }
 
     @inlinable
@@ -480,7 +491,9 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace {
     ///
     /// Represents transformations that preserve parallel lines:
     /// translation, rotation, scaling, shearing, and combinations thereof.
-    public typealias AffineTransform = ISO_32000.AffineTransform<ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit>
+    public typealias AffineTransform = ISO_32000.AffineTransform<
+        ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+    >
 
     // MARK: - Vectors & Angles
 

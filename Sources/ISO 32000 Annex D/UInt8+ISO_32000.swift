@@ -137,7 +137,8 @@ extension UInt8.WinAnsi {
 extension UInt8.WinAnsi.Serializable where Context == Void {
     /// Parse from canonical WinAnsiEncoding byte representation (context-free)
     @inlinable
-    public init<Bytes: Collection>(winAnsi bytes: Bytes) throws(Error) where Bytes.Element == UInt8 {
+    public init<Bytes: Collection>(winAnsi bytes: Bytes) throws(Error)
+    where Bytes.Element == UInt8 {
         try self.init(winAnsi: bytes, in: ())
     }
 }
@@ -164,8 +165,17 @@ extension Array where Element == UInt8 {
     ///   - withFallback: Must be `true` to use fallback mode
     ///   - preservingControlChars: If true, control characters (0x00-0x1F) pass through unchanged (default: false)
     @inlinable
-    public init(winAnsi string: some StringProtocol, withFallback: Bool, preservingControlChars: Bool = false) {
-        self.init(string, encoding: ISO_32000.WinAnsiEncoding.self, withFallback: withFallback, preservingControlChars: preservingControlChars)
+    public init(
+        winAnsi string: some StringProtocol,
+        withFallback: Bool,
+        preservingControlChars: Bool = false
+    ) {
+        self.init(
+            string,
+            encoding: ISO_32000.WinAnsiEncoding.self,
+            withFallback: withFallback,
+            preservingControlChars: preservingControlChars
+        )
     }
 }
 
@@ -188,7 +198,8 @@ extension String {
     ///   - bytes: The WinAnsiEncoding bytes to decode
     ///   - withReplacement: Must be `true` to use replacement mode
     @inlinable
-    public init<Bytes: Collection>(winAnsi bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+    public init<Bytes: Collection>(winAnsi bytes: Bytes, withReplacement: Bool)
+    where Bytes.Element == UInt8 {
         self.init(bytes, encoding: ISO_32000.WinAnsiEncoding.self, withReplacement: withReplacement)
     }
 }
@@ -297,7 +308,8 @@ extension String {
 
     /// Decode PDFDocEncoding bytes to a string with replacement
     @inlinable
-    public init<Bytes: Collection>(pdfDoc bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+    public init<Bytes: Collection>(pdfDoc bytes: Bytes, withReplacement: Bool)
+    where Bytes.Element == UInt8 {
         self.init(bytes, encoding: ISO_32000.PDFDocEncoding.self, withReplacement: withReplacement)
     }
 }
@@ -389,8 +401,13 @@ extension String {
 
     /// Decode StandardEncoding bytes to a string with replacement
     @inlinable
-    public init<Bytes: Collection>(standard bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(bytes, encoding: ISO_32000.StandardEncoding.self, withReplacement: withReplacement)
+    public init<Bytes: Collection>(standard bytes: Bytes, withReplacement: Bool)
+    where Bytes.Element == UInt8 {
+        self.init(
+            bytes,
+            encoding: ISO_32000.StandardEncoding.self,
+            withReplacement: withReplacement
+        )
     }
 }
 
@@ -449,7 +466,8 @@ extension UInt8.MacRoman {
 
 extension UInt8.MacRoman.Serializable where Context == Void {
     @inlinable
-    public init<Bytes: Collection>(macRoman bytes: Bytes) throws(Error) where Bytes.Element == UInt8 {
+    public init<Bytes: Collection>(macRoman bytes: Bytes) throws(Error)
+    where Bytes.Element == UInt8 {
         try self.init(macRoman: bytes, in: ())
     }
 }
@@ -479,8 +497,13 @@ extension String {
 
     /// Decode MacRomanEncoding bytes to a string with replacement
     @inlinable
-    public init<Bytes: Collection>(macRoman bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(bytes, encoding: ISO_32000.MacRomanEncoding.self, withReplacement: withReplacement)
+    public init<Bytes: Collection>(macRoman bytes: Bytes, withReplacement: Bool)
+    where Bytes.Element == UInt8 {
+        self.init(
+            bytes,
+            encoding: ISO_32000.MacRomanEncoding.self,
+            withReplacement: withReplacement
+        )
     }
 }
 
@@ -569,7 +592,8 @@ extension String {
 
     /// Decode SymbolEncoding bytes to a string with replacement
     @inlinable
-    public init<Bytes: Collection>(symbol bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
+    public init<Bytes: Collection>(symbol bytes: Bytes, withReplacement: Bool)
+    where Bytes.Element == UInt8 {
         self.init(bytes, encoding: ISO_32000.SymbolEncoding.self, withReplacement: withReplacement)
     }
 }
@@ -629,7 +653,8 @@ extension UInt8.ZapfDingbats {
 
 extension UInt8.ZapfDingbats.Serializable where Context == Void {
     @inlinable
-    public init<Bytes: Collection>(zapfDingbats bytes: Bytes) throws(Error) where Bytes.Element == UInt8 {
+    public init<Bytes: Collection>(zapfDingbats bytes: Bytes) throws(Error)
+    where Bytes.Element == UInt8 {
         try self.init(zapfDingbats: bytes, in: ())
     }
 }
@@ -659,8 +684,13 @@ extension String {
 
     /// Decode ZapfDingbatsEncoding bytes to a string with replacement
     @inlinable
-    public init<Bytes: Collection>(zapfDingbats bytes: Bytes, withReplacement: Bool) where Bytes.Element == UInt8 {
-        self.init(bytes, encoding: ISO_32000.ZapfDingbatsEncoding.self, withReplacement: withReplacement)
+    public init<Bytes: Collection>(zapfDingbats bytes: Bytes, withReplacement: Bool)
+    where Bytes.Element == UInt8 {
+        self.init(
+            bytes,
+            encoding: ISO_32000.ZapfDingbatsEncoding.self,
+            withReplacement: withReplacement
+        )
     }
 }
 
