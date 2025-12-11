@@ -13,7 +13,7 @@ extension ISO_32000 {
         public var info: Info?
 
         /// Document pages
-        public var pages: [Page]
+        public var pages: [Page.Object]
 
         /// Document outline (bookmarks)
         ///
@@ -25,21 +25,21 @@ extension ISO_32000 {
         ///
         /// Per ISO 32000-2:2020 Section 12.2, specifies how the document
         /// should be displayed when opened.
-        public var viewerPreferences: ViewerPreferences?
+        public var viewer: Viewer?
 
         /// Create a document
         public init(
             version: Version = .default,
             info: Info? = nil,
-            pages: [Page] = [],
+            pages: [Page.Object] = [],
             outline: Outline.Root? = nil,
-            viewerPreferences: ViewerPreferences? = nil
+            viewer: Viewer? = nil
         ) {
             self.version = version
             self.info = info
             self.pages = pages
             self.outline = outline
-            self.viewerPreferences = viewerPreferences
+            self.viewer = viewer
         }
     }
 }
@@ -49,12 +49,13 @@ extension ISO_32000.Document {
     public init(
         version: ISO_32000.Version = .default,
         info: ISO_32000.Document.Info? = nil,
-        page: ISO_32000.Page,
-        viewerPreferences: ISO_32000.ViewerPreferences? = nil
+        page: ISO_32000.Page.Object,
+        viewer: ISO_32000.Viewer? = nil
     ) {
         self.version = version
         self.info = info
         self.pages = [page]
-        self.viewerPreferences = viewerPreferences
+        self.outline = nil
+        self.viewer = viewer
     }
 }

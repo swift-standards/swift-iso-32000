@@ -461,23 +461,42 @@ extension ISO_32000.ContentStream {
         ///
         /// - Parameter circle: The circle to draw (from Geometry package)
         public mutating func circle(_ circle: Geometry<ISO_32000.UserSpace.Unit>.Circle) {
-            let curves = circle.bezierCurves
-            let start = circle.bezierStartPoint
+            // Standard bezier approximation constant: k = 4/3 * (√2 - 1) ≈ 0.5522847498
+            let k = 0.5522847498
+            let cx = circle.center.x.value
+            let cy = circle.center.y.value
+            let r = circle.radius.value
 
-            emit(.moveTo(x: start.x, y: start.y))
+            // Start at rightmost point (3 o'clock position)
+            emit(.moveTo(x: .init(cx + r), y: .init(cy)))
 
-            for curve in curves {
-                emit(
-                    .curveTo(
-                        x1: curve.control1.x,
-                        y1: curve.control1.y,
-                        x2: curve.control2.x,
-                        y2: curve.control2.y,
-                        x3: curve.end.x,
-                        y3: curve.end.y
-                    )
-                )
-            }
+            // First quadrant: right to top
+            emit(.curveTo(
+                x1: .init(cx + r), y1: .init(cy + r * k),
+                x2: .init(cx + r * k), y2: .init(cy + r),
+                x3: .init(cx), y3: .init(cy + r)
+            ))
+
+            // Second quadrant: top to left
+            emit(.curveTo(
+                x1: .init(cx - r * k), y1: .init(cy + r),
+                x2: .init(cx - r), y2: .init(cy + r * k),
+                x3: .init(cx - r), y3: .init(cy)
+            ))
+
+            // Third quadrant: left to bottom
+            emit(.curveTo(
+                x1: .init(cx - r), y1: .init(cy - r * k),
+                x2: .init(cx - r * k), y2: .init(cy - r),
+                x3: .init(cx), y3: .init(cy - r)
+            ))
+
+            // Fourth quadrant: bottom to right
+            emit(.curveTo(
+                x1: .init(cx + r * k), y1: .init(cy - r),
+                x2: .init(cx + r), y2: .init(cy - r * k),
+                x3: .init(cx + r), y3: .init(cy)
+            ))
 
             emit(.closePath)
         }

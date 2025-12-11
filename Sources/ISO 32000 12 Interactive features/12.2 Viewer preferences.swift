@@ -23,7 +23,7 @@ extension ISO_32000.`12`.`2` {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Table 147 — Entries in a viewer preferences dictionary
-    public struct ViewerPreferences: Sendable, Hashable, Codable {
+    public struct Viewer: Sendable, Hashable, Codable {
 
         // MARK: - UI Visibility Options
 
@@ -94,31 +94,106 @@ extension ISO_32000.`12`.`2` {
         /// Default value: `.leftToRight`
         public var direction: Direction
 
-        // MARK: - Page Boundaries (Deprecated in PDF 2.0)
+        // MARK: - View Settings
 
+        /// View area and clipping settings for on-screen display.
+        public var view: View
+
+        // MARK: - Print Settings
+
+        /// Print settings including area, clipping, scaling, and other options.
+        public var print: Print
+
+        // MARK: - Enforcement (PDF 2.0)
+
+        /// An array of names of Viewer preference settings that shall be
+        /// enforced by PDF processors and that shall not be overridden by
+        /// subsequent selections in the application user interface.
+        ///
+        /// - Note: PDF 2.0
+        ///
+        /// Default value: empty (no enforcement)
+        public var enforce: [EnforceableSetting]
+
+        // MARK: - Initialization
+
+        /// Creates a viewer preferences dictionary with default values.
+        public init(
+            hideToolbar: Bool = false,
+            hideMenubar: Bool = false,
+            hideWindowUI: Bool = false,
+            fitWindow: Bool = false,
+            centerWindow: Bool = false,
+            displayDocTitle: Bool = false,
+            nonFullScreenPageMode: NonFullScreenPageMode = .useNone,
+            direction: Direction = .leftToRight,
+            view: View = .init(),
+            print: Print = .init(),
+            enforce: [EnforceableSetting] = []
+        ) {
+            self.hideToolbar = hideToolbar
+            self.hideMenubar = hideMenubar
+            self.hideWindowUI = hideWindowUI
+            self.fitWindow = fitWindow
+            self.centerWindow = centerWindow
+            self.displayDocTitle = displayDocTitle
+            self.nonFullScreenPageMode = nonFullScreenPageMode
+            self.direction = direction
+            self.view = view
+            self.print = print
+            self.enforce = enforce
+        }
+
+        /// Default viewer preferences (all defaults per the spec).
+        public static let `default` = Viewer()
+    }
+}
+
+// MARK: - Viewer.View
+
+extension ISO_32000.`12`.`2`.Viewer {
+    /// View settings for on-screen display (Table 147)
+    ///
+    /// Controls how pages are displayed on screen.
+    ///
+    /// - Note: PDF 1.4; deprecated in PDF 2.0
+    public struct View: Sendable, Hashable, Codable {
         /// The name of the page boundary representing the area of a page
         /// that shall be displayed when viewing the document on the screen.
         ///
-        /// - Note: PDF 1.4; deprecated in PDF 2.0
-        ///
         /// Default value: `.cropBox`
-        public var viewArea: PageBoundary
+        public var area: ISO_32000.Page.Boundary
 
         /// The name of the page boundary to which the contents of a page
         /// shall be clipped when viewing the document on the screen.
         ///
-        /// - Note: PDF 1.4; deprecated in PDF 2.0
-        ///
         /// Default value: `.cropBox`
-        public var viewClip: PageBoundary
+        public var clip: ISO_32000.Page.Boundary
 
+        public init(
+            area: ISO_32000.Page.Boundary = .cropBox,
+            clip: ISO_32000.Page.Boundary = .cropBox
+        ) {
+            self.area = area
+            self.clip = clip
+        }
+    }
+}
+
+// MARK: - Viewer.Print
+
+extension ISO_32000.`12`.`2`.Viewer {
+    /// Print settings (Table 147)
+    ///
+    /// Controls how the document is printed.
+    public struct Print: Sendable, Hashable, Codable {
         /// The name of the page boundary representing the area of a page
         /// that shall be rendered when printing the document.
         ///
         /// - Note: PDF 1.4; deprecated in PDF 2.0
         ///
         /// Default value: `.cropBox`
-        public var printArea: PageBoundary
+        public var area: ISO_32000.Page.Boundary
 
         /// The name of the page boundary to which the contents of a page
         /// shall be clipped when printing the document.
@@ -126,9 +201,7 @@ extension ISO_32000.`12`.`2` {
         /// - Note: PDF 1.4; deprecated in PDF 2.0
         ///
         /// Default value: `.cropBox`
-        public var printClip: PageBoundary
-
-        // MARK: - Print Options
+        public var clip: ISO_32000.Page.Boundary
 
         /// The page scaling option that shall be selected when a print
         /// dialogue is displayed for this document.
@@ -140,7 +213,7 @@ extension ISO_32000.`12`.`2` {
         /// - Note: PDF 1.6
         ///
         /// Default value: `.appDefault`
-        public var printScaling: PrintScaling
+        public var scaling: ISO_32000.Print.Scaling
 
         /// The paper handling option that shall be used when printing the
         /// PDF file from the print dialogue.
@@ -148,7 +221,7 @@ extension ISO_32000.`12`.`2` {
         /// - Note: PDF 1.7
         ///
         /// Default value: implementation dependent
-        public var duplex: Duplex?
+        public var duplex: ISO_32000.Print.Duplex?
 
         /// A flag specifying whether the PDF page size shall be used to
         /// select the input paper tray.
@@ -176,7 +249,7 @@ extension ISO_32000.`12`.`2` {
         ///   numbering, other features of PDF use zero-based page numbering.
         ///
         /// Default value: implementation dependent
-        public var printPageRange: [PageRange]?
+        public var pageRange: [ISO_32000.Page.Range]?
 
         /// The number of copies that shall be printed when the print dialog
         /// is opened for this PDF file.
@@ -186,62 +259,23 @@ extension ISO_32000.`12`.`2` {
         /// Default value: implementation dependent, but typically 1
         public var numCopies: Int?
 
-        // MARK: - Enforcement (PDF 2.0)
-
-        /// An array of names of Viewer preference settings that shall be
-        /// enforced by PDF processors and that shall not be overridden by
-        /// subsequent selections in the application user interface.
-        ///
-        /// - Note: PDF 2.0
-        ///
-        /// Default value: empty (no enforcement)
-        public var enforce: [EnforceableSetting]
-
-        // MARK: - Initialization
-
-        /// Creates a viewer preferences dictionary with default values.
         public init(
-            hideToolbar: Bool = false,
-            hideMenubar: Bool = false,
-            hideWindowUI: Bool = false,
-            fitWindow: Bool = false,
-            centerWindow: Bool = false,
-            displayDocTitle: Bool = false,
-            nonFullScreenPageMode: NonFullScreenPageMode = .useNone,
-            direction: Direction = .leftToRight,
-            viewArea: PageBoundary = .cropBox,
-            viewClip: PageBoundary = .cropBox,
-            printArea: PageBoundary = .cropBox,
-            printClip: PageBoundary = .cropBox,
-            printScaling: PrintScaling = .appDefault,
-            duplex: Duplex? = nil,
+            area: ISO_32000.Page.Boundary = .cropBox,
+            clip: ISO_32000.Page.Boundary = .cropBox,
+            scaling: ISO_32000.Print.Scaling = .appDefault,
+            duplex: ISO_32000.Print.Duplex? = nil,
             pickTrayByPDFSize: Bool? = nil,
-            printPageRange: [PageRange]? = nil,
-            numCopies: Int? = nil,
-            enforce: [EnforceableSetting] = []
+            pageRange: [ISO_32000.Page.Range]? = nil,
+            numCopies: Int? = nil
         ) {
-            self.hideToolbar = hideToolbar
-            self.hideMenubar = hideMenubar
-            self.hideWindowUI = hideWindowUI
-            self.fitWindow = fitWindow
-            self.centerWindow = centerWindow
-            self.displayDocTitle = displayDocTitle
-            self.nonFullScreenPageMode = nonFullScreenPageMode
-            self.direction = direction
-            self.viewArea = viewArea
-            self.viewClip = viewClip
-            self.printArea = printArea
-            self.printClip = printClip
-            self.printScaling = printScaling
+            self.area = area
+            self.clip = clip
+            self.scaling = scaling
             self.duplex = duplex
             self.pickTrayByPDFSize = pickTrayByPDFSize
-            self.printPageRange = printPageRange
+            self.pageRange = pageRange
             self.numCopies = numCopies
-            self.enforce = enforce
         }
-
-        /// Default viewer preferences (all defaults per the spec).
-        public static let `default` = ViewerPreferences()
     }
 }
 
@@ -296,40 +330,18 @@ extension ISO_32000.`12`.`2` {
     }
 }
 
-// MARK: - PageBoundary
+// MARK: - Print
 
 extension ISO_32000.`12`.`2` {
-    /// Page boundary names for view/print area and clip settings (Table 147)
+    /// Print-related types for viewer preferences (Table 147)
     ///
-    /// The value is the key designating the relevant page boundary in the
-    /// page object (see 7.7.3, "Page tree" and 14.11.2, "Page boundaries").
-    ///
-    /// - Note: PDF 1.4; deprecated in PDF 2.0
-    ///
-    /// ## Reference
-    ///
-    /// ISO 32000-2:2020, Table 147 — ViewArea, ViewClip, PrintArea, PrintClip
-    public enum PageBoundary: String, Sendable, Hashable, Codable, CaseIterable {
-        /// The media box
-        case mediaBox = "MediaBox"
-
-        /// The crop box (default)
-        case cropBox = "CropBox"
-
-        /// The bleed box
-        case bleedBox = "BleedBox"
-
-        /// The trim box
-        case trimBox = "TrimBox"
-
-        /// The art box
-        case artBox = "ArtBox"
-    }
+    /// These types control how a document is printed.
+    public enum Print {}
 }
 
-// MARK: - PrintScaling
+// MARK: - Print.Scaling
 
-extension ISO_32000.`12`.`2` {
+extension ISO_32000.`12`.`2`.Print {
     /// Page scaling option for print dialogue (Table 147)
     ///
     /// If this entry has an unrecognised value, `.appDefault` shall be used.
@@ -339,7 +351,7 @@ extension ISO_32000.`12`.`2` {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Table 147 — PrintScaling
-    public enum PrintScaling: String, Sendable, Hashable, Codable, CaseIterable {
+    public enum Scaling: String, Sendable, Hashable, Codable, CaseIterable {
         /// No page scaling
         case none = "None"
 
@@ -348,9 +360,9 @@ extension ISO_32000.`12`.`2` {
     }
 }
 
-// MARK: - Duplex
+// MARK: - Print.Duplex
 
-extension ISO_32000.`12`.`2` {
+extension ISO_32000.`12`.`2`.Print {
     /// Paper handling option for print dialogue (Table 147)
     ///
     /// - Note: PDF 1.7
@@ -367,47 +379,6 @@ extension ISO_32000.`12`.`2` {
 
         /// Duplex and flip on the long edge of the sheet
         case duplexFlipLongEdge = "DuplexFlipLongEdge"
-    }
-}
-
-// MARK: - PageRange
-
-extension ISO_32000.`12`.`2` {
-    /// A range of pages for printing (Table 147)
-    ///
-    /// Specifies the first and last pages in a sub-range of pages to be printed.
-    /// Page numbers are 1-based (the first page of the PDF file is denoted by 1).
-    ///
-    /// - Note: PDF 1.7. Although PrintPageRange uses 1-based page numbering,
-    ///   other features of PDF use zero-based page numbering.
-    ///
-    /// ## Reference
-    ///
-    /// ISO 32000-2:2020, Table 147 — PrintPageRange
-    public struct PageRange: Sendable, Hashable, Codable {
-        /// The first page in the range (1-based)
-        public var first: Int
-
-        /// The last page in the range (1-based)
-        public var last: Int
-
-        /// Creates a page range.
-        ///
-        /// - Parameters:
-        ///   - first: The first page (1-based)
-        ///   - last: The last page (1-based)
-        public init(first: Int, last: Int) {
-            self.first = first
-            self.last = last
-        }
-
-        /// Creates a single-page range.
-        ///
-        /// - Parameter page: The page number (1-based)
-        public init(page: Int) {
-            self.first = page
-            self.last = page
-        }
     }
 }
 
@@ -441,7 +412,7 @@ extension ISO_32000.`12`.`2` {
 
 extension ISO_32000 {
     /// Viewer preferences dictionary
-    public typealias ViewerPreferences = ISO_32000.`12`.`2`.ViewerPreferences
+    public typealias Viewer = ISO_32000.`12`.`2`.Viewer
 
     /// Page mode after exiting full-screen mode
     public typealias NonFullScreenPageMode = ISO_32000.`12`.`2`.NonFullScreenPageMode
@@ -449,9 +420,6 @@ extension ISO_32000 {
     /// Reading direction for page positioning
     public typealias Direction = ISO_32000.`12`.`2`.Direction
 
-    /// Page boundary for display and print areas
-    public typealias PageBoundary = ISO_32000.`12`.`2`.PageBoundary
-
-    /// Print scaling behavior
-    public typealias PrintScaling = ISO_32000.`12`.`2`.PrintScaling
+    /// Print-related types namespace
+    public typealias Print = ISO_32000.`12`.`2`.Print
 }
