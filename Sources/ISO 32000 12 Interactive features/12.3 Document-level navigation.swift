@@ -173,6 +173,24 @@ extension ISO_32000.Outline {
     }
 }
 
+// MARK: - Outline Item Target
+
+extension ISO_32000.Outline {
+    /// Target for an outline item activation (Table 151, Dest or A entry)
+    ///
+    /// Per ISO 32000-2:2020 Table 151:
+    /// - **Dest**: The destination that shall be displayed when this item is activated.
+    /// - **A**: The action that shall be performed when this item is activated (PDF 1.1).
+    ///
+    /// These entries are mutually exclusive; only one may be present.
+    public enum Target: Sendable {
+        /// Navigate to a destination (Dest entry)
+        case destination(ISO_32000.Destination)
+        /// Perform an action (A entry, PDF 1.1)
+        case action(ISO_32000.Action.Kind)
+    }
+}
+
 // MARK: - Table 151: Outline Item Dictionary
 
 extension ISO_32000.Outline {
@@ -189,11 +207,11 @@ extension ISO_32000.Outline {
         /// (Required)
         public var title: String
 
-        /// The destination that shall be displayed when this item is activated.
-        /// (Optional; shall not be present if an A entry is present)
+        /// The target when this item is activated.
         ///
-        /// Per ISO 32000-2:2020, Section 12.3.2, "Destinations"
-        public var destination: ISO_32000.Destination?
+        /// Per Table 151, either Dest or A may be present, but not both.
+        /// If nil, the item has no effect when activated.
+        public var target: Target?
 
         /// Child items under this item.
         public var children: [Item]
@@ -236,18 +254,56 @@ extension ISO_32000.Outline {
 
         public init(
             title: String,
-            destination: ISO_32000.Destination? = nil,
+            target: Target? = nil,
             children: [Item] = [],
             isOpen: Bool = true,
             color: (red: Double, green: Double, blue: Double)? = nil,
             flags: ItemFlags = []
         ) {
             self.title = title
-            self.destination = destination
+            self.target = target
             self.children = children
             self.isOpen = isOpen
             self.color = color
             self.flags = flags
+        }
+
+        /// Convenience initializer with a destination.
+        public init(
+            title: String,
+            destination: ISO_32000.Destination,
+            children: [Item] = [],
+            isOpen: Bool = true,
+            color: (red: Double, green: Double, blue: Double)? = nil,
+            flags: ItemFlags = []
+        ) {
+            self.init(
+                title: title,
+                target: .destination(destination),
+                children: children,
+                isOpen: isOpen,
+                color: color,
+                flags: flags
+            )
+        }
+
+        /// Convenience initializer with an action.
+        public init(
+            title: String,
+            action: ISO_32000.Action.Kind,
+            children: [Item] = [],
+            isOpen: Bool = true,
+            color: (red: Double, green: Double, blue: Double)? = nil,
+            flags: ItemFlags = []
+        ) {
+            self.init(
+                title: title,
+                target: .action(action),
+                children: children,
+                isOpen: isOpen,
+                color: color,
+                flags: flags
+            )
         }
     }
 }
@@ -435,8 +491,15 @@ extension ISO_32000.Outline {
     ///     H3 "Subsection 1.2.1"
     /// H1 "Chapter 2"
     /// ```
+    /// Build an outline from a flat list of headings.
+    ///
+    /// - Parameters:
+    ///   - headings: Flat list of headings with level, title, page index, and Y position
+    ///   - openToLevel: Maximum heading level to expand by default (1 = only H1 expanded, 2 = H1 and H2, etc.)
+    ///                  Default is 1 (H1 expanded, H2+ collapsed)
     public static func build(
-        from headings: [(level: Int, title: String, pageIndex: Int, yPosition: ISO_32000.UserSpace.Y)]
+        from headings: [(level: Int, title: String, pageIndex: Int, yPosition: ISO_32000.UserSpace.Y)],
+        openToLevel: Int = 1
     ) -> Root {
         guard !headings.isEmpty else { return Root() }
 
@@ -444,14 +507,18 @@ extension ISO_32000.Outline {
         var stack: [(level: Int, item: Item)] = []
 
         for heading in headings {
+            let destination = ISO_32000.Destination.xyz(
+                page: heading.pageIndex,
+                left: nil,
+                top: heading.yPosition.value,
+                zoom: nil
+            )
+            // Items at or below openToLevel are expanded, others collapsed
             let item = Item(
                 title: heading.title,
-                destination: .xyz(
-                    page: heading.pageIndex,
-                    left: nil,
-                    top: heading.yPosition.value,
-                    zoom: nil
-                )
+                target: .destination(destination),
+                children: [],
+                isOpen: heading.level <= openToLevel
             )
 
             while let last = stack.last, last.level >= heading.level {
@@ -462,7 +529,7 @@ extension ISO_32000.Outline {
                     var (parentLevel, parentItem) = stack.removeLast()
                     parentItem = Item(
                         title: parentItem.title,
-                        destination: parentItem.destination,
+                        target: parentItem.target,
                         children: parentItem.children + [child],
                         isOpen: parentItem.isOpen
                     )
@@ -480,7 +547,7 @@ extension ISO_32000.Outline {
                 var (parentLevel, parentItem) = stack.removeLast()
                 parentItem = Item(
                     title: parentItem.title,
-                    destination: parentItem.destination,
+                    target: parentItem.target,
                     children: parentItem.children + [child],
                     isOpen: parentItem.isOpen
                 )
@@ -501,6 +568,9 @@ extension ISO_32000.`12`.`3` {
     /// Outline item (Table 151)
     public typealias OutlineItem = ISO_32000.Outline.Item
 
+    /// Outline item target (Table 151, Dest/A entries)
+    public typealias OutlineItemTarget = ISO_32000.Outline.Target
+
     /// Outline item flags (Table 152)
     public typealias OutlineItemFlags = ISO_32000.Outline.ItemFlags
 
@@ -516,6 +586,9 @@ extension ISO_32000 {
 
     /// Convenience typealias for outline item
     public typealias OutlineItem = Outline.Item
+
+    /// Convenience typealias for outline item target
+    public typealias OutlineItemTarget = Outline.Target
 
     /// Convenience typealias for outline item flags
     public typealias OutlineItemFlags = Outline.ItemFlags

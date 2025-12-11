@@ -490,9 +490,15 @@ extension ISO_32000 {
                     itemDict[.count] = .integer(Int64(countValue))
                 }
 
-                // Destination
-                if let destination = fi.item.destination {
-                    itemDict[.dest] = serializeDestination(destination, pageRefs: pageRefs)
+                // Target (destination or action)
+                if let target = fi.item.target {
+                    switch target {
+                    case .destination(let destination):
+                        itemDict[.dest] = serializeDestination(destination, pageRefs: pageRefs)
+                    case .action:
+                        // Action serialization not yet implemented
+                        break
+                    }
                 }
 
                 state.objectOffsets[fi.objNum] = buffer.count
