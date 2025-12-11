@@ -91,7 +91,18 @@ extension ISO_32000 {
                 contentRefs.append(pageContentRefs)
             }
 
-            // Create annotation objects for each page
+            // Pre-allocate page object numbers (needed for destination links)
+            // We allocate: 1 for pages dict + N for each page
+            let pagesObjNum = state.nextObjectNumber()
+            let pagesRef = COS.IndirectReference(objectNumber: pagesObjNum)
+
+            var pageRefs: [COS.IndirectReference] = []
+            for _ in document.pages {
+                let objNum = state.nextObjectNumber()
+                pageRefs.append(COS.IndirectReference(objectNumber: objNum))
+            }
+
+            // Create annotation objects for each page (now pageRefs are available)
             var annotationRefs: [[COS.IndirectReference]] = []
             for page in document.pages {
                 var pageAnnotRefs: [COS.IndirectReference] = []
@@ -112,11 +123,18 @@ extension ISO_32000 {
                             .real(linkAnnot.borderWidth.value),
                         ])
 
-                        // URI action
-                        var actionDict = COS.Dictionary()
-                        actionDict[.s] = .name(.uri)
-                        actionDict[.uri] = .string(COS.StringValue(linkAnnot.uri))
-                        annotDict[.a] = .dictionary(actionDict)
+                        switch linkAnnot.target {
+                        case .uri(let uri):
+                            // URI action for external links
+                            var actionDict = COS.Dictionary()
+                            actionDict[.s] = .name(.uri)
+                            actionDict[.uri] = .string(COS.StringValue(uri))
+                            annotDict[.a] = .dictionary(actionDict)
+
+                        case .destination(let dest):
+                            // Direct destination for internal links
+                            annotDict[.dest] = serializeDestination(dest, pageRefs: pageRefs)
+                        }
                     }
 
                     state.objectOffsets[objNum] = buffer.count
@@ -125,14 +143,9 @@ extension ISO_32000 {
                 annotationRefs.append(pageAnnotRefs)
             }
 
-            // Create page objects
-            let pagesObjNum = state.nextObjectNumber()
-            let pagesRef = COS.IndirectReference(objectNumber: pagesObjNum)
-
-            var pageRefs: [COS.IndirectReference] = []
+            // Write page objects (object numbers already allocated above)
             for (i, page) in document.pages.enumerated() {
-                let objNum = state.nextObjectNumber()
-                pageRefs.append(COS.IndirectReference(objectNumber: objNum))
+                let pageRef = pageRefs[i]
 
                 var pageDict = COS.Dictionary()
                 pageDict[.type] = .name(.page)
@@ -144,7 +157,7 @@ extension ISO_32000 {
                 }
 
                 if let rotation = page.rotation, rotation != 0 {
-                    pageDict[.rotate] = .integer(Int64(rotation))
+                    pageDict[.rotate] = .integer(Int64(rotation.value))
                 }
 
                 // Contents
@@ -182,8 +195,8 @@ extension ISO_32000 {
 
                 pageDict[.resources] = .dictionary(resourcesDict)
 
-                state.objectOffsets[objNum] = buffer.count
-                writeIndirectObject(objNum, object: .dictionary(pageDict), into: &buffer)
+                state.objectOffsets[pageRef.objectNumber] = buffer.count
+                writeIndirectObject(pageRef.objectNumber, object: .dictionary(pageDict), into: &buffer)
             }
 
             // Pages dictionary
@@ -195,11 +208,21 @@ extension ISO_32000 {
             state.objectOffsets[pagesObjNum] = buffer.count
             writeIndirectObject(pagesObjNum, object: .dictionary(pagesDict), into: &buffer)
 
+            // Outline (if present)
+            var outlineRef: COS.IndirectReference?
+            if let outline = document.outline, !outline.isEmpty {
+                outlineRef = writeOutline(outline, pageRefs: pageRefs, state: &state, into: &buffer)
+            }
+
             // Catalog
             let catalogObjNum = state.nextObjectNumber()
             var catalogDict = COS.Dictionary()
             catalogDict[.type] = .name(.catalog)
             catalogDict[.pages] = .reference(pagesRef)
+
+            if let outlineRef = outlineRef {
+                catalogDict[.outlines] = .reference(outlineRef)
+            }
 
             state.objectOffsets[catalogObjNum] = buffer.count
             writeIndirectObject(catalogObjNum, object: .dictionary(catalogDict), into: &buffer)
@@ -299,6 +322,203 @@ extension ISO_32000 {
                 }
                 let entry = "\(offsetStr) 00000 n \n"
                 buffer.append(contentsOf: entry.utf8)
+            }
+        }
+
+        // MARK: - Outline Writing
+
+        private func writeOutline<Buffer: RangeReplaceableCollection>(
+            _ outline: Outline.Root,
+            pageRefs: [COS.IndirectReference],
+            state: inout Writer.State,
+            into buffer: inout Buffer
+        ) -> COS.IndirectReference where Buffer.Element == UInt8 {
+            // Allocate object numbers for all items first
+            var itemObjNums: [[Int]] = []  // [level][index] -> objNum
+            var allItems: [(item: Outline.Item, level: Int, parentIndex: Int?, siblingIndex: Int)] = []
+
+            func collectItems(_ items: [Outline.Item], level: Int, parentIndex: Int?) {
+                var levelObjNums: [Int] = []
+                for (sibIdx, item) in items.enumerated() {
+                    let objNum = state.nextObjectNumber()
+                    levelObjNums.append(objNum)
+                    let itemIndex = allItems.count
+                    allItems.append((item, level, parentIndex, sibIdx))
+
+                    if !item.children.isEmpty {
+                        collectItems(item.children, level: level + 1, parentIndex: itemIndex)
+                    }
+                }
+                if level >= itemObjNums.count {
+                    itemObjNums.append(levelObjNums)
+                } else {
+                    itemObjNums[level].append(contentsOf: levelObjNums)
+                }
+            }
+
+            // Outline root object number
+            let outlineObjNum = state.nextObjectNumber()
+            let outlineRef = COS.IndirectReference(objectNumber: outlineObjNum)
+
+            // Collect all items and allocate object numbers
+            collectItems(outline.items, level: 0, parentIndex: nil)
+
+            // Build a flat list with object numbers
+            var flatItems: [(item: Outline.Item, objNum: Int, parentObjNum: Int, prevObjNum: Int?, nextObjNum: Int?, firstChildObjNum: Int?, lastChildObjNum: Int?)] = []
+
+            func buildFlatList(_ items: [Outline.Item], parentObjNum: Int, startObjNum: inout Int) {
+                for (i, item) in items.enumerated() {
+                    let myObjNum = startObjNum
+                    startObjNum += 1
+
+                    let prevObjNum = i > 0 ? myObjNum - 1 : nil
+                    let nextObjNum = i < items.count - 1 ? myObjNum + 1 : nil
+
+                    var firstChildObjNum: Int? = nil
+                    var lastChildObjNum: Int? = nil
+
+                    if !item.children.isEmpty {
+                        firstChildObjNum = startObjNum
+                        lastChildObjNum = startObjNum + item.children.count - 1
+                    }
+
+                    flatItems.append((item, myObjNum, parentObjNum, prevObjNum, nextObjNum, firstChildObjNum, lastChildObjNum))
+
+                    if !item.children.isEmpty {
+                        buildFlatList(item.children, parentObjNum: myObjNum, startObjNum: &startObjNum)
+                    }
+                }
+            }
+
+            var nextObjNum = outlineObjNum + 1
+            buildFlatList(outline.items, parentObjNum: outlineObjNum, startObjNum: &nextObjNum)
+
+            // Write outline root dictionary
+            var outlineDict = COS.Dictionary()
+            outlineDict[.type] = .name(.outlines)
+
+            if !flatItems.isEmpty {
+                outlineDict[.first] = .reference(COS.IndirectReference(objectNumber: outlineObjNum + 1))
+                // Find last top-level item
+                var lastTopLevelObjNum = outlineObjNum + 1
+                for (i, fi) in flatItems.enumerated() {
+                    if fi.parentObjNum == outlineObjNum && flatItems[i].nextObjNum == nil {
+                        lastTopLevelObjNum = fi.objNum
+                        break
+                    }
+                }
+                outlineDict[.last] = .reference(COS.IndirectReference(objectNumber: lastTopLevelObjNum))
+            }
+
+            outlineDict[.count] = .integer(Int64(outline.count))
+
+            state.objectOffsets[outlineObjNum] = buffer.count
+            writeIndirectObject(outlineObjNum, object: .dictionary(outlineDict), into: &buffer)
+
+            // Write all outline item dictionaries
+            for flatItem in flatItems {
+                var itemDict = COS.Dictionary()
+                itemDict[.title] = .string(COS.StringValue(flatItem.item.title))
+                itemDict[.parent] = .reference(COS.IndirectReference(objectNumber: flatItem.parentObjNum))
+
+                if let prev = flatItem.prevObjNum {
+                    itemDict[.prev] = .reference(COS.IndirectReference(objectNumber: prev))
+                }
+                if let next = flatItem.nextObjNum {
+                    itemDict[.next] = .reference(COS.IndirectReference(objectNumber: next))
+                }
+                if let first = flatItem.firstChildObjNum {
+                    itemDict[.first] = .reference(COS.IndirectReference(objectNumber: first))
+                }
+                if let last = flatItem.lastChildObjNum {
+                    itemDict[.last] = .reference(COS.IndirectReference(objectNumber: last))
+                }
+
+                // Count: positive if open, negative if closed
+                if !flatItem.item.children.isEmpty {
+                    let descendantCount = flatItem.item.visibleDescendantCount - 1
+                    let countValue = flatItem.item.isOpen ? descendantCount : -descendantCount
+                    itemDict[.count] = .integer(Int64(countValue))
+                }
+
+                // Destination
+                itemDict[.dest] = serializeDestination(flatItem.item.destination, pageRefs: pageRefs)
+
+                state.objectOffsets[flatItem.objNum] = buffer.count
+                writeIndirectObject(flatItem.objNum, object: .dictionary(itemDict), into: &buffer)
+            }
+
+            return outlineRef
+        }
+
+        private func serializeDestination(
+            _ dest: Destination,
+            pageRefs: [COS.IndirectReference]
+        ) -> COS.Object {
+            switch dest {
+            case .xyz(let page, let left, let top, let zoom):
+                let pageRef = pageRefs.indices.contains(page) ? pageRefs[page] : pageRefs[0]
+                return .array([
+                    .reference(pageRef),
+                    .name(.xyz),
+                    left.map { .real($0.value) } ?? .null,
+                    top.map { .real($0.value) } ?? .null,
+                    zoom.map { .real($0) } ?? .null
+                ])
+
+            case .fit(let page):
+                let pageRef = pageRefs.indices.contains(page) ? pageRefs[page] : pageRefs[0]
+                return .array([.reference(pageRef), .name(.fit)])
+
+            case .fitH(let page, let top):
+                let pageRef = pageRefs.indices.contains(page) ? pageRefs[page] : pageRefs[0]
+                return .array([
+                    .reference(pageRef),
+                    .name(.fitH),
+                    top.map { .real($0.value) } ?? .null
+                ])
+
+            case .fitV(let page, let left):
+                let pageRef = pageRefs.indices.contains(page) ? pageRefs[page] : pageRefs[0]
+                return .array([
+                    .reference(pageRef),
+                    .name(.fitV),
+                    left.map { .real($0.value) } ?? .null
+                ])
+
+            case .fitR(let page, let left, let bottom, let right, let top):
+                let pageRef = pageRefs.indices.contains(page) ? pageRefs[page] : pageRefs[0]
+                return .array([
+                    .reference(pageRef),
+                    .name(.fitR),
+                    .real(left.value),
+                    .real(bottom.value),
+                    .real(right.value),
+                    .real(top.value)
+                ])
+
+            case .fitB(let page):
+                let pageRef = pageRefs.indices.contains(page) ? pageRefs[page] : pageRefs[0]
+                return .array([.reference(pageRef), .name(.fitB)])
+
+            case .fitBH(let page, let top):
+                let pageRef = pageRefs.indices.contains(page) ? pageRefs[page] : pageRefs[0]
+                return .array([
+                    .reference(pageRef),
+                    .name(.fitBH),
+                    top.map { .real($0.value) } ?? .null
+                ])
+
+            case .fitBV(let page, let left):
+                let pageRef = pageRefs.indices.contains(page) ? pageRefs[page] : pageRefs[0]
+                return .array([
+                    .reference(pageRef),
+                    .name(.fitBV),
+                    left.map { .real($0.value) } ?? .null
+                ])
+
+            case .named(let name):
+                return .string(COS.StringValue(name))
             }
         }
 

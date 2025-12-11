@@ -48,7 +48,7 @@ extension ISO_32000 {
         // MARK: - Other Properties
 
         /// Page rotation in degrees (0, 90, 180, 270)
-        public var rotation: Int?
+        public var rotation: Degree?
 
         /// Page content streams
         public var contents: [ContentStream]
@@ -68,7 +68,7 @@ extension ISO_32000 {
             bleedBox: UserSpace.Rectangle? = nil,
             trimBox: UserSpace.Rectangle? = nil,
             artBox: UserSpace.Rectangle? = nil,
-            rotation: Int? = nil,
+            rotation: Degree? = nil,
             contents: [ContentStream] = [],
             resources: Resources = Resources(),
             annotations: [Annotation] = []

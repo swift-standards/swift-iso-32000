@@ -454,6 +454,23 @@ extension ISO_32000.`7`.`3`.`5`.Name {
     public static let page = Self(__unchecked: (), rawValue: "Page")
     public static let outlines = Self(__unchecked: (), rawValue: "Outlines")
 
+    // Outline entries (Table 150, 151)
+    public static let first = Self(__unchecked: (), rawValue: "First")
+    public static let last = Self(__unchecked: (), rawValue: "Last")
+    public static let next = Self(__unchecked: (), rawValue: "Next")
+    public static let prev = Self(__unchecked: (), rawValue: "Prev")
+    public static let dest = Self(__unchecked: (), rawValue: "Dest")
+
+    // Destination types (Table 149)
+    public static let xyz = Self(__unchecked: (), rawValue: "XYZ")
+    public static let fit = Self(__unchecked: (), rawValue: "Fit")
+    public static let fitH = Self(__unchecked: (), rawValue: "FitH")
+    public static let fitV = Self(__unchecked: (), rawValue: "FitV")
+    public static let fitR = Self(__unchecked: (), rawValue: "FitR")
+    public static let fitB = Self(__unchecked: (), rawValue: "FitB")
+    public static let fitBH = Self(__unchecked: (), rawValue: "FitBH")
+    public static let fitBV = Self(__unchecked: (), rawValue: "FitBV")
+
     // Page attributes
     public static let parent = Self(__unchecked: (), rawValue: "Parent")
     public static let kids = Self(__unchecked: (), rawValue: "Kids")

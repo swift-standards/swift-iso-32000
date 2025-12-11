@@ -15,15 +15,23 @@ extension ISO_32000 {
         /// Document pages
         public var pages: [Page]
 
+        /// Document outline (bookmarks)
+        ///
+        /// Per ISO 32000-2:2020 Section 12.3.3, a document may contain
+        /// an outline that allows users to navigate interactively.
+        public var outline: Outline.Root?
+
         /// Create a document
         public init(
             version: Version = .default,
             info: Info? = nil,
             pages: [Page] = [],
+            outline: Outline.Root? = nil
         ) {
             self.version = version
             self.info = info
             self.pages = pages
+            self.outline = outline
         }
     }
 }
