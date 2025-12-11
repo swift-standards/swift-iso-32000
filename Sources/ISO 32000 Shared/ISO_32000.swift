@@ -75,6 +75,9 @@ extension ISO_32000.UserSpace {
     /// Height
     public typealias Height = ISO_32000.Height<Unit>
 
+    /// Size (width and height)
+    public typealias Size = ISO_32000.Size<Unit>
+
     /// Edge insets
     public typealias EdgeInsets = Geometry<Unit>.EdgeInsets
 }
