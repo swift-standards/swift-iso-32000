@@ -64,13 +64,17 @@ extension ISO_32000.`9`.`8`.FontDesign {
 
         /// Convert to user space units at a specific font size
         ///
+        /// Returns an untyped user space measurement. Use the typed accessors
+        /// on `Metrics` (like `ascender(atSize:)` or `width(of:atSize:)`) when
+        /// you need Width or Height specifically.
+        ///
         /// - Parameter fontSize: The font size in user space units
-        /// - Returns: The measurement in user space units
+        /// - Returns: The measurement in user space units (untyped)
         @inlinable
         public func atSize(
-            _ fontSize: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit(Double(value) * fontSize.value / 1000.0)
+            _ fontSize: ISO_32000.UserSpace.Unit
+        ) -> ISO_32000.UserSpace.Unit {
+            ISO_32000.UserSpace.Unit(Double(value) * fontSize.value / 1000.0)
         }
     }
 }
@@ -230,9 +234,9 @@ extension ISO_32000.`9`.`8` {
         /// Calculate width of a String at a specific font size
         public func width(
             of text: String,
-            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            width(of: text).atSize(size)
+            atSize size: ISO_32000.UserSpace.Unit
+        ) -> ISO_32000.UserSpace.Width {
+            ISO_32000.UserSpace.Width(width(of: text).atSize(size).value)
         }
 
         /// WinAnsi encoding operations on this font metrics
@@ -257,9 +261,9 @@ extension ISO_32000.`9`.`8` {
             /// Calculate width of WinAnsi-encoded bytes at a specific font size
             public func width<Bytes: Collection>(
                 of bytes: Bytes,
-                atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-            ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit where Bytes.Element == UInt8 {
-                width(of: bytes).atSize(size)
+                atSize size: ISO_32000.UserSpace.Unit
+            ) -> ISO_32000.UserSpace.Width where Bytes.Element == UInt8 {
+                ISO_32000.UserSpace.Width(width(of: bytes).atSize(size).value)
             }
         }
 
@@ -280,44 +284,44 @@ extension ISO_32000.`9`.`8` {
 
         /// Line height at a specific font size
         public func lineHeight(
-            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            lineHeight.atSize(size)
+            atSize size: ISO_32000.UserSpace.Unit
+        ) -> ISO_32000.UserSpace.Height {
+            ISO_32000.UserSpace.Height(lineHeight.atSize(size).value)
         }
 
         /// Normal line height at a specific font size (includes leading)
         public func normalLineHeight(
-            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            normalLineHeight.atSize(size)
+            atSize size: ISO_32000.UserSpace.Unit
+        ) -> ISO_32000.UserSpace.Height {
+            ISO_32000.UserSpace.Height(normalLineHeight.atSize(size).value)
         }
 
         /// Ascender at a specific font size
         public func ascender(
-            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            ascender.atSize(size)
+            atSize size: ISO_32000.UserSpace.Unit
+        ) -> ISO_32000.UserSpace.Height {
+            ISO_32000.UserSpace.Height(ascender.atSize(size).value)
         }
 
         /// Descender at a specific font size (negative value)
         public func descender(
-            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            descender.atSize(size)
+            atSize size: ISO_32000.UserSpace.Unit
+        ) -> ISO_32000.UserSpace.Height {
+            ISO_32000.UserSpace.Height(descender.atSize(size).value)
         }
 
         /// x-height at a specific font size
         public func xHeight(
-            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            xHeight.atSize(size)
+            atSize size: ISO_32000.UserSpace.Unit
+        ) -> ISO_32000.UserSpace.Height {
+            ISO_32000.UserSpace.Height(xHeight.atSize(size).value)
         }
 
         /// Cap height at a specific font size
         public func capHeight(
-            atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-        ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-            capHeight.atSize(size)
+            atSize size: ISO_32000.UserSpace.Unit
+        ) -> ISO_32000.UserSpace.Height {
+            ISO_32000.UserSpace.Height(capHeight.atSize(size).value)
         }
 
         // MARK: - Glyph Accessors
@@ -348,9 +352,9 @@ extension ISO_32000.`9`.`8` {
 
             /// Glyph width at a specific font size
             public func width(
-                atSize size: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-            ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-                width.atSize(size)
+                atSize size: ISO_32000.UserSpace.Unit
+            ) -> ISO_32000.UserSpace.Width {
+                ISO_32000.UserSpace.Width(width.atSize(size).value)
             }
         }
     }
