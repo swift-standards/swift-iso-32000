@@ -728,7 +728,7 @@ extension ISO_32000.`12`.`5`.Annotation {
         /// Quadrilaterals for the active area (QuadPoints entry). Optional.
         ///
         /// Each quadrilateral defines a region of interest on the page.
-        public var quadPoints: [Geometry<Double>.Quadrilateral]?
+        public var quadPoints: [Geometry<Double, ISO_32000.UserSpace>.Quadrilateral]?
 
         /// The target of the link
         public enum Target: Sendable, Hashable {
@@ -753,7 +753,7 @@ extension ISO_32000.`12`.`5`.Annotation {
         public init(
             target: Target,
             highlightMode: HighlightMode = .invert,
-            quadPoints: [Geometry<Double>.Quadrilateral]? = nil
+            quadPoints: [Geometry<Double, ISO_32000.UserSpace>.Quadrilateral]? = nil
         ) {
             self.target = target
             self.highlightMode = highlightMode
@@ -794,7 +794,7 @@ extension ISO_32000.`12`.`5`.Annotation {
         /// Quadrilaterals defining the regions to be marked up. Required.
         ///
         /// Each quadrilateral specifies a marked-up region on the page.
-        public var quadPoints: [Geometry<Double>.Quadrilateral]
+        public var quadPoints: [Geometry<Double, ISO_32000.UserSpace>.Quadrilateral]
 
         /// Text markup annotation kinds
         public enum Kind: Sendable, Hashable {
@@ -808,7 +808,7 @@ extension ISO_32000.`12`.`5`.Annotation {
             case squiggly
         }
 
-        public init(kind: Kind, quadPoints: [Geometry<Double>.Quadrilateral]) {
+        public init(kind: Kind, quadPoints: [Geometry<Double, ISO_32000.UserSpace>.Quadrilateral]) {
             self.kind = kind
             self.quadPoints = quadPoints
         }
@@ -1462,7 +1462,7 @@ extension ISO_32000.`12`.`5`.Annotation {
         /// Quadrilaterals specifying the content regions to be removed. Optional.
         ///
         /// Each quadrilateral defines a region to be redacted.
-        public var quadPoints: [Geometry<Double>.Quadrilateral]?
+        public var quadPoints: [Geometry<Double, ISO_32000.UserSpace>.Quadrilateral]?
 
         /// Interior color (RGB) for the redacted region after removal. Optional.
         public var interiorColor: Color?
@@ -1477,7 +1477,7 @@ extension ISO_32000.`12`.`5`.Annotation {
         public var quadding: FreeText.Quadding
 
         public init(
-            quadPoints: [Geometry<Double>.Quadrilateral]? = nil,
+            quadPoints: [Geometry<Double, ISO_32000.UserSpace>.Quadrilateral]? = nil,
             interiorColor: Color? = nil,
             overlayText: String? = nil,
             repeatText: Bool = false,

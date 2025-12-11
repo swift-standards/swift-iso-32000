@@ -2,3 +2,4 @@
 // Re-exports Radian and Degree types from Geometry module
 
 @_exported public import Angle
+@_exported public import Dimension

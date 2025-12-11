@@ -262,7 +262,7 @@ extension ISO_32000.`7`.`3`.`5` {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 7.3.5 — Name objects
-    public struct Name: Sendable, Hashable, Codable {
+    public struct Name: Sendable, Hashable {
         /// The raw string value of the name
         public let rawValue: String
 
@@ -307,6 +307,11 @@ extension ISO_32000.`7`.`3`.`5` {
         }
     }
 }
+
+#if Codable
+extension ISO_32000.`7`.`3`.`5`.Name: Codable {}
+#endif
+
 extension ISO_32000.`7`.`3`.`5`.Name {
     @inlinable
     public static var f1: Self {
@@ -660,7 +665,7 @@ extension ISO_32000.`7`.`3`.`10` {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 7.3.10 — Indirect objects
-    public struct IndirectReference: Sendable, Hashable, Codable {
+    public struct IndirectReference: Sendable, Hashable {
         /// Object number (unique identifier within the PDF)
         public let objectNumber: Int
 
@@ -674,6 +679,10 @@ extension ISO_32000.`7`.`3`.`10` {
         }
     }
 }
+
+#if Codable
+extension ISO_32000.`7`.`3`.`10`.IndirectReference: Codable {}
+#endif
 
 extension ISO_32000.`7`.`3`.`10`.IndirectReference: CustomStringConvertible {
     public var description: String {
@@ -1139,41 +1148,31 @@ extension ISO_32000.`7`.`3`.`3` {
     /// - Never uses exponential notation
     /// - Maximum 5 decimal places
     /// - Non-finite values (infinity, NaN) output as `0`
-    public struct PDFNumber: Sendable {
-        public let value: Double
-
-        /// Maximum decimal places for real numbers (per Annex C recommendations)
-        private static let maxDecimalPlaces = 5
-
-        /// Multiplier for extracting fractional digits (10^maxDecimalPlaces)
-        private static let multiplier: Double = 100_000
-
-        /// Serialize this PDF number directly to bytes
-        ///
-        /// - Parameter buffer: The buffer to append ASCII bytes to
-        public func serialize<Buffer: RangeReplaceableCollection>(
+    public struct PDFNumber: Sendable, Binary.Serializable {
+        public static func serialize<Buffer>(
+            _ number: ISO_32000_Shared.ISO_32000.`7`.`3`.`3`.PDFNumber,
             into buffer: inout Buffer
-        ) where Buffer.Element == UInt8 {
+        ) where Buffer : RangeReplaceableCollection, Buffer.Element == UInt8 {
             // Handle special cases (PDF doesn't support infinity/NaN)
-            guard value.isFinite else {
+            guard number.value.isFinite else {
                 buffer.append(INCITS_4_1986.GraphicCharacters.`0`)
                 return
             }
 
             // Check if value is effectively an integer
-            let rounded = value.rounded()
-            if value == rounded && abs(value) < Double(Int64.max) {
-                Int64(value).serialize(into: &buffer)
+            let rounded = number.value.rounded()
+            if number.value == rounded && abs(number.value) < Double(Int64.max) {
+                Int64(number.value).serialize(into: &buffer)
                 return
             }
 
             // Handle negative numbers
             let absValue: Double
-            if value < 0 {
+            if number.value < 0 {
                 buffer.append(INCITS_4_1986.GraphicCharacters.hyphen)
-                absValue = -value
+                absValue = -number.value
             } else {
-                absValue = value
+                absValue = number.value
             }
 
             // Split into integer and fractional parts
@@ -1203,5 +1202,13 @@ extension ISO_32000.`7`.`3`.`3` {
                 buffer.append(contentsOf: digits)
             }
         }
+        
+        public let value: Double
+
+        /// Maximum decimal places for real numbers (per Annex C recommendations)
+        private static let maxDecimalPlaces = 5
+
+        /// Multiplier for extracting fractional digits (10^maxDecimalPlaces)
+        private static let multiplier: Double = 100_000
     }
 }

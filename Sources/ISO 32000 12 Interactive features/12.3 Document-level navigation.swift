@@ -47,7 +47,7 @@ extension ISO_32000 {
         ///   - left: Left coordinate, or nil for current value
         ///   - top: Top coordinate, or nil for current value
         ///   - zoom: Zoom factor, or nil/0 for current value
-        case xyz(page: Int, left: ISO_32000.UserSpace.Unit?, top: ISO_32000.UserSpace.Unit?, zoom: Double?)
+        case xyz(page: Int, left: ISO_32000.UserSpace.X?, top: ISO_32000.UserSpace.Y?, zoom: Double?)
 
         /// Fit the entire page within the window.
         ///
@@ -64,7 +64,7 @@ extension ISO_32000 {
         ///
         /// The vertical coordinate top is positioned at the top edge of the window.
         /// A null value for top specifies that the current value shall be retained.
-        case fitH(page: Int, top: ISO_32000.UserSpace.Unit?)
+        case fitH(page: Int, top: ISO_32000.UserSpace.Y?)
 
         /// Fit the height of the page to the window.
         ///
@@ -72,7 +72,7 @@ extension ISO_32000 {
         ///
         /// The horizontal coordinate left is positioned at the left edge of the window.
         /// A null value for left specifies that the current value shall be retained.
-        case fitV(page: Int, left: ISO_32000.UserSpace.Unit?)
+        case fitV(page: Int, left: ISO_32000.UserSpace.X?)
 
         /// Fit the specified rectangle to the window.
         ///
@@ -81,7 +81,7 @@ extension ISO_32000 {
         /// If the required horizontal and vertical magnification factors are
         /// different, use the smaller of the two, centring the rectangle
         /// within the window in the other dimension.
-        case fitR(page: Int, left: ISO_32000.UserSpace.Unit, bottom: ISO_32000.UserSpace.Unit, right: ISO_32000.UserSpace.Unit, top: ISO_32000.UserSpace.Unit)
+        case fitR(page: Int, left: ISO_32000.UserSpace.X, bottom: ISO_32000.UserSpace.Y, right: ISO_32000.UserSpace.X, top: ISO_32000.UserSpace.Y)
 
         /// Fit the page's bounding box to the window. (PDF 1.1)
         ///
@@ -93,12 +93,12 @@ extension ISO_32000 {
         /// Fit the width of the page's bounding box to the window. (PDF 1.1)
         ///
         /// `[page /FitBH top]`
-        case fitBH(page: Int, top: ISO_32000.UserSpace.Unit?)
+        case fitBH(page: Int, top: ISO_32000.UserSpace.Y?)
 
         /// Fit the height of the page's bounding box to the window. (PDF 1.1)
         ///
         /// `[page /FitBV left]`
-        case fitBV(page: Int, left: ISO_32000.UserSpace.Unit?)
+        case fitBV(page: Int, left: ISO_32000.UserSpace.X?)
 
         /// Named destination (resolved at runtime).
         ///
@@ -520,7 +520,7 @@ extension ISO_32000.Outline {
             let destination = ISO_32000.Destination.xyz(
                 page: heading.pageIndex,
                 left: nil,
-                top: heading.yPosition.value,
+                top: heading.yPosition,
                 zoom: nil
             )
             // Items at or below openToLevel are expanded, others collapsed

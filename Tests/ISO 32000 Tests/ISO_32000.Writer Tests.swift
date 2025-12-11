@@ -14,7 +14,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes valid PDF header`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.empty(size: .letter)
+            pages: [ISO_32000.Page.empty(size: .letter)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -26,7 +26,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Includes binary marker after header`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.empty(size: .letter)
+            pages: [ISO_32000.Page.empty(size: .letter)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -39,7 +39,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes catalog object`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.empty(size: .letter)
+            pages: [ISO_32000.Page.empty(size: .letter)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -51,7 +51,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes pages object`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.empty(size: .letter)
+            pages: [ISO_32000.Page.empty(size: .letter)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -64,7 +64,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes page object`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.empty(size: .letter)
+            pages: [ISO_32000.Page.empty(size: .letter)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -77,7 +77,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes cross-reference table`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.empty(size: .letter)
+            pages: [ISO_32000.Page.empty(size: .letter)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -90,7 +90,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes trailer`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.empty(size: .letter)
+            pages: [ISO_32000.Page.empty(size: .letter)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -116,7 +116,7 @@ struct `ISO_32000.Writer Tests` {
         height: Double
     ) {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.empty(size: rect)
+            pages: [ISO_32000.Page.empty(size: rect)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -135,7 +135,7 @@ struct `ISO_32000.Writer Tests` {
                 author: "Swift PDF",
                 creator: "swift-iso-32000"
             ),
-            page: ISO_32000.Page.empty(size: .letter)
+            pages: [ISO_32000.Page.empty(size: .letter)]
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -155,8 +155,10 @@ struct `ISO_32000.Writer Tests` {
             builder.beginText()
             builder.setFont(ISO_32000.Font.helvetica, size: 12)
             for i in 0..<20 {
-                let yPos = ISO_32000.UserSpace.Y(ISO_32000.UserSpace.Unit(700 - Double(i * 20)))
-                builder.moveText(x: 72, y: yPos)
+                builder.moveText(
+                    x: 72,
+                    y: .init(700 - i * 20)
+                )
                 builder.showText(
                     "Line \(i): This is test content for compression testing purposes."
                 )
@@ -165,13 +167,15 @@ struct `ISO_32000.Writer Tests` {
         }
 
         let document = ISO_32000.Document(
-            page: ISO_32000.Page(
-                mediaBox: .letter,
-                content: content,
-                resources: ISO_32000.Resources(fonts: [
-                    ISO_32000.Font.helvetica.resourceName: ISO_32000.Font.helvetica
-                ])
-            )
+            pages: [
+                ISO_32000.Page(
+                    mediaBox: .letter,
+                    content: content,
+                    resources: ISO_32000.Resources(fonts: [
+                        ISO_32000.Font.helvetica.resourceName: ISO_32000.Font.helvetica
+                    ])
+                )
+            ]
         )
 
         var writer = ISO_32000.Writer.flate()
@@ -206,23 +210,25 @@ struct `ISO_32000.Writer Tests` {
                 title: "Test Document",
                 creator: "swift-iso-32000 tests"
             ),
-            page: ISO_32000.Page(
-                mediaBox: .letter,
-                content: ISO_32000.ContentStream { builder in
-                    builder.beginText()
-                    builder.setFont(ISO_32000.Font.helvetica, size: 24)
-                    builder.moveText(x: 72, y: 700)
-                    builder.showText("ISO 32000 Test Document")
+            pages: [
+                ISO_32000.Page(
+                    mediaBox: .letter,
+                    content: ISO_32000.ContentStream { builder in
+                        builder.beginText()
+                        builder.setFont(ISO_32000.Font.helvetica, size: 24)
+                        builder.moveText(x: 72, y: 700)
+                        builder.showText("ISO 32000 Test Document")
 
-                    builder.setFont(ISO_32000.Font.helvetica, size: 12)
-                    builder.moveText(x: 0, y: -30)
-                    builder.showText("This PDF was generated by swift-iso-32000.")
-                    builder.endText()
-                },
-                resources: ISO_32000.Resources(fonts: [
-                    ISO_32000.Font.helvetica.resourceName: ISO_32000.Font.helvetica
-                ])
-            )
+                        builder.setFont(ISO_32000.Font.helvetica, size: 12)
+                        builder.moveText(x: 0, y: -30)
+                        builder.showText("This PDF was generated by swift-iso-32000.")
+                        builder.endText()
+                    },
+                    resources: ISO_32000.Resources(fonts: [
+                        ISO_32000.Font.helvetica.resourceName: ISO_32000.Font.helvetica
+                    ])
+                )
+            ]
         )
 
         var writer = ISO_32000.Writer()
@@ -257,11 +263,13 @@ struct `ISO_32000.Writer Tests` {
 
         let document = ISO_32000.Document(
             info: ISO_32000.Document.Info(title: "Standard 14 Fonts"),
-            page: ISO_32000.Page(
-                mediaBox: .letter,
-                content: ISO_32000.ContentStream(data: contentBuilder.data),
-                resources: ISO_32000.Resources(fonts: fonts)
-            )
+            pages: [
+                ISO_32000.Page(
+                    mediaBox: .letter,
+                    content: ISO_32000.ContentStream(data: contentBuilder.data),
+                    resources: ISO_32000.Resources(fonts: fonts)
+                )
+            ]
         )
 
         var writer = ISO_32000.Writer()

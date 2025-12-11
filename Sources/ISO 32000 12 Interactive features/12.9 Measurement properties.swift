@@ -10,6 +10,7 @@
 //   Table 267 — Additional entries in a rectilinear measure dictionary
 //   Table 268 — Entries in a number format dictionary
 
+public import Geometry
 public import ISO_32000_8_Graphics
 public import ISO_32000_Shared
 

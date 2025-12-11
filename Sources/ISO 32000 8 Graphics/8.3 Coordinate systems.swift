@@ -31,51 +31,6 @@ extension ISO_32000.`8`.`3`.`2`.`3` {
     public typealias UserSpace = ISO_32000.UserSpace
 }
 
-// MARK: - Core Type Aliases
-// These types are defined in ISO_32000_Shared for cross-clause availability.
-// We re-export them here under the section namespace for organizational clarity.
-
-extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace {
-    /// User space unit - see ISO_32000.UserSpace.Unit
-    public typealias Unit = ISO_32000.UserSpace.Unit
-
-    /// Rectangle in user space
-    public typealias Rectangle = ISO_32000.UserSpace.Rectangle
-
-    /// Coordinate in user space
-    public typealias Coordinate = ISO_32000.UserSpace.Coordinate
-
-    /// Size in user space
-    public typealias Size = ISO_32000.Size<Unit>
-
-    /// X coordinate
-    public typealias X = ISO_32000.UserSpace.X
-
-    /// Y coordinate
-    public typealias Y = ISO_32000.UserSpace.Y
-
-    /// Width
-    public typealias Width = ISO_32000.UserSpace.Width
-
-    /// Height
-    public typealias Height = ISO_32000.UserSpace.Height
-
-    /// Edge insets
-    public typealias EdgeInsets = ISO_32000.UserSpace.EdgeInsets
-
-    /// Affine transformation matrix
-    public typealias AffineTransform = ISO_32000.AffineTransform<Unit>
-
-    /// Displacement vector
-    public typealias Vector = ISO_32000.Vector<Unit>
-
-    /// Infinite line
-    public typealias Line = ISO_32000.Line<Unit>
-
-    /// Line segment
-    public typealias LineSegment = ISO_32000.LineSegment<Unit>
-}
-
 // MARK: - Unit Extensions (additional functionality beyond Shared)
 
 extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
@@ -179,42 +134,6 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
     }
 }
 
-// MARK: - AffineTransform Extensions for Unit
-// These provide the FloatingPoint-like functionality needed for transforms
-
-extension Geometry<ISO_32000.UserSpace.Unit>.AffineTransform {
-    /// Create a translation transform
-    @inlinable
-    public static func translation(
-        x: ISO_32000.UserSpace.Unit,
-        y: ISO_32000.UserSpace.Unit
-    ) -> Self {
-        Self(a: .init(1), b: .init(0), c: .init(0), d: .init(1), tx: x, ty: y)
-    }
-
-    /// Create a scale transform
-    @inlinable
-    public static func scale(
-        x: ISO_32000.UserSpace.Unit,
-        y: ISO_32000.UserSpace.Unit
-    ) -> Self {
-        Self(a: x, b: .init(0), c: .init(0), d: y, tx: .init(0), ty: .init(0))
-    }
-
-    /// Concatenate with another transform (self * other)
-    @inlinable
-    public func concatenating(_ other: Self) -> Self {
-        Self(
-            a: .init(a.value * other.a.value + b.value * other.c.value),
-            b: .init(a.value * other.b.value + b.value * other.d.value),
-            c: .init(c.value * other.a.value + d.value * other.c.value),
-            d: .init(c.value * other.b.value + d.value * other.d.value),
-            tx: .init(tx.value * other.a.value + ty.value * other.c.value + other.tx.value),
-            ty: .init(tx.value * other.b.value + ty.value * other.d.value + other.ty.value)
-        )
-    }
-}
-
 // MARK: - Coordinate Conversion
 
 extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Coordinate {
@@ -242,7 +161,7 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Coordinate {
     /// - Parameter pageHeight: Total page height for coordinate conversion
     /// - Returns: Y coordinate from top edge
     public func topLeftY(
-        pageHeight: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        pageHeight: ISO_32000.UserSpace.Height
     ) -> ISO_32000.UserSpace.Y {
         pageHeight - y
     }
@@ -256,39 +175,45 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
     ///
     /// - Parameters:
     ///   - x: X coordinate of top-left corner
-    ///   - y: Y coordinate from top edge (increasing downward)
+    ///   - topY: Distance from top edge (as Height displacement)
     ///   - width: Width of rectangle
     ///   - height: Height of rectangle
-    ///   - pageHeight: Total page height for coordinate conversion
+    ///   - pageTop: Y coordinate of page top edge
     public static func fromTopLeft(
-        x: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit,
-        y: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit,
-        width: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit,
-        height: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit,
-        pageHeight: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        x: ISO_32000.UserSpace.X,
+        topY: ISO_32000.UserSpace.Height,
+        width: ISO_32000.UserSpace.Width,
+        height: ISO_32000.UserSpace.Height,
+        pageTop: ISO_32000.UserSpace.Y
     ) -> Self {
-        // In top-left coords: y is distance from top, rectangle extends downward
+        // In top-left coords: topY is distance from top, rectangle extends downward
         // In bottom-left coords: need to find bottom-left corner
-        let bottomLeftY = pageHeight - y - height
-        return Self(x: x, y: bottomLeftY, width: width, height: height)
+        let bottomLeftY: ISO_32000.UserSpace.Y = pageTop - topY - height
+        return Self(
+            x: x,
+            y: bottomLeftY,
+            width: width,
+            height: height
+        )
     }
 
-    /// The top-left Y coordinate (in top-left coordinate system)
+    /// The distance from top edge to the rectangle's top edge
     ///
-    /// - Parameter pageHeight: Total page height for coordinate conversion
-    /// - Returns: Y coordinate from top edge
-    public func topLeftY(
-        pageHeight: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-    ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Y {
-        pageHeight - ury
+    /// - Parameter pageTop: Y coordinate of page top edge
+    /// - Returns: Distance from top edge (as Height)
+    public func topY(
+        pageTop: ISO_32000.UserSpace.Y
+    ) -> ISO_32000.UserSpace.Height {
+        pageTop - ury
     }
 
-    /// The top-left corner coordinate (in top-left coordinate system)
+    /// The top-left corner in top-left coordinate system
     ///
-    /// - Parameter pageHeight: Total page height for coordinate conversion
+    /// - Parameter pageTop: Y coordinate of page top edge
+    /// - Returns: Coordinate with x and distance from top as y
     public func topLeftOrigin(
-        pageHeight: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-    ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Coordinate {
-        ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Coordinate(x: llx, y: pageHeight - ury)
+        pageTop: ISO_32000.UserSpace.Y
+    ) -> (x: ISO_32000.UserSpace.X, topY: ISO_32000.UserSpace.Height) {
+        (x: llx, topY: pageTop - ury)
     }
 }

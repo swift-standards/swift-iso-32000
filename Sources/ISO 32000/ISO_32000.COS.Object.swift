@@ -16,18 +16,6 @@ extension ISO_32000.COS.Object {
     /// - Parameter rect: The rectangle in user space coordinates
     public init(_ rect: ISO_32000.UserSpace.Rectangle) {
         self = .array([
-            .real(rect.llx.value.value),
-            .real(rect.lly.value.value),
-            .real(rect.urx.value.value),
-            .real(rect.ury.value.value),
-        ])
-    }
-
-    /// Create a COS array from a generic rectangle with Double units
-    ///
-    /// - Parameter rect: The rectangle with Double coordinates
-    public init(_ rect: Geometry<Double>.Rectangle) {
-        self = .array([
             .real(rect.llx.value),
             .real(rect.lly.value),
             .real(rect.urx.value),

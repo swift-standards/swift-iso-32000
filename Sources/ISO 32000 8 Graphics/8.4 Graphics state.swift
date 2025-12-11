@@ -6,6 +6,7 @@
 
 public import Geometry
 public import ISO_32000_Shared
+public import RealModule
 
 extension ISO_32000.`8` {
     /// ISO 32000-2:2020, 8.4 Graphics state
@@ -421,7 +422,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         /// Modified by the `cm` operator.
         ///
         /// Initial value: a matrix that transforms default user coordinates to device coordinates.
-        public var ctm: ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit>
+        public var ctm: ISO_32000.UserSpace.AffineTransform
 
         // MARK: - Clipping (internal, not directly representable)
 
@@ -594,7 +595,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         /// The `textState` parameter must be provided as it depends on the
         /// concrete `TextState` type.
         public init(
-            ctm: ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit> = .identity,
+            ctm: ISO_32000.UserSpace.AffineTransform = .identity,
             strokingColorSpace: ISO_32000.`8`.`4`.Graphics.State.ColorSpace = .deviceGray,
             nonstrokingColorSpace: ISO_32000.`8`.`4`.Graphics.State.ColorSpace = .deviceGray,
             strokingColor: ISO_32000.`8`.`4`.Graphics.State.Color = .gray(0),
@@ -1099,7 +1100,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
     /// - Parameter transform: The transform to concatenate
     @inlinable
     public mutating func concatenate<TextState>(
-        _ transform: ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit>
+        _ transform: ISO_32000.UserSpace.AffineTransform
     ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.ctm = current.ctm.concatenating(transform)
     }
@@ -1107,14 +1108,14 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
     /// Translate the current coordinate system.
     ///
     /// - Parameters:
-    ///   - x: Horizontal translation in user space units
-    ///   - y: Vertical translation in user space units
+    ///   - dx: Horizontal translation in user space units
+    ///   - dy: Vertical translation in user space units
     @inlinable
     public mutating func translate<TextState>(
-        x: ISO_32000.UserSpace.Unit,
-        y: ISO_32000.UserSpace.Unit
+        dx: ISO_32000.UserSpace.Width,
+        dy: ISO_32000.UserSpace.Height
     ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
-        concatenate(.translation(x: x, y: y))
+        concatenate(.translation(dx: dx, dy: dy))
     }
 
     /// Scale the current coordinate system.
@@ -1124,8 +1125,8 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
     ///   - y: Vertical scale factor
     @inlinable
     public mutating func scale<TextState>(
-        x: ISO_32000.UserSpace.Unit,
-        y: ISO_32000.UserSpace.Unit
+        x: ISO_32000.UserSpace.X,
+        y: ISO_32000.UserSpace.Y
     ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         concatenate(.scale(x: x, y: y))
     }
@@ -1137,17 +1138,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
     public mutating func rotate<TextState>(
         _ angle: Radian
     ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
-        let c = ISO_32000.UserSpace.Unit(angle.cos)
-        let s = ISO_32000.UserSpace.Unit(angle.sin)
-        let rotation = ISO_32000.AffineTransform<ISO_32000.UserSpace.Unit>(
-            a: c,
-            b: s,
-            c: -s,
-            d: c,
-            tx: .init(0),
-            ty: .init(0)
-        )
-        concatenate(rotation)
+        concatenate(.rotation(angle))
     }
 
     // MARK: - Color Helpers

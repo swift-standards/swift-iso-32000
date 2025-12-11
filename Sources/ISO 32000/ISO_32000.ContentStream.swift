@@ -248,7 +248,10 @@ extension ISO_32000.ContentStream {
         }
 
         /// Move text position (Td)
-        public mutating func moveText(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y) {
+        public mutating func moveText(
+            x: ISO_32000.UserSpace.X,
+            y: ISO_32000.UserSpace.Y
+        ) {
             emit(.moveTextPosition(tx: x, ty: y))
         }
 
@@ -315,7 +318,7 @@ extension ISO_32000.ContentStream {
         /// Set horizontal scaling (Tz)
         ///
         /// Scale is a percentage (100 = normal).
-        public mutating func setHorizontalScaling(_ scale: Scale<1>) {
+        public mutating func setHorizontalScaling(_ scale: Scale<1, Double>) {
             emit(.setHorizontalScaling(scale))
         }
 
@@ -386,7 +389,7 @@ extension ISO_32000.ContentStream {
         /// for type uniformity), while tx,ty are actual spatial translations (displacements).
         public mutating func transform(_ t: ISO_32000.UserSpace.AffineTransform) {
             emit(
-                .transform(a: t.a.value, b: t.b.value, c: t.c.value, d: t.d.value, e: t.tx, f: t.ty)
+                .transform(a: t.a, b: t.b, c: t.c, d: t.d, e: t.tx, f: t.ty)
             )
         }
 
@@ -410,7 +413,7 @@ extension ISO_32000.ContentStream {
         }
 
         /// Translate by a vector (convenience wrapper for cm)
-        public mutating func translate(_ vector: ISO_32000.UserSpace.Vector) {
+        public mutating func translate(_ vector: ISO_32000.UserSpace.Vector<2>) {
             emit(.transform(a: 1, b: 0, c: 0, d: 1, e: vector.dx, f: vector.dy))
         }
 
@@ -460,7 +463,7 @@ extension ISO_32000.ContentStream {
         /// which provides an excellent approximation of a circle.
         ///
         /// - Parameter circle: The circle to draw (from Geometry package)
-        public mutating func circle(_ circle: Geometry<ISO_32000.UserSpace.Unit>.Circle) {
+        public mutating func circle(_ circle: ISO_32000.UserSpace.Circle) {
             // Standard bezier approximation constant: k = 4/3 * (√2 - 1) ≈ 0.5522847498
             let k = 0.5522847498
             let cx = circle.center.x.value
@@ -510,10 +513,10 @@ extension ISO_32000.ContentStream {
         public mutating func setTextMatrix(_ t: ISO_32000.UserSpace.AffineTransform) {
             emit(
                 .setTextMatrix(
-                    a: t.a.value,
-                    b: t.b.value,
-                    c: t.c.value,
-                    d: t.d.value,
+                    a: t.a,
+                    b: t.b,
+                    c: t.c,
+                    d: t.d,
                     e: t.tx,
                     f: t.ty
                 )

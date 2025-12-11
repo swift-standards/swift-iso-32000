@@ -129,10 +129,10 @@ extension ISO_32000.Page {
 
 extension ISO_32000.Page {
     /// Page width (from mediaBox)
-    public var width: ISO_32000.UserSpace.Unit { mediaBox.width.value }
+    public var width: ISO_32000.UserSpace.Width { mediaBox.width }
 
     /// Page height (from mediaBox)
-    public var height: ISO_32000.UserSpace.Unit { mediaBox.height.value }
+    public var height: ISO_32000.UserSpace.Height { mediaBox.height }
 
     /// Effective crop box (cropBox or mediaBox if not set)
     public var effectiveCropBox: ISO_32000.UserSpace.Rectangle {
