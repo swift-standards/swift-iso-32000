@@ -889,6 +889,125 @@ extension ISO_32000.Action {
     }
 }
 
+// MARK: - 12.6.3 Trigger Events (Tables 197-200)
+
+extension ISO_32000.Action {
+    /// Additional actions dictionary for form fields (Table 199)
+    ///
+    /// Defines actions triggered by various events on form fields.
+    /// These are critical for form validation, formatting, and calculation.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Table 199 — Entries in a form field's additional-actions dictionary
+    public struct FormFieldTriggers: Sendable, Hashable {
+        /// Action performed when user types a keystroke. Optional.
+        ///
+        /// Per ISO 32000-2 Table 199, K entry:
+        /// > (Optional) An action that shall be performed when the user types a
+        /// > keystroke in a text field or combo box, or modifies the selection
+        /// > in a scrollable list box.
+        public var keystroke: JavaScript?
+
+        /// Action performed before field is formatted for display. Optional.
+        ///
+        /// Per ISO 32000-2 Table 199, F entry:
+        /// > (Optional) An action that shall be performed before the field is
+        /// > formatted to display its current value. This action may modify the
+        /// > field's value before formatting.
+        public var format: JavaScript?
+
+        /// Action performed when field's value is changed. Optional.
+        ///
+        /// Per ISO 32000-2 Table 199, V entry:
+        /// > (Optional) An action that shall be performed when the field's value
+        /// > is changed. This action may check the new value for validity.
+        public var validate: JavaScript?
+
+        /// Action performed to recalculate field's value. Optional.
+        ///
+        /// Per ISO 32000-2 Table 199, C entry:
+        /// > (Optional) An action that shall be performed in order to recalculate
+        /// > the value of this field when that of another field changes.
+        public var calculate: JavaScript?
+
+        public init(
+            keystroke: JavaScript? = nil,
+            format: JavaScript? = nil,
+            validate: JavaScript? = nil,
+            calculate: JavaScript? = nil
+        ) {
+            self.keystroke = keystroke
+            self.format = format
+            self.validate = validate
+            self.calculate = calculate
+        }
+    }
+
+    /// Additional actions dictionary for annotations (Table 198)
+    ///
+    /// Defines actions triggered by various events on annotations.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Table 198 — Entries in an annotation's additional-actions dictionary
+    public struct AnnotationTriggers: Sendable, Hashable {
+        /// Action performed when cursor enters annotation area. Optional.
+        public var cursorEnter: JavaScript?
+
+        /// Action performed when cursor exits annotation area. Optional.
+        public var cursorExit: JavaScript?
+
+        /// Action performed when mouse button is pressed. Optional.
+        public var mouseDown: JavaScript?
+
+        /// Action performed when mouse button is released. Optional.
+        public var mouseUp: JavaScript?
+
+        /// Action performed when annotation receives input focus. Optional.
+        public var focus: JavaScript?
+
+        /// Action performed when annotation loses input focus. Optional.
+        public var blur: JavaScript?
+
+        /// Action performed when page containing annotation is opened. Optional.
+        public var pageOpen: JavaScript?
+
+        /// Action performed when page containing annotation is closed. Optional.
+        public var pageClose: JavaScript?
+
+        /// Action performed when page containing annotation becomes visible. Optional.
+        public var pageVisible: JavaScript?
+
+        /// Action performed when page containing annotation is no longer visible. Optional.
+        public var pageInvisible: JavaScript?
+
+        public init(
+            cursorEnter: JavaScript? = nil,
+            cursorExit: JavaScript? = nil,
+            mouseDown: JavaScript? = nil,
+            mouseUp: JavaScript? = nil,
+            focus: JavaScript? = nil,
+            blur: JavaScript? = nil,
+            pageOpen: JavaScript? = nil,
+            pageClose: JavaScript? = nil,
+            pageVisible: JavaScript? = nil,
+            pageInvisible: JavaScript? = nil
+        ) {
+            self.cursorEnter = cursorEnter
+            self.cursorExit = cursorExit
+            self.mouseDown = mouseDown
+            self.mouseUp = mouseUp
+            self.focus = focus
+            self.blur = blur
+            self.pageOpen = pageOpen
+            self.pageClose = pageClose
+            self.pageVisible = pageVisible
+            self.pageInvisible = pageInvisible
+        }
+    }
+}
+
 // MARK: - Section Typealiases
 
 extension ISO_32000.`12`.`6` {
@@ -936,6 +1055,12 @@ extension ISO_32000.`12`.`6` {
 
     /// RichMediaExecute action (Tables 222-223)
     public typealias RichMediaExecute = ISO_32000.Action.RichMediaExecute
+
+    /// Form field triggers (Table 199)
+    public typealias FormFieldTriggers = ISO_32000.Action.FormFieldTriggers
+
+    /// Annotation triggers (Table 198)
+    public typealias AnnotationTriggers = ISO_32000.Action.AnnotationTriggers
 }
 
 // MARK: - Raw Spec Text (for reference)

@@ -97,6 +97,22 @@ extension ISO_32000.`12`.`5` {
         /// Language identifier for the annotation. Optional; PDF 2.0.
         public var language: String?
 
+        // MARK: - Appearance Entries (Table 166)
+
+        /// The annotation's appearance dictionary. Optional.
+        ///
+        /// Per ISO 32000-2 Table 166, AP entry:
+        /// > An appearance dictionary specifying how the annotation shall be
+        /// > presented visually on the page.
+        public var appearance: ISO_32000.`12`.`5`.Appearance?
+
+        /// The annotation's appearance state. Optional.
+        ///
+        /// Per ISO 32000-2 Table 166, AS entry:
+        /// > The annotation's appearance state, which selects the applicable
+        /// > appearance stream from an appearance subdictionary.
+        public var appearanceState: String?
+
         // MARK: - Type-Specific Content
 
         /// The type-specific content (sum type over all annotation subtypes).
@@ -118,7 +134,9 @@ extension ISO_32000.`12`.`5` {
             fillOpacity: Double? = nil,
             strokeOpacity: Double? = nil,
             blendMode: ISO_32000.`8`.`4`.Graphics.State.Blend.Mode? = nil,
-            language: String? = nil
+            language: String? = nil,
+            appearance: ISO_32000.`12`.`5`.Appearance? = nil,
+            appearanceState: String? = nil
         ) {
             self.rect = rect
             self.content = content
@@ -133,6 +151,8 @@ extension ISO_32000.`12`.`5` {
             self.strokeOpacity = strokeOpacity
             self.blendMode = blendMode
             self.language = language
+            self.appearance = appearance
+            self.appearanceState = appearanceState
         }
     }
 }
@@ -187,6 +207,9 @@ extension ISO_32000.`12`.`5`.Annotation {
         /// Redaction annotation (Table 195)
         case redaction(Redaction)
 
+        /// Widget annotation (Table 191) - for interactive forms
+        case widget(Widget)
+
         /// The subtype for this content.
         public var subtype: Subtype {
             switch self {
@@ -209,6 +232,7 @@ extension ISO_32000.`12`.`5`.Annotation {
             case .popup: return .popup
             case .fileAttachment: return .fileAttachment
             case .redaction: return .redact
+            case .widget: return .widget
             }
         }
     }
