@@ -103,7 +103,7 @@ extension ISO_32000 {
             }
 
             // Create annotation objects for each page (now pageRefs are available)
-            var annotationRefs: [[COS.IndirectReference]] = []
+            var annotRefs: [[COS.IndirectReference]] = []
             for page in document.pages {
                 var pageAnnotRefs: [COS.IndirectReference] = []
                 for annotation in page.annotations {
@@ -112,18 +112,23 @@ extension ISO_32000 {
 
                     var annotDict = COS.Dictionary()
                     annotDict[.type] = .name(.annot)
+                    // Safe: Subtype raw values are valid PDF names
+                    annotDict[.subtype] = .name(try! COS.Name(annotation.subtype.rawValue))
+                    annotDict[.rect] = COS.Object(annotation.rect)
 
-                    switch annotation {
-                    case .link(let linkAnnot):
-                        annotDict[.subtype] = .name(.link)
-                        annotDict[.rect] = COS.Object(linkAnnot.rect)
+                    // Border (common entry)
+                    if let border = annotation.border {
                         annotDict[.border] = .array([
-                            .integer(0),
-                            .integer(0),
-                            .real(linkAnnot.borderWidth.value),
+                            .real(border.horizontalRadius),
+                            .real(border.verticalRadius),
+                            .real(border.width),
                         ])
+                    }
 
-                        switch linkAnnot.target {
+                    // Serialize type-specific content
+                    switch annotation.content {
+                    case .link(let link):
+                        switch link.target {
                         case .uri(let uri):
                             // URI action for external links
                             var actionDict = COS.Dictionary()
@@ -135,12 +140,16 @@ extension ISO_32000 {
                             // Direct destination for internal links
                             annotDict[.dest] = serializeDestination(dest, pageRefs: pageRefs)
                         }
+
+                    default:
+                        // Other annotation types not yet fully implemented in serialization
+                        break
                     }
 
                     state.objectOffsets[objNum] = buffer.count
                     writeIndirectObject(objNum, object: .dictionary(annotDict), into: &buffer)
                 }
-                annotationRefs.append(pageAnnotRefs)
+                annotRefs.append(pageAnnotRefs)
             }
 
             // Write page objects (object numbers already allocated above)
@@ -168,8 +177,8 @@ extension ISO_32000 {
                 }
 
                 // Annotations
-                if !annotationRefs[i].isEmpty {
-                    pageDict[.annots] = .array(annotationRefs[i].map { .reference($0) })
+                if !annotRefs[i].isEmpty {
+                    pageDict[.annots] = .array(annotRefs[i].map { .reference($0) })
                 }
 
                 // Resources
@@ -327,87 +336,127 @@ extension ISO_32000 {
 
         // MARK: - Outline Writing
 
+        /// Helper type for tracking outline item metadata during serialization
+        private struct OutlineFlatItem {
+            let item: Outline.Item
+            let objNum: Int
+            let parentObjNum: Int
+            let prevObjNum: Int?
+            let nextObjNum: Int?
+            let firstChildObjNum: Int?
+            let lastChildObjNum: Int?
+        }
+
         private func writeOutline<Buffer: RangeReplaceableCollection>(
             _ outline: Outline.Root,
             pageRefs: [COS.IndirectReference],
             state: inout Writer.State,
             into buffer: inout Buffer
         ) -> COS.IndirectReference where Buffer.Element == UInt8 {
-            // Allocate object numbers for all items first
-            var itemObjNums: [[Int]] = []  // [level][index] -> objNum
-            var allItems: [(item: Outline.Item, level: Int, parentIndex: Int?, siblingIndex: Int)] = []
-
-            func collectItems(_ items: [Outline.Item], level: Int, parentIndex: Int?) {
-                var levelObjNums: [Int] = []
-                for (sibIdx, item) in items.enumerated() {
-                    let objNum = state.nextObjectNumber()
-                    levelObjNums.append(objNum)
-                    let itemIndex = allItems.count
-                    allItems.append((item, level, parentIndex, sibIdx))
-
-                    if !item.children.isEmpty {
-                        collectItems(item.children, level: level + 1, parentIndex: itemIndex)
-                    }
-                }
-                if level >= itemObjNums.count {
-                    itemObjNums.append(levelObjNums)
-                } else {
-                    itemObjNums[level].append(contentsOf: levelObjNums)
-                }
-            }
-
             // Outline root object number
             let outlineObjNum = state.nextObjectNumber()
             let outlineRef = COS.IndirectReference(objectNumber: outlineObjNum)
 
-            // Collect all items and allocate object numbers
-            collectItems(outline.items, level: 0, parentIndex: nil)
+            // First pass: assign object numbers to all items in depth-first order
+            // We track items by their flat index
+            var itemObjNums: [Int] = []  // flatIndex -> objNum
+            var allItems: [Outline.Item] = []
 
-            // Build a flat list with object numbers
-            var flatItems: [(item: Outline.Item, objNum: Int, parentObjNum: Int, prevObjNum: Int?, nextObjNum: Int?, firstChildObjNum: Int?, lastChildObjNum: Int?)] = []
+            func assignObjectNumbers(_ items: [Outline.Item]) {
+                for item in items {
+                    let objNum = state.nextObjectNumber()
+                    itemObjNums.append(objNum)
+                    allItems.append(item)
+                    if !item.children.isEmpty {
+                        assignObjectNumbers(item.children)
+                    }
+                }
+            }
+            assignObjectNumbers(outline.items)
 
-            func buildFlatList(_ items: [Outline.Item], parentObjNum: Int, startObjNum: inout Int) {
+            // Second pass: build flat list with correct references
+            var flatItems: [OutlineFlatItem] = []
+            var currentIndex = 0
+
+            func buildFlatList(_ items: [Outline.Item], parentObjNum: Int) {
+                // First, collect object numbers for all items at this level
+                var siblingObjNums: [Int] = []
+                var tempIndex = currentIndex
+                for item in items {
+                    siblingObjNums.append(itemObjNums[tempIndex])
+                    tempIndex += 1
+                    tempIndex += countDescendants(item)
+                }
+
+                // Now build the flat items with correct sibling references
                 for (i, item) in items.enumerated() {
-                    let myObjNum = startObjNum
-                    startObjNum += 1
+                    let myObjNum = itemObjNums[currentIndex]
+                    currentIndex += 1
 
-                    let prevObjNum = i > 0 ? myObjNum - 1 : nil
-                    let nextObjNum = i < items.count - 1 ? myObjNum + 1 : nil
+                    // Previous and next siblings from our pre-collected list
+                    let prevObjNum = i > 0 ? siblingObjNums[i - 1] : nil
+                    let nextObjNum = i < items.count - 1 ? siblingObjNums[i + 1] : nil
 
+                    // First and last child
                     var firstChildObjNum: Int? = nil
                     var lastChildObjNum: Int? = nil
-
                     if !item.children.isEmpty {
-                        firstChildObjNum = startObjNum
-                        lastChildObjNum = startObjNum + item.children.count - 1
+                        firstChildObjNum = itemObjNums[currentIndex]  // Next item is first child
+                        // Last child: need to find it
+                        var lastChildIndex = currentIndex
+                        for (j, child) in item.children.enumerated() {
+                            if j == item.children.count - 1 {
+                                lastChildObjNum = itemObjNums[lastChildIndex]
+                            }
+                            lastChildIndex += 1
+                            lastChildIndex += countDescendants(child)
+                        }
                     }
 
-                    flatItems.append((item, myObjNum, parentObjNum, prevObjNum, nextObjNum, firstChildObjNum, lastChildObjNum))
+                    flatItems.append(OutlineFlatItem(
+                        item: item,
+                        objNum: myObjNum,
+                        parentObjNum: parentObjNum,
+                        prevObjNum: prevObjNum,
+                        nextObjNum: nextObjNum,
+                        firstChildObjNum: firstChildObjNum,
+                        lastChildObjNum: lastChildObjNum
+                    ))
 
                     if !item.children.isEmpty {
-                        buildFlatList(item.children, parentObjNum: myObjNum, startObjNum: &startObjNum)
+                        buildFlatList(item.children, parentObjNum: myObjNum)
                     }
                 }
             }
 
-            var nextObjNum = outlineObjNum + 1
-            buildFlatList(outline.items, parentObjNum: outlineObjNum, startObjNum: &nextObjNum)
+            // Helper to count all descendants of an item
+            func countDescendants(_ item: Outline.Item) -> Int {
+                var count = 0
+                for child in item.children {
+                    count += 1
+                    count += countDescendants(child)
+                }
+                return count
+            }
+
+            buildFlatList(outline.items, parentObjNum: outlineObjNum)
 
             // Write outline root dictionary
             var outlineDict = COS.Dictionary()
             outlineDict[.type] = .name(.outlines)
 
-            if !flatItems.isEmpty {
-                outlineDict[.first] = .reference(COS.IndirectReference(objectNumber: outlineObjNum + 1))
-                // Find last top-level item
-                var lastTopLevelObjNum = outlineObjNum + 1
-                for (i, fi) in flatItems.enumerated() {
-                    if fi.parentObjNum == outlineObjNum && flatItems[i].nextObjNum == nil {
-                        lastTopLevelObjNum = fi.objNum
+            if !outline.items.isEmpty {
+                outlineDict[.first] = .reference(COS.IndirectReference(objectNumber: itemObjNums[0]))
+                // Find last top-level item's object number
+                var lastTopLevelIndex = 0
+                for (i, item) in outline.items.enumerated() {
+                    if i == outline.items.count - 1 {
                         break
                     }
+                    lastTopLevelIndex += 1
+                    lastTopLevelIndex += countDescendants(item)
                 }
-                outlineDict[.last] = .reference(COS.IndirectReference(objectNumber: lastTopLevelObjNum))
+                outlineDict[.last] = .reference(COS.IndirectReference(objectNumber: itemObjNums[lastTopLevelIndex]))
             }
 
             outlineDict[.count] = .integer(Int64(outline.count))
@@ -416,36 +465,38 @@ extension ISO_32000 {
             writeIndirectObject(outlineObjNum, object: .dictionary(outlineDict), into: &buffer)
 
             // Write all outline item dictionaries
-            for flatItem in flatItems {
+            for fi in flatItems {
                 var itemDict = COS.Dictionary()
-                itemDict[.title] = .string(COS.StringValue(flatItem.item.title))
-                itemDict[.parent] = .reference(COS.IndirectReference(objectNumber: flatItem.parentObjNum))
+                itemDict[.title] = .string(COS.StringValue(fi.item.title))
+                itemDict[.parent] = .reference(COS.IndirectReference(objectNumber: fi.parentObjNum))
 
-                if let prev = flatItem.prevObjNum {
+                if let prev = fi.prevObjNum {
                     itemDict[.prev] = .reference(COS.IndirectReference(objectNumber: prev))
                 }
-                if let next = flatItem.nextObjNum {
+                if let next = fi.nextObjNum {
                     itemDict[.next] = .reference(COS.IndirectReference(objectNumber: next))
                 }
-                if let first = flatItem.firstChildObjNum {
+                if let first = fi.firstChildObjNum {
                     itemDict[.first] = .reference(COS.IndirectReference(objectNumber: first))
                 }
-                if let last = flatItem.lastChildObjNum {
+                if let last = fi.lastChildObjNum {
                     itemDict[.last] = .reference(COS.IndirectReference(objectNumber: last))
                 }
 
                 // Count: positive if open, negative if closed
-                if !flatItem.item.children.isEmpty {
-                    let descendantCount = flatItem.item.visibleDescendantCount - 1
-                    let countValue = flatItem.item.isOpen ? descendantCount : -descendantCount
+                if !fi.item.children.isEmpty {
+                    let descendantCount = fi.item.visibleDescendantCount - 1
+                    let countValue = fi.item.isOpen ? descendantCount : -descendantCount
                     itemDict[.count] = .integer(Int64(countValue))
                 }
 
                 // Destination
-                itemDict[.dest] = serializeDestination(flatItem.item.destination, pageRefs: pageRefs)
+                if let destination = fi.item.destination {
+                    itemDict[.dest] = serializeDestination(destination, pageRefs: pageRefs)
+                }
 
-                state.objectOffsets[flatItem.objNum] = buffer.count
-                writeIndirectObject(flatItem.objNum, object: .dictionary(itemDict), into: &buffer)
+                state.objectOffsets[fi.objNum] = buffer.count
+                writeIndirectObject(fi.objNum, object: .dictionary(itemDict), into: &buffer)
             }
 
             return outlineRef

@@ -56,7 +56,7 @@ extension ISO_32000 {
         /// Page resources (fonts, etc.)
         public var resources: Resources
 
-        /// Page annotations (links, etc.)
+        /// Page annotations (links, text, etc.)
         public var annotations: [Annotation]
 
         // MARK: - Initializers
