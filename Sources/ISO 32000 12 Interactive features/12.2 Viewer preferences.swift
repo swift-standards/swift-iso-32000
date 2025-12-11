@@ -11,6 +11,78 @@ extension ISO_32000.`12` {
     public enum `2` {}
 }
 
+// MARK: - Table 147: Page Boundary (ViewArea, ViewClip, PrintArea, PrintClip)
+
+extension ISO_32000.`12`.`2` {
+    /// Page boundary names for view/print area and clip settings (Table 147)
+    ///
+    /// The value is the key designating the relevant page boundary in the
+    /// page object (see 7.7.3, "Page tree" and 14.11.2, "Page boundaries").
+    ///
+    /// - Note: PDF 1.4; deprecated in PDF 2.0
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Table 147 — ViewArea, ViewClip, PrintArea, PrintClip
+    public enum Boundary: String, Sendable, Hashable, Codable, CaseIterable {
+        /// The media box
+        case mediaBox = "MediaBox"
+
+        /// The crop box (default)
+        case cropBox = "CropBox"
+
+        /// The bleed box
+        case bleedBox = "BleedBox"
+
+        /// The trim box
+        case trimBox = "TrimBox"
+
+        /// The art box
+        case artBox = "ArtBox"
+    }
+}
+
+// MARK: - Table 147: PrintPageRange
+
+extension ISO_32000.`12`.`2` {
+    /// A range of pages for printing (Table 147)
+    ///
+    /// Specifies the first and last pages in a sub-range of pages to be printed.
+    /// Page numbers are 1-based (the first page of the PDF file is denoted by 1).
+    ///
+    /// - Note: PDF 1.7. Although PrintPageRange uses 1-based page numbering,
+    ///   other features of PDF use zero-based page numbering.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Table 147 — PrintPageRange
+    public struct PageRange: Sendable, Hashable, Codable {
+        /// The first page in the range (1-based)
+        public var first: Int
+
+        /// The last page in the range (1-based)
+        public var last: Int
+
+        /// Creates a page range.
+        ///
+        /// - Parameters:
+        ///   - first: The first page (1-based)
+        ///   - last: The last page (1-based)
+        public init(first: Int, last: Int) {
+            self.first = first
+            self.last = last
+        }
+
+        /// Creates a single-page range.
+        ///
+        /// - Parameter page: The page number (1-based)
+        public init(page: Int) {
+            self.first = page
+            self.last = page
+        }
+    }
+}
+
 // MARK: - Table 147: Viewer Preferences Dictionary
 
 extension ISO_32000.`12`.`2` {
@@ -162,17 +234,17 @@ extension ISO_32000.`12`.`2`.Viewer {
         /// that shall be displayed when viewing the document on the screen.
         ///
         /// Default value: `.cropBox`
-        public var area: ISO_32000.Page.Boundary
+        public var area: ISO_32000.`12`.`2`.Boundary
 
         /// The name of the page boundary to which the contents of a page
         /// shall be clipped when viewing the document on the screen.
         ///
         /// Default value: `.cropBox`
-        public var clip: ISO_32000.Page.Boundary
+        public var clip: ISO_32000.`12`.`2`.Boundary
 
         public init(
-            area: ISO_32000.Page.Boundary = .cropBox,
-            clip: ISO_32000.Page.Boundary = .cropBox
+            area: ISO_32000.`12`.`2`.Boundary = .cropBox,
+            clip: ISO_32000.`12`.`2`.Boundary = .cropBox
         ) {
             self.area = area
             self.clip = clip
@@ -193,7 +265,7 @@ extension ISO_32000.`12`.`2`.Viewer {
         /// - Note: PDF 1.4; deprecated in PDF 2.0
         ///
         /// Default value: `.cropBox`
-        public var area: ISO_32000.Page.Boundary
+        public var area: ISO_32000.`12`.`2`.Boundary
 
         /// The name of the page boundary to which the contents of a page
         /// shall be clipped when printing the document.
@@ -201,7 +273,7 @@ extension ISO_32000.`12`.`2`.Viewer {
         /// - Note: PDF 1.4; deprecated in PDF 2.0
         ///
         /// Default value: `.cropBox`
-        public var clip: ISO_32000.Page.Boundary
+        public var clip: ISO_32000.`12`.`2`.Boundary
 
         /// The page scaling option that shall be selected when a print
         /// dialogue is displayed for this document.
@@ -213,7 +285,7 @@ extension ISO_32000.`12`.`2`.Viewer {
         /// - Note: PDF 1.6
         ///
         /// Default value: `.appDefault`
-        public var scaling: ISO_32000.Print.Scaling
+        public var scaling: ISO_32000.`12`.`2`.Print.Scaling
 
         /// The paper handling option that shall be used when printing the
         /// PDF file from the print dialogue.
@@ -221,7 +293,7 @@ extension ISO_32000.`12`.`2`.Viewer {
         /// - Note: PDF 1.7
         ///
         /// Default value: implementation dependent
-        public var duplex: ISO_32000.Print.Duplex?
+        public var duplex: ISO_32000.`12`.`2`.Print.Duplex?
 
         /// A flag specifying whether the PDF page size shall be used to
         /// select the input paper tray.
@@ -249,7 +321,7 @@ extension ISO_32000.`12`.`2`.Viewer {
         ///   numbering, other features of PDF use zero-based page numbering.
         ///
         /// Default value: implementation dependent
-        public var pageRange: [ISO_32000.Page.Range]?
+        public var pageRange: [ISO_32000.`12`.`2`.PageRange]?
 
         /// The number of copies that shall be printed when the print dialog
         /// is opened for this PDF file.
@@ -260,12 +332,12 @@ extension ISO_32000.`12`.`2`.Viewer {
         public var numCopies: Int?
 
         public init(
-            area: ISO_32000.Page.Boundary = .cropBox,
-            clip: ISO_32000.Page.Boundary = .cropBox,
-            scaling: ISO_32000.Print.Scaling = .appDefault,
-            duplex: ISO_32000.Print.Duplex? = nil,
+            area: ISO_32000.`12`.`2`.Boundary = .cropBox,
+            clip: ISO_32000.`12`.`2`.Boundary = .cropBox,
+            scaling: ISO_32000.`12`.`2`.Print.Scaling = .appDefault,
+            duplex: ISO_32000.`12`.`2`.Print.Duplex? = nil,
             pickTrayByPDFSize: Bool? = nil,
-            pageRange: [ISO_32000.Page.Range]? = nil,
+            pageRange: [ISO_32000.`12`.`2`.PageRange]? = nil,
             numCopies: Int? = nil
         ) {
             self.area = area

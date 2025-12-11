@@ -13,7 +13,7 @@ extension ISO_32000 {
         public var info: Info?
 
         /// Document pages
-        public var pages: [Page.Object]
+        public var pages: [Page]
 
         /// Document outline (bookmarks)
         ///
@@ -31,7 +31,7 @@ extension ISO_32000 {
         public init(
             version: Version = .default,
             info: Info? = nil,
-            pages: [Page.Object] = [],
+            pages: [Page] = [],
             outline: Outline.Root? = nil,
             viewer: Viewer? = nil
         ) {
@@ -44,18 +44,3 @@ extension ISO_32000 {
     }
 }
 
-extension ISO_32000.Document {
-    /// Create a document with a single page
-    public init(
-        version: ISO_32000.Version = .default,
-        info: ISO_32000.Document.Info? = nil,
-        page: ISO_32000.Page.Object,
-        viewer: ISO_32000.Viewer? = nil
-    ) {
-        self.version = version
-        self.info = info
-        self.pages = [page]
-        self.outline = nil
-        self.viewer = viewer
-    }
-}

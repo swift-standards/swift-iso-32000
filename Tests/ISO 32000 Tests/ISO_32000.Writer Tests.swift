@@ -14,7 +14,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes valid PDF header`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object.empty(size: .letter)
+            page: ISO_32000.Page.empty(size: .letter)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -26,7 +26,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Includes binary marker after header`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object.empty(size: .letter)
+            page: ISO_32000.Page.empty(size: .letter)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -39,7 +39,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes catalog object`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object.empty(size: .letter)
+            page: ISO_32000.Page.empty(size: .letter)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -51,7 +51,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes pages object`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object.empty(size: .letter)
+            page: ISO_32000.Page.empty(size: .letter)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -64,7 +64,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes page object`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object.empty(size: .letter)
+            page: ISO_32000.Page.empty(size: .letter)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -77,7 +77,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes cross-reference table`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object.empty(size: .letter)
+            page: ISO_32000.Page.empty(size: .letter)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -90,7 +90,7 @@ struct `ISO_32000.Writer Tests` {
     @Test
     func `Writes trailer`() {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object.empty(size: .letter)
+            page: ISO_32000.Page.empty(size: .letter)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -116,7 +116,7 @@ struct `ISO_32000.Writer Tests` {
         height: Double
     ) {
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object.empty(size: rect)
+            page: ISO_32000.Page.empty(size: rect)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -135,7 +135,7 @@ struct `ISO_32000.Writer Tests` {
                 author: "Swift PDF",
                 creator: "swift-iso-32000"
             ),
-            page: ISO_32000.Page.Object.empty(size: .letter)
+            page: ISO_32000.Page.empty(size: .letter)
         )
         var writer = ISO_32000.Writer()
         let pdf = writer.write(document)
@@ -165,7 +165,7 @@ struct `ISO_32000.Writer Tests` {
         }
 
         let document = ISO_32000.Document(
-            page: ISO_32000.Page.Object(
+            page: ISO_32000.Page(
                 mediaBox: .letter,
                 content: content,
                 resources: ISO_32000.Resources(fonts: [
@@ -185,8 +185,8 @@ struct `ISO_32000.Writer Tests` {
 
     @Test
     func `Writes multi-page document`() {
-        let page1 = ISO_32000.Page.Object.empty(size: .letter)
-        let page2 = ISO_32000.Page.Object.empty(size: .letter)
+        let page1 = ISO_32000.Page.empty(size: .letter)
+        let page2 = ISO_32000.Page.empty(size: .letter)
 
         let document = ISO_32000.Document(pages: [page1, page2])
 
@@ -206,7 +206,7 @@ struct `ISO_32000.Writer Tests` {
                 title: "Test Document",
                 creator: "swift-iso-32000 tests"
             ),
-            page: ISO_32000.Page.Object(
+            page: ISO_32000.Page(
                 mediaBox: .letter,
                 content: ISO_32000.ContentStream { builder in
                     builder.beginText()
@@ -257,7 +257,7 @@ struct `ISO_32000.Writer Tests` {
 
         let document = ISO_32000.Document(
             info: ISO_32000.Document.Info(title: "Standard 14 Fonts"),
-            page: ISO_32000.Page.Object(
+            page: ISO_32000.Page(
                 mediaBox: .letter,
                 content: ISO_32000.ContentStream(data: contentBuilder.data),
                 resources: ISO_32000.Resources(fonts: fonts)

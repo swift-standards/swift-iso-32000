@@ -3,16 +3,14 @@
 // Page is defined here in the main module because it depends on types
 // from multiple chapters (ContentStream, Resources, Annotation).
 // This file corresponds to ISO 32000-2:2020, 7.7.3 Page tree.
-//
-// NOTE: ISO_32000.Page is an enum namespace defined in Shared.
-// The page struct is ISO_32000.Page.Object.
 
 import ISO_32000_8_Graphics
+public import ISO_32000_12_Interactive_features
 
-// MARK: - Page.Object (7.7.3)
+// MARK: - Page (7.7.3)
 
-extension ISO_32000.Page {
-    /// A PDF page object (ISO 32000-2:2020, 7.7.3)
+extension ISO_32000 {
+    /// A PDF page (ISO 32000-2:2020, 7.7.3)
     ///
     /// Per ISO 32000-1 Section 7.7.3.3, a page object contains the
     /// visible contents and attributes of a single page.
@@ -25,7 +23,7 @@ extension ISO_32000.Page {
     /// - **bleedBox**: Region for production clipping (defaults to cropBox)
     /// - **trimBox**: Intended finished page dimensions (defaults to cropBox)
     /// - **artBox**: Meaningful content extent (defaults to cropBox)
-    public struct Object: Sendable {
+    public struct Page: Sendable {
         // MARK: - Page Boxes (Section 14.11.2)
 
         /// Media box - boundaries of physical medium (required)
@@ -111,15 +109,25 @@ extension ISO_32000.Page {
         }
 
         /// Create an empty page
-        public static func empty(size: ISO_32000.UserSpace.Rectangle = .a4) -> Object {
-            Object(mediaBox: size)
+        public static func empty(size: ISO_32000.UserSpace.Rectangle = .a4) -> Page {
+            Page(mediaBox: size)
         }
     }
 }
 
+// MARK: - Typealiases for Nested Types
+
+extension ISO_32000.Page {
+    /// Page boundary names (Table 147)
+    public typealias Boundary = ISO_32000.`12`.`2`.Boundary
+
+    /// Page range for printing (Table 147)
+    public typealias Range = ISO_32000.`12`.`2`.PageRange
+}
+
 // MARK: - Convenience Properties
 
-extension ISO_32000.Page.Object {
+extension ISO_32000.Page {
     /// Page width (from mediaBox)
     public var width: ISO_32000.UserSpace.Unit { mediaBox.width.value }
 
