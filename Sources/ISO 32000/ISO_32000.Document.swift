@@ -21,17 +21,25 @@ extension ISO_32000 {
         /// an outline that allows users to navigate interactively.
         public var outline: Outline.Root?
 
+        /// Viewer preferences
+        ///
+        /// Per ISO 32000-2:2020 Section 12.2, specifies how the document
+        /// should be displayed when opened.
+        public var viewerPreferences: ViewerPreferences?
+
         /// Create a document
         public init(
             version: Version = .default,
             info: Info? = nil,
             pages: [Page] = [],
-            outline: Outline.Root? = nil
+            outline: Outline.Root? = nil,
+            viewerPreferences: ViewerPreferences? = nil
         ) {
             self.version = version
             self.info = info
             self.pages = pages
             self.outline = outline
+            self.viewerPreferences = viewerPreferences
         }
     }
 }
@@ -42,9 +50,11 @@ extension ISO_32000.Document {
         version: ISO_32000.Version = .default,
         info: ISO_32000.Document.Info? = nil,
         page: ISO_32000.Page,
+        viewerPreferences: ISO_32000.ViewerPreferences? = nil
     ) {
         self.version = version
         self.info = info
         self.pages = [page]
+        self.viewerPreferences = viewerPreferences
     }
 }

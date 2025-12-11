@@ -9,6 +9,7 @@
 //   12.3.6  Navigators
 
 public import Geometry
+public import IEC_61966
 public import ISO_32000_Shared
 public import ISO_32000_8_Graphics
 
@@ -224,9 +225,9 @@ extension ISO_32000.Outline {
 
         /// RGB color for the outline entry's text. (Optional; PDF 1.4)
         ///
-        /// An array of three numbers in the range 0.0 to 1.0, representing the
-        /// components in the DeviceRGB colour space. Default: [0.0 0.0 0.0] (black).
-        public var color: (red: Double, green: Double, blue: Double)?
+        /// Three numbers in the range 0.0 to 1.0, representing the components
+        /// in the DeviceRGB colour space. Default: black (0, 0, 0).
+        public var color: ISO_32000.DeviceRGB?
 
         /// Style flags for displaying the outline item's text. (Optional; PDF 1.4)
         ///
@@ -257,7 +258,7 @@ extension ISO_32000.Outline {
             target: Target? = nil,
             children: [Item] = [],
             isOpen: Bool = true,
-            color: (red: Double, green: Double, blue: Double)? = nil,
+            color: ISO_32000.DeviceRGB? = nil,
             flags: ItemFlags = []
         ) {
             self.title = title
@@ -274,7 +275,7 @@ extension ISO_32000.Outline {
             destination: ISO_32000.Destination,
             children: [Item] = [],
             isOpen: Bool = true,
-            color: (red: Double, green: Double, blue: Double)? = nil,
+            color: ISO_32000.DeviceRGB? = nil,
             flags: ItemFlags = []
         ) {
             self.init(
@@ -293,7 +294,7 @@ extension ISO_32000.Outline {
             action: ISO_32000.Action.Kind,
             children: [Item] = [],
             isOpen: Bool = true,
-            color: (red: Double, green: Double, blue: Double)? = nil,
+            color: ISO_32000.DeviceRGB? = nil,
             flags: ItemFlags = []
         ) {
             self.init(
@@ -497,9 +498,18 @@ extension ISO_32000.Outline {
     ///   - headings: Flat list of headings with level, title, page index, and Y position
     ///   - openToLevel: Maximum heading level to expand by default (1 = only H1 expanded, 2 = H1 and H2, etc.)
     ///                  Default is 1 (H1 expanded, H2+ collapsed)
+    ///   - color: RGB color for all outline items (nil uses viewer default, typically black)
+    ///   - flags: Style flags (bold/italic) for all outline items
     public static func build(
-        from headings: [(level: Int, title: String, pageIndex: Int, yPosition: ISO_32000.UserSpace.Y)],
-        openToLevel: Int = 1
+        from headings: [(
+            level: Int,
+            title: String,
+            pageIndex: Int,
+            yPosition: ISO_32000.UserSpace.Y
+        )],
+        openToLevel: Int = 1,
+        color: ISO_32000.DeviceRGB? = nil,
+        flags: ItemFlags = []
     ) -> Root {
         guard !headings.isEmpty else { return Root() }
 
@@ -518,7 +528,9 @@ extension ISO_32000.Outline {
                 title: heading.title,
                 target: .destination(destination),
                 children: [],
-                isOpen: heading.level <= openToLevel
+                isOpen: heading.level <= openToLevel,
+                color: color,
+                flags: flags
             )
 
             while let last = stack.last, last.level >= heading.level {
@@ -531,7 +543,9 @@ extension ISO_32000.Outline {
                         title: parentItem.title,
                         target: parentItem.target,
                         children: parentItem.children + [child],
-                        isOpen: parentItem.isOpen
+                        isOpen: parentItem.isOpen,
+                        color: parentItem.color,
+                        flags: parentItem.flags
                     )
                     stack.append((parentLevel, parentItem))
                 }
@@ -549,7 +563,9 @@ extension ISO_32000.Outline {
                     title: parentItem.title,
                     target: parentItem.target,
                     children: parentItem.children + [child],
-                    isOpen: parentItem.isOpen
+                    isOpen: parentItem.isOpen,
+                    color: parentItem.color,
+                    flags: parentItem.flags
                 )
                 stack.append((parentLevel, parentItem))
             }
@@ -581,6 +597,13 @@ extension ISO_32000.`12`.`3` {
 // MARK: - Convenience Typealiases
 
 extension ISO_32000 {
+    /// Device-dependent RGB color space.
+    ///
+    /// Per ISO 32000-2:2020, DeviceRGB colors are three components in the range 0.0 to 1.0.
+    /// This typealias uses sRGB (IEC 61966-2-1) for convenience, as most PDF viewers
+    /// interpret DeviceRGB values as sRGB in practice.
+    public typealias DeviceRGB = IEC_61966.sRGB
+
     /// Convenience typealias for outline root
     public typealias OutlineRoot = Outline.Root
 

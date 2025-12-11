@@ -442,4 +442,16 @@ extension ISO_32000.`12`.`2` {
 extension ISO_32000 {
     /// Viewer preferences dictionary
     public typealias ViewerPreferences = ISO_32000.`12`.`2`.ViewerPreferences
+
+    /// Page mode after exiting full-screen mode
+    public typealias NonFullScreenPageMode = ISO_32000.`12`.`2`.NonFullScreenPageMode
+
+    /// Reading direction for page positioning
+    public typealias Direction = ISO_32000.`12`.`2`.Direction
+
+    /// Page boundary for display and print areas
+    public typealias PageBoundary = ISO_32000.`12`.`2`.PageBoundary
+
+    /// Print scaling behavior
+    public typealias PrintScaling = ISO_32000.`12`.`2`.PrintScaling
 }
