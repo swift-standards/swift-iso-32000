@@ -90,7 +90,9 @@ extension ISO_32000.`12`.`5` {
         public var strokeOpacity: Double?
 
         /// Blend mode for painting the annotation. Optional; PDF 2.0.
-        public var blendMode: String?
+        ///
+        /// Uses the same blend modes as graphics state (Section 11.3.5, Tables 134-135).
+        public var blendMode: ISO_32000.`8`.`4`.Graphics.State.Blend.Mode?
 
         /// Language identifier for the annotation. Optional; PDF 2.0.
         public var language: String?
@@ -115,7 +117,7 @@ extension ISO_32000.`12`.`5` {
             structParent: Int? = nil,
             fillOpacity: Double? = nil,
             strokeOpacity: Double? = nil,
-            blendMode: String? = nil,
+            blendMode: ISO_32000.`8`.`4`.Graphics.State.Blend.Mode? = nil,
             language: String? = nil
         ) {
             self.rect = rect
