@@ -347,6 +347,548 @@ extension ISO_32000.Action {
     }
 }
 
+// MARK: - 12.6.4.4 Go-To-Embedded Action (Table 204)
+
+extension ISO_32000.Action {
+    /// A go-to-embedded action jumps to a destination in an embedded file.
+    ///
+    /// Per ISO 32000-2:2020 Section 12.6.4.4:
+    /// > A go-to-embedded action (PDF 1.6) is similar to a remote go-to action but
+    /// > allows jumping to a destination in a PDF file that is embedded in another
+    /// > PDF file.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Table 204 — Additional entries specific to an embedded go-to action
+    public struct GoToE: Sendable, Hashable {
+        /// The root document from which to find the target.
+        ///
+        /// Per ISO 32000-2 Table 204:
+        /// > (Optional) The root document of the target relative to the root document
+        /// > of the source.
+        public var file: String?
+
+        /// The destination in the embedded document.
+        ///
+        /// Per ISO 32000-2 Table 204:
+        /// > (Required) The destination in the target to jump to.
+        public var destination: ISO_32000.Destination
+
+        /// A target dictionary specifying path information to the target document.
+        ///
+        /// Per ISO 32000-2 Table 204:
+        /// > (Required if F is not present) A target dictionary specifying path
+        /// > information to the target document.
+        public var target: Target?
+
+        /// Whether to open the document in a new window.
+        ///
+        /// Per ISO 32000-2 Table 204:
+        /// > (Optional) If true, the destination document shall be opened in a new window;
+        /// > if false, the destination document shall replace the current document.
+        public var newWindow: Bool?
+
+        /// Target dictionary for embedded go-to action
+        public struct Target: Sendable, Hashable {
+            /// The relationship between the current document and the target.
+            public enum Relation: String, Sendable, Hashable, Codable, CaseIterable {
+                /// The target is the parent of the current document.
+                case parent = "P"
+                /// The target is a child of the current document.
+                case child = "C"
+            }
+
+            /// The relationship to the target.
+            public var relation: Relation
+
+            /// The name of the file in the EmbeddedFiles name tree (for child relation).
+            public var name: String?
+
+            /// The page number in a PDF Portfolio (PDF 2.0).
+            public var pageNumber: Int?
+
+            /// The annotation index on the page (for child relation).
+            public var annotationIndex: Int?
+
+            /// Further target specification for multi-level embedding.
+            public var next: Box<Target>?
+
+            public init(
+                relation: Relation,
+                name: String? = nil,
+                pageNumber: Int? = nil,
+                annotationIndex: Int? = nil,
+                next: Target? = nil
+            ) {
+                self.relation = relation
+                self.name = name
+                self.pageNumber = pageNumber
+                self.annotationIndex = annotationIndex
+                self.next = next.map { Box($0) }
+            }
+        }
+
+        public init(
+            destination: ISO_32000.Destination,
+            file: String? = nil,
+            target: Target? = nil,
+            newWindow: Bool? = nil
+        ) {
+            self.destination = destination
+            self.file = file
+            self.target = target
+            self.newWindow = newWindow
+        }
+    }
+
+    /// Box type for recursive Target structure
+    public final class Box<T: Sendable & Hashable>: @unchecked Sendable, Hashable {
+        public let value: T
+
+        public init(_ value: T) {
+            self.value = value
+        }
+
+        public static func == (lhs: Box<T>, rhs: Box<T>) -> Bool {
+            lhs.value == rhs.value
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(value)
+        }
+    }
+}
+
+// MARK: - 12.6.4.5 Go-To-DPart Action (Tables 205, 206)
+
+extension ISO_32000.Action {
+    /// A go-to-DPart action jumps to a specific DPart in a PDF document.
+    ///
+    /// Per ISO 32000-2:2020 Section 12.6.4.5:
+    /// > A go-to-DPart action (PDF 2.0) identifies a specific DPart (14.12, "Document
+    /// > parts") as the destination. A DPart action may optionally include a go-to
+    /// > action whose destination is used if the DPart cannot be located.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Tables 205-206 — Additional entries specific to a go-to-DPart action
+    public struct GoToDp: Sendable, Hashable {
+        /// The DPart to jump to.
+        ///
+        /// Per ISO 32000-2 Table 206:
+        /// > (Required) An indirect reference to the DPart dictionary representing
+        /// > the destination document part.
+        public var dpart: Int  // Object reference
+
+        /// Create a go-to-DPart action.
+        ///
+        /// - Parameter dpart: Object reference to the DPart dictionary
+        public init(dpart: Int) {
+            self.dpart = dpart
+        }
+    }
+}
+
+// MARK: - 12.6.4.6 Launch Action (Table 207)
+
+extension ISO_32000.Action {
+    /// A launch action launches an application or opens a document.
+    ///
+    /// Per ISO 32000-2:2020 Section 12.6.4.6:
+    /// > A launch action launches an application or opens or prints a document.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Table 207 — Additional entries specific to a launch action
+    public struct Launch: Sendable, Hashable {
+        /// The application to launch or document to open.
+        ///
+        /// Per ISO 32000-2 Table 207:
+        /// > (Required if none of the entries Win, Mac, or Unix is present)
+        /// > The application that shall be launched or the document that shall be
+        /// > opened or printed.
+        public var file: String?
+
+        /// Windows-specific launch parameters.
+        public var win: WindowsLaunch?
+
+        /// Whether to open the document in a new window.
+        ///
+        /// Per ISO 32000-2 Table 207:
+        /// > (Optional; PDF 1.4) If true, the new document shall be opened in a new
+        /// > window. Default value: false.
+        public var newWindow: Bool?
+
+        /// Windows-specific launch parameters (Table 207)
+        public struct WindowsLaunch: Sendable, Hashable {
+            /// The file name of the application or document.
+            public var file: String
+
+            /// The default directory.
+            public var directory: String?
+
+            /// The operation to perform: "open" or "print".
+            public var operation: Operation?
+
+            /// The parameter string to pass to the application.
+            public var parameters: String?
+
+            /// Windows launch operations
+            public enum Operation: String, Sendable, Hashable, Codable, CaseIterable {
+                /// Open the document.
+                case open = "open"
+                /// Print the document.
+                case print = "print"
+            }
+
+            public init(
+                file: String,
+                directory: String? = nil,
+                operation: Operation? = nil,
+                parameters: String? = nil
+            ) {
+                self.file = file
+                self.directory = directory
+                self.operation = operation
+                self.parameters = parameters
+            }
+        }
+
+        public init(
+            file: String? = nil,
+            win: WindowsLaunch? = nil,
+            newWindow: Bool? = nil
+        ) {
+            self.file = file
+            self.win = win
+            self.newWindow = newWindow
+        }
+    }
+}
+
+// MARK: - 12.6.4.7 Thread Action (Tables 208, 209)
+
+extension ISO_32000.Action {
+    /// A thread action jumps to a bead in an article thread.
+    ///
+    /// Per ISO 32000-2:2020 Section 12.6.4.7:
+    /// > A thread action (PDF 1.1) jumps to a specified bead on an article thread,
+    /// > starting at a specific bead or the first bead in the thread.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Tables 208-209 — Additional entries specific to a thread action
+    public struct Thread: Sendable, Hashable {
+        /// The file containing the thread (if not the current document).
+        ///
+        /// Per ISO 32000-2 Table 209:
+        /// > (Optional) The file containing the thread. If this entry is absent,
+        /// > the thread is in the current file.
+        public var file: String?
+
+        /// The thread specification.
+        ///
+        /// Per ISO 32000-2 Table 209:
+        /// > (Required) The destination thread, specified as an index into the
+        /// > Threads array of the catalog, a byte string representing the thread's
+        /// > title, or an indirect reference to a thread dictionary.
+        public var thread: ThreadSpec
+
+        /// The bead in the thread.
+        ///
+        /// Per ISO 32000-2 Table 209:
+        /// > (Optional) The bead in the destination thread, specified as an index
+        /// > into the thread's B array or an indirect reference to a bead dictionary.
+        public var bead: BeadSpec?
+
+        /// Thread specification (index, name, or reference)
+        public enum ThreadSpec: Sendable, Hashable {
+            /// Index into the Threads array.
+            case index(Int)
+            /// Thread title.
+            case title(String)
+            /// Indirect reference to thread dictionary.
+            case reference(Int)
+        }
+
+        /// Bead specification (index or reference)
+        public enum BeadSpec: Sendable, Hashable {
+            /// Index into the thread's B array.
+            case index(Int)
+            /// Indirect reference to bead dictionary.
+            case reference(Int)
+        }
+
+        public init(
+            thread: ThreadSpec,
+            file: String? = nil,
+            bead: BeadSpec? = nil
+        ) {
+            self.thread = thread
+            self.file = file
+            self.bead = bead
+        }
+    }
+}
+
+// MARK: - 12.6.4.13 Set-OCG-State Action (Table 217)
+
+extension ISO_32000.Action {
+    /// A set-OCG-state action changes the state of optional content groups.
+    ///
+    /// Per ISO 32000-2:2020 Section 12.6.4.13:
+    /// > A set-OCG-state action (PDF 1.5) sets the state of one or more optional
+    /// > content groups.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Table 217 — Additional entries specific to a set-OCG-state action
+    public struct SetOCGState: Sendable, Hashable {
+        /// The state changes to apply.
+        ///
+        /// Per ISO 32000-2 Table 217:
+        /// > (Required) An array consisting of any number of sequences, each of which
+        /// > begins with a state change command (ON, OFF, or Toggle) followed by one
+        /// > or more references to optional content group dictionaries.
+        public var state: [StateChange]
+
+        /// Whether to preserve the current RadioButton states.
+        ///
+        /// Per ISO 32000-2 Table 217:
+        /// > (Optional) If true, indicates that the states of radio button groups should
+        /// > be preserved when setting states. Default value: true.
+        public var preserveRB: Bool
+
+        /// State change command
+        public enum Command: String, Sendable, Hashable, Codable, CaseIterable {
+            /// Set the OCG to ON.
+            case on = "ON"
+            /// Set the OCG to OFF.
+            case off = "OFF"
+            /// Toggle the OCG state.
+            case toggle = "Toggle"
+        }
+
+        /// A state change entry (command + OCG references)
+        public struct StateChange: Sendable, Hashable {
+            /// The command to apply.
+            public var command: Command
+            /// Object references to OCG dictionaries.
+            public var ocgs: [Int]
+
+            public init(command: Command, ocgs: [Int]) {
+                self.command = command
+                self.ocgs = ocgs
+            }
+        }
+
+        public init(state: [StateChange], preserveRB: Bool = true) {
+            self.state = state
+            self.preserveRB = preserveRB
+        }
+    }
+}
+
+// MARK: - 12.6.4.14 Rendition Action (Tables 218, 219)
+
+extension ISO_32000.Action {
+    /// A rendition action controls multimedia playback.
+    ///
+    /// Per ISO 32000-2:2020 Section 12.6.4.14:
+    /// > A rendition action (PDF 1.5) associates a screen annotation with a rendition
+    /// > for the purpose of playing the rendition.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Tables 218-219 — Additional entries specific to a rendition action
+    public struct Rendition: Sendable, Hashable {
+        /// The operation to perform.
+        ///
+        /// Per ISO 32000-2 Table 219:
+        /// > (Required if JS is not present) The operation to perform.
+        public var operation: Operation?
+
+        /// The screen annotation with which this action is associated.
+        ///
+        /// Per ISO 32000-2 Table 219:
+        /// > (Required if OP is 0 or 4; optional otherwise) An indirect reference
+        /// > to a screen annotation to which the action is associated.
+        public var annotation: Int?  // Object reference
+
+        /// The rendition object.
+        ///
+        /// Per ISO 32000-2 Table 219:
+        /// > (Required if OP is 0; optional otherwise) An indirect reference to a
+        /// > rendition object.
+        public var rendition: Int?  // Object reference
+
+        /// ECMAScript code to execute.
+        ///
+        /// Per ISO 32000-2 Table 219:
+        /// > (Optional) A text string or stream containing an ECMAScript script.
+        public var javaScript: String?
+
+        /// Rendition operations (Table 218)
+        public enum Operation: Int, Sendable, Hashable, Codable, CaseIterable {
+            /// Associate rendition with annotation and play.
+            case play = 0
+            /// Stop any rendition playing in the annotation.
+            case stop = 1
+            /// Pause any rendition playing in the annotation.
+            case pause = 2
+            /// Resume any paused rendition.
+            case resume = 3
+            /// Play the rendition designated by the AN entry.
+            case playFromAnnotation = 4
+        }
+
+        public init(
+            operation: Operation? = nil,
+            annotation: Int? = nil,
+            rendition: Int? = nil,
+            javaScript: String? = nil
+        ) {
+            self.operation = operation
+            self.annotation = annotation
+            self.rendition = rendition
+            self.javaScript = javaScript
+        }
+    }
+}
+
+// MARK: - 12.6.4.15 Transition Action (Table 220)
+
+extension ISO_32000.Action {
+    /// A transition action updates the display with a page transition.
+    ///
+    /// Per ISO 32000-2:2020 Section 12.6.4.15:
+    /// > A trans action (PDF 1.5) provides the ability to update the display
+    /// > of a document, using a transition dictionary.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Table 220 — Additional entries specific to a transition action
+    public struct Transition: Sendable, Hashable {
+        /// The transition dictionary.
+        ///
+        /// Per ISO 32000-2 Table 220:
+        /// > (Required) A transition dictionary describing the transition effect
+        /// > (see 14.11.3, "Transitions").
+        public var trans: TransitionDict
+
+        /// Transition dictionary (simplified representation)
+        public struct TransitionDict: Sendable, Hashable {
+            /// Transition style
+            public var style: Style
+
+            /// Duration of the transition in seconds. Default: 1.
+            public var duration: Double
+
+            /// Transition styles (Table 363)
+            public enum Style: String, Sendable, Hashable, Codable, CaseIterable {
+                /// Two lines sweep across the screen, split.
+                case split = "Split"
+                /// Multiple lines sweep across the screen, blinds.
+                case blinds = "Blinds"
+                /// The new page reveals from one box to four.
+                case box = "Box"
+                /// Single line sweeping across the screen.
+                case wipe = "Wipe"
+                /// Old page dissolves to reveal the new page.
+                case dissolve = "Dissolve"
+                /// Similar to Dissolve, pixels in two-direction sweep.
+                case glitter = "Glitter"
+                /// No transition effect.
+                case replace = "R"
+                /// Changes are flown in (PDF 1.5).
+                case fly = "Fly"
+                /// Old page pushes new page (PDF 1.5).
+                case push = "Push"
+                /// New page slides over old (PDF 1.5).
+                case cover = "Cover"
+                /// Old page slides off (PDF 1.5).
+                case uncover = "Uncover"
+                /// Old page fades out, new fades in (PDF 1.5).
+                case fade = "Fade"
+            }
+
+            public init(style: Style = .replace, duration: Double = 1) {
+                self.style = style
+                self.duration = duration
+            }
+        }
+
+        public init(trans: TransitionDict) {
+            self.trans = trans
+        }
+    }
+}
+
+// MARK: - 12.6.4.18 RichMediaExecute Action (Tables 222, 223)
+
+extension ISO_32000.Action {
+    /// A rich media execute action sends a command to a rich media annotation.
+    ///
+    /// Per ISO 32000-2:2020 Section 12.6.4.18:
+    /// > A rich media execute action (PDF 2.0) sends a command to a rich media
+    /// > annotation.
+    ///
+    /// ## Reference
+    ///
+    /// ISO 32000-2:2020, Tables 222-223 — Additional entries specific to a rich media execute action
+    public struct RichMediaExecute: Sendable, Hashable {
+        /// The rich media annotation to target.
+        ///
+        /// Per ISO 32000-2 Table 223:
+        /// > (Required) An indirect reference to a RichMedia annotation.
+        public var annotation: Int  // Object reference
+
+        /// The command to execute.
+        ///
+        /// Per ISO 32000-2 Table 223:
+        /// > (Required) An indirect reference to a rich media command dictionary.
+        public var command: Command
+
+        /// Rich media command dictionary (Table 222)
+        public struct Command: Sendable, Hashable {
+            /// The type of command.
+            ///
+            /// Per ISO 32000-2 Table 222:
+            /// > (Required) Specifies the type of command.
+            public var type: CommandType
+
+            /// The command name.
+            ///
+            /// Per ISO 32000-2 Table 222:
+            /// > (Optional) The command name.
+            public var name: String?
+
+            /// The argument to pass.
+            ///
+            /// Per ISO 32000-2 Table 222:
+            /// > (Optional) The argument to pass to the command.
+            public var argument: String?
+
+            /// Command types
+            public enum CommandType: String, Sendable, Hashable, Codable, CaseIterable {
+                /// Call a JavaScript function in the instance.
+                case javaScript = "cycscript"
+            }
+
+            public init(type: CommandType, name: String? = nil, argument: String? = nil) {
+                self.type = type
+                self.name = name
+                self.argument = argument
+            }
+        }
+
+        public init(annotation: Int, command: Command) {
+            self.annotation = annotation
+            self.command = command
+        }
+    }
+}
+
 // MARK: - Section Typealiases
 
 extension ISO_32000.`12`.`6` {
@@ -359,6 +901,18 @@ extension ISO_32000.`12`.`6` {
     /// Remote go-to action (Table 203)
     public typealias GoToR = ISO_32000.Action.GoToR
 
+    /// Embedded go-to action (Table 204)
+    public typealias GoToE = ISO_32000.Action.GoToE
+
+    /// Go-to-DPart action (Tables 205-206)
+    public typealias GoToDp = ISO_32000.Action.GoToDp
+
+    /// Launch action (Table 207)
+    public typealias Launch = ISO_32000.Action.Launch
+
+    /// Thread action (Tables 208-209)
+    public typealias Thread = ISO_32000.Action.Thread
+
     /// URI action (Table 210)
     public typealias URI = ISO_32000.Action.URI
 
@@ -368,8 +922,20 @@ extension ISO_32000.`12`.`6` {
     /// Named action (Table 216)
     public typealias Named = ISO_32000.Action.Named
 
+    /// Set-OCG-State action (Table 217)
+    public typealias SetOCGState = ISO_32000.Action.SetOCGState
+
+    /// Rendition action (Tables 218-219)
+    public typealias Rendition = ISO_32000.Action.Rendition
+
+    /// Transition action (Table 220)
+    public typealias Transition = ISO_32000.Action.Transition
+
     /// JavaScript action (Table 221)
     public typealias JavaScript = ISO_32000.Action.JavaScript
+
+    /// RichMediaExecute action (Tables 222-223)
+    public typealias RichMediaExecute = ISO_32000.Action.RichMediaExecute
 }
 
 // MARK: - Raw Spec Text (for reference)
