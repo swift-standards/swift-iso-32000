@@ -249,7 +249,7 @@ struct `ISO_32000.Writer Tests` {
             contentBuilder.showText(
                 "\(pdfFont.baseFontName.rawValue): The quick brown fox jumps over the lazy dog."
             )
-            y -= 30
+            y -= 30.0
             contentBuilder.moveText(x: -72, y: 0)
         }
 
@@ -272,3 +272,6 @@ struct `ISO_32000.Writer Tests` {
         print("PDF written to: \(path)")
     }
 }
+
+
+

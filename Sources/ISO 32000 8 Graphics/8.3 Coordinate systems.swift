@@ -228,9 +228,9 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Coordinate {
     ///   - y: Y coordinate from top edge (increasing downward)
     ///   - pageHeight: Total page height for coordinate conversion
     public static func fromTopLeft(
-        x: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit,
-        y: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit,
-        pageHeight: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
+        x: ISO_32000.UserSpace.X,
+        y: ISO_32000.UserSpace.Y,
+        pageHeight: ISO_32000.UserSpace.Height
     ) -> Self {
         Self(x: x, y: pageHeight - y)
     }
@@ -243,8 +243,8 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Coordinate {
     /// - Returns: Y coordinate from top edge
     public func topLeftY(
         pageHeight: ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit
-    ) -> ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-        pageHeight - y.value
+    ) -> ISO_32000.UserSpace.Y {
+        pageHeight - y
     }
 }
 

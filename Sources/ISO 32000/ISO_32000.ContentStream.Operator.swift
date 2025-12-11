@@ -22,14 +22,14 @@ extension ISO_32000.ContentStream {
         ///
         /// - Parameters:
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
-        ///   - e, f: Translation in user space units
+        ///   - e, f: Translation (displacement) in user space units
         case transform(
             a: Double,
             b: Double,
             c: Double,
             d: Double,
-            e: ISO_32000.UserSpace.X,
-            f: ISO_32000.UserSpace.Y
+            e: ISO_32000.UserSpace.Width,
+            f: ISO_32000.UserSpace.Height
         )
 
         // MARK: - Color (Section 8.6)
@@ -154,14 +154,14 @@ extension ISO_32000.ContentStream {
         ///
         /// - Parameters:
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
-        ///   - e, f: Translation in user space units
+        ///   - e, f: Translation (displacement) in user space units
         case setTextMatrix(
             a: Double,
             b: Double,
             c: Double,
             d: Double,
-            e: ISO_32000.UserSpace.X,
-            f: ISO_32000.UserSpace.Y
+            e: ISO_32000.UserSpace.Width,
+            f: ISO_32000.UserSpace.Height
         )
 
         /// Move to next line (T*)
@@ -475,44 +475,4 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit: Binary.Serializable {
     }
 }
 
-extension Geometry.X: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-    /// Serialize Geometry.X to PDF number format
-    public static func serialize<Buffer: RangeReplaceableCollection>(
-        _ value: Self,
-        into buffer: inout Buffer
-    ) where Buffer.Element == UInt8 {
-        value.value.serialize(into: &buffer)
-    }
-}
-
-extension Geometry.Y: Binary.Serializable where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-    /// Serialize Geometry.Y to PDF number format
-    public static func serialize<Buffer: RangeReplaceableCollection>(
-        _ value: Self,
-        into buffer: inout Buffer
-    ) where Buffer.Element == UInt8 {
-        value.value.serialize(into: &buffer)
-    }
-}
-
-extension Geometry.Width: Binary.Serializable
-where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-    /// Serialize Geometry.Width to PDF number format
-    public static func serialize<Buffer: RangeReplaceableCollection>(
-        _ value: Self,
-        into buffer: inout Buffer
-    ) where Buffer.Element == UInt8 {
-        value.value.serialize(into: &buffer)
-    }
-}
-
-extension Geometry.Height: Binary.Serializable
-where Scalar == ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
-    /// Serialize Geometry.Height to PDF number format
-    public static func serialize<Buffer: RangeReplaceableCollection>(
-        _ value: Self,
-        into buffer: inout Buffer
-    ) where Buffer.Element == UInt8 {
-        value.value.serialize(into: &buffer)
-    }
-}
+// Note: UserSpace.X, Y, Width and Height get Binary.Serializable via Tagged conformance in swift-standards.

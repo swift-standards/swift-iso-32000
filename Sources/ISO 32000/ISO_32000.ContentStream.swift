@@ -90,20 +90,20 @@ extension ISO_32000.ContentStream {
         ///
         /// - Parameters:
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
-        ///   - e, f: Translation in user space units
+        ///   - e, f: Translation (displacement) in user space units
         public mutating func transform(
             a: Double,
             b: Double,
             c: Double,
             d: Double,
-            e: ISO_32000.UserSpace.X,
-            f: ISO_32000.UserSpace.Y
+            e: ISO_32000.UserSpace.Width,
+            f: ISO_32000.UserSpace.Height
         ) {
             emit(.transform(a: a, b: b, c: c, d: d, e: e, f: f))
         }
 
         /// Translate (convenience wrapper for cm)
-        public mutating func translate(x: ISO_32000.UserSpace.X, y: ISO_32000.UserSpace.Y) {
+        public mutating func translate(x: ISO_32000.UserSpace.Width, y: ISO_32000.UserSpace.Height) {
             emit(.transform(a: 1, b: 0, c: 0, d: 1, e: x, f: y))
         }
 
@@ -264,14 +264,14 @@ extension ISO_32000.ContentStream {
         ///
         /// - Parameters:
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
-        ///   - e, f: Translation in user space units
+        ///   - e, f: Translation (displacement) in user space units
         public mutating func setTextMatrix(
             a: Double,
             b: Double,
             c: Double,
             d: Double,
-            e: ISO_32000.UserSpace.X,
-            f: ISO_32000.UserSpace.Y
+            e: ISO_32000.UserSpace.Width,
+            f: ISO_32000.UserSpace.Height
         ) {
             emit(.setTextMatrix(a: a, b: b, c: c, d: d, e: e, f: f))
         }
@@ -383,7 +383,7 @@ extension ISO_32000.ContentStream {
         /// Set transformation matrix from an AffineTransform (cm)
         ///
         /// Note: AffineTransform's a,b,c,d are dimensionless coefficients (stored as UserSpace.Unit
-        /// for type uniformity), while tx,ty are actual spatial translations.
+        /// for type uniformity), while tx,ty are actual spatial translations (displacements).
         public mutating func transform(_ t: ISO_32000.UserSpace.AffineTransform) {
             emit(
                 .transform(a: t.a.value, b: t.b.value, c: t.c.value, d: t.d.value, e: t.tx, f: t.ty)
