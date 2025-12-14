@@ -317,6 +317,46 @@ extension ISO_32000.`9`.`8`.Metrics {
         capHeight.scaled(by: fontSize, unitsPerEm: unitsPerEm)
     }
 
+    // MARK: - Line Height Multipliers
+
+    /// Line height metrics as multipliers (relative to font size).
+    ///
+    /// This provides CSS-compatible line height multipliers:
+    /// - `line.height.value` is `(ascender - descender) / unitsPerEm` (the base 1.0 factor)
+    /// - `line.normal.value` is `(ascender - descender + leading) / unitsPerEm`
+    public var line: Line { Line(metrics: self) }
+
+    /// Line height multipliers namespace.
+    public struct Line: Sendable {
+        let metrics: ISO_32000.`9`.`8`.Metrics
+
+        /// Base line height as a multiplier (ascender - descender) / unitsPerEm.
+        ///
+        /// This is the ratio of the typographic line height to the em square.
+        public var height: Multiplier {
+            let h = metrics.ascender._rawValue - metrics.descender._rawValue
+            return Multiplier(Double(h) / Double(metrics.unitsPerEm))
+        }
+
+        /// Normal line height as a multiplier (ascender - descender + leading) / unitsPerEm.
+        ///
+        /// This corresponds to CSS `line-height: normal` and includes the font's
+        /// recommended leading (from the Leading entry in the font descriptor).
+        public var normal: Multiplier {
+            let h = metrics.ascender._rawValue - metrics.descender._rawValue + metrics.leading._rawValue
+            return Multiplier(Double(h) / Double(metrics.unitsPerEm))
+        }
+
+        /// A multiplier value (dimensionless ratio).
+        public struct Multiplier: Sendable {
+            public let value: Double
+
+            public init(_ value: Double) {
+                self.value = value
+            }
+        }
+    }
+
     // MARK: - Glyph Accessors
 
     /// Bullet glyph metrics (U+2022, •).
