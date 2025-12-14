@@ -2,6 +2,8 @@
 
 public import Geometry
 public import ISO_32000_Shared
+import Dimension
+@_spi(Internal) import struct Dimension.Tagged
 
 extension ISO_32000.`8` {
     /// ISO 32000-2:2020, 8.3 Coordinate systems
@@ -55,35 +57,16 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
 
     /// The measurement in inches
     @inlinable
-    public var inches: Double { value / 72 }
+    public var inches: Double { _rawValue / 72 }
 
     /// The measurement in millimeters
     @inlinable
-    public var millimeters: Double { value / 2.83465 }
+    public var millimeters: Double { _rawValue / 2.83465 }
 
     /// The measurement in centimeters
     @inlinable
-    public var centimeters: Double { value / 28.3465 }
+    public var centimeters: Double { _rawValue / 28.3465 }
 
-    /// Multiply by a scalar
-    @inlinable
-    @_disfavoredOverload
-    public static func * (lhs: Self, rhs: Double) -> Self { Self(lhs.value * rhs) }
-
-    /// Multiply scalar by unit
-    @inlinable
-    @_disfavoredOverload
-    public static func * (lhs: Double, rhs: Self) -> Self { Self(lhs * rhs.value) }
-
-    /// Divide by a scalar
-    @inlinable
-    @_disfavoredOverload
-    public static func / (lhs: Self, rhs: Double) -> Self { Self(lhs.value / rhs) }
-
-    /// Negate
-    @inlinable
-    @_disfavoredOverload
-    public static prefix func - (value: Self) -> Self { Self(-value.value) }
 }
 
 // MARK: - Standard Paper Sizes (ISO 216 / ANSI)
@@ -111,28 +94,31 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
 // MARK: - Rectangle Orientation
 
 extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
-    /// Return the landscape version (width > height)
-    ///
-    /// Swaps width and height if currently in portrait orientation.
-    /// Preserves the origin position.
-    public var landscape: Self {
-        if width.value >= height.value {
-            return self
-        }
-        return Self(x: llx, y: lly, width: .init(height.value), height: .init(width.value))
-    }
+     /// Return the landscape version (width > height)
+     public var landscape: Self {
+         // Compare raw values since Extent.X and Extent.Y are different types
+         if width >= height { return self }
+         var result = self
+         // Retag: Y extent becomes X, X extent becomes Y
+         result.halfExtents = Geometry.Size(
+             width: halfExtents.height.retag(Extent.X<UserSpace>.self),
+             height: halfExtents.width.retag(Extent.Y<UserSpace>.self)
+         )
+         return result
+     }
 
-    /// Return the portrait version (height > width)
-    ///
-    /// Swaps width and height if currently in landscape orientation.
-    /// Preserves the origin position.
-    public var portrait: Self {
-        if height.value >= width.value {
-            return self
-        }
-        return Self(x: llx, y: lly, width: .init(height.value), height: .init(width.value))
-    }
-}
+     /// Return the portrait version (height > width)
+     public var portrait: Self {
+         if height >= width { return self }
+         var result = self
+         result.halfExtents = Geometry.Size(
+             width: halfExtents.height.retag(Extent.X<UserSpace>.self),
+             height: halfExtents.width.retag(Extent.Y<UserSpace>.self)
+         )
+         return result
+     }
+ }
+
 
 // MARK: - Coordinate Conversion
 
@@ -144,26 +130,26 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Coordinate {
     ///
     /// - Parameters:
     ///   - x: X coordinate from left edge
-    ///   - y: Y coordinate from top edge (increasing downward)
-    ///   - pageHeight: Total page height for coordinate conversion
+    ///   - topY: Y displacement from top edge (increasing downward)
+    ///   - pageTop: Y coordinate of the page top edge
     public static func fromTopLeft(
         x: ISO_32000.UserSpace.X,
-        y: ISO_32000.UserSpace.Y,
-        pageHeight: ISO_32000.UserSpace.Height
+        topY: ISO_32000.UserSpace.Dy,
+        pageTop: ISO_32000.UserSpace.Y
     ) -> Self {
-        Self(x: x, y: pageHeight - y)
+        Self(x: x, y: pageTop - topY)
     }
 
-    /// Convert to top-left y coordinate
+    /// Convert to top-left y displacement
     ///
-    /// Returns the y coordinate in top-left origin system (y increases downward).
+    /// Returns the y displacement from the top edge (y increases downward).
     ///
-    /// - Parameter pageHeight: Total page height for coordinate conversion
-    /// - Returns: Y coordinate from top edge
+    /// - Parameter pageTop: Y coordinate of the page top edge
+    /// - Returns: Y displacement from top edge
     public func topLeftY(
-        pageHeight: ISO_32000.UserSpace.Height
-    ) -> ISO_32000.UserSpace.Y {
-        pageHeight - y
+        pageTop: ISO_32000.UserSpace.Y
+    ) -> ISO_32000.UserSpace.Dy {
+        pageTop - y
     }
 }
 
@@ -175,20 +161,22 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
     ///
     /// - Parameters:
     ///   - x: X coordinate of top-left corner
-    ///   - topY: Distance from top edge (as Height displacement)
+    ///   - topY: Y displacement from top edge (downward)
     ///   - width: Width of rectangle
     ///   - height: Height of rectangle
     ///   - pageTop: Y coordinate of page top edge
     public static func fromTopLeft(
         x: ISO_32000.UserSpace.X,
-        topY: ISO_32000.UserSpace.Height,
+        topY: ISO_32000.UserSpace.Dy,
         width: ISO_32000.UserSpace.Width,
         height: ISO_32000.UserSpace.Height,
         pageTop: ISO_32000.UserSpace.Y
     ) -> Self {
-        // In top-left coords: topY is distance from top, rectangle extends downward
+        // In top-left coords: topY is displacement from top, rectangle extends downward
         // In bottom-left coords: need to find bottom-left corner
-        let bottomLeftY: ISO_32000.UserSpace.Y = pageTop - topY - height
+        // bottomLeftY = pageTop - topY - height
+        let topLeftY: ISO_32000.UserSpace.Y = pageTop - topY
+        let bottomLeftY: ISO_32000.UserSpace.Y = topLeftY - height.retag(Displacement.Y<UserSpace>.self)
         return Self(
             x: x,
             y: bottomLeftY,
@@ -197,23 +185,23 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
         )
     }
 
-    /// The distance from top edge to the rectangle's top edge
+    /// The displacement from top edge to the rectangle's top edge
     ///
     /// - Parameter pageTop: Y coordinate of page top edge
-    /// - Returns: Distance from top edge (as Height)
+    /// - Returns: Y displacement from top edge
     public func topY(
         pageTop: ISO_32000.UserSpace.Y
-    ) -> ISO_32000.UserSpace.Height {
+    ) -> ISO_32000.UserSpace.Dy {
         pageTop - ury
     }
 
     /// The top-left corner in top-left coordinate system
     ///
     /// - Parameter pageTop: Y coordinate of page top edge
-    /// - Returns: Coordinate with x and distance from top as y
+    /// - Returns: Coordinate with x and displacement from top as y
     public func topLeftOrigin(
         pageTop: ISO_32000.UserSpace.Y
-    ) -> (x: ISO_32000.UserSpace.X, topY: ISO_32000.UserSpace.Height) {
+    ) -> (x: ISO_32000.UserSpace.X, topY: ISO_32000.UserSpace.Dy) {
         (x: llx, topY: pageTop - ury)
     }
 }

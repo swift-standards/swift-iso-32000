@@ -1112,8 +1112,8 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
     ///   - dy: Vertical translation in user space units
     @inlinable
     public mutating func translate<TextState>(
-        dx: ISO_32000.UserSpace.Width,
-        dy: ISO_32000.UserSpace.Height
+        dx: ISO_32000.UserSpace.Dx,
+        dy: ISO_32000.UserSpace.Dy
     ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         concatenate(.translation(dx: dx, dy: dy))
     }
@@ -1136,7 +1136,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
     /// - Parameter angle: Rotation angle in radians
     @inlinable
     public mutating func rotate<TextState>(
-        _ angle: Radian
+        _ angle: Radian<Double>
     ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         concatenate(.rotation(angle))
     }

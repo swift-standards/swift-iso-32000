@@ -88,7 +88,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.Graphi
 
     /// Set the font size on the current state.
     @inlinable
-    public mutating func setFontSize(_ size: ISO_32000.UserSpace.Unit) {
+    public mutating func setFontSize(_ size: ISO_32000.UserSpace.Size<1>) {
         current.textState.fontSize = size
     }
 
@@ -97,7 +97,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.Graphi
     /// Leading is the vertical distance between baselines of adjacent lines.
     /// Typical value: 1.2 × fontSize for comfortable reading.
     @inlinable
-    public mutating func setLeading(_ leading: ISO_32000.UserSpace.Unit) {
+    public mutating func setLeading(_ leading: ISO_32000.UserSpace.Dy) {
         current.textState.leading = leading
     }
 
@@ -106,19 +106,19 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.Graphi
     /// Positive values move the baseline up (superscript).
     /// Negative values move the baseline down (subscript).
     @inlinable
-    public mutating func setRise(_ rise: ISO_32000.UserSpace.Unit) {
+    public mutating func setRise(_ rise: ISO_32000.UserSpace.Dy) {
         current.textState.rise = rise
     }
 
     /// Set the character spacing on the current state.
     @inlinable
-    public mutating func setCharacterSpacing(_ spacing: ISO_32000.UserSpace.Unit) {
+    public mutating func setCharacterSpacing(_ spacing: ISO_32000.UserSpace.Dx) {
         current.textState.characterSpacing = spacing
     }
 
     /// Set the word spacing on the current state.
     @inlinable
-    public mutating func setWordSpacing(_ spacing: ISO_32000.UserSpace.Unit) {
+    public mutating func setWordSpacing(_ spacing: ISO_32000.UserSpace.Dx) {
         current.textState.wordSpacing = spacing
     }
 }

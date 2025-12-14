@@ -2,7 +2,7 @@
 // Object is defined in Section 7.3 and re-exported via COS typealias.
 // This file provides additional COS.Object convenience initializers.
 
-public import Geometry
+@_spi(Internal) public import struct Geometry.Tagged
 import ISO_32000_8_Graphics
 
 // MARK: - Rectangle Conversions
@@ -16,10 +16,10 @@ extension ISO_32000.COS.Object {
     /// - Parameter rect: The rectangle in user space coordinates
     public init(_ rect: ISO_32000.UserSpace.Rectangle) {
         self = .array([
-            .real(rect.llx.value),
-            .real(rect.lly.value),
-            .real(rect.urx.value),
-            .real(rect.ury.value),
+            .real(rect.llx._rawValue),
+            .real(rect.lly._rawValue),
+            .real(rect.urx._rawValue),
+            .real(rect.ury._rawValue),
         ])
     }
 }

@@ -92,25 +92,25 @@ extension ISO_32000.ContentStream {
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
         ///   - e, f: Translation (displacement) in user space units
         public mutating func transform(
-            a: Double,
-            b: Double,
-            c: Double,
-            d: Double,
-            e: ISO_32000.UserSpace.Width,
-            f: ISO_32000.UserSpace.Height
+            a: Scale<1, Double>,
+            b: Scale<1, Double>,
+            c: Scale<1, Double>,
+            d: Scale<1, Double>,
+            e: ISO_32000.UserSpace.Dx,
+            f: ISO_32000.UserSpace.Dy
         ) {
             emit(.transform(a: a, b: b, c: c, d: d, e: e, f: f))
         }
 
         /// Translate (convenience wrapper for cm)
-        public mutating func translate(x: ISO_32000.UserSpace.Width, y: ISO_32000.UserSpace.Height) {
-            emit(.transform(a: 1, b: 0, c: 0, d: 1, e: x, f: y))
+        public mutating func translate(dx: ISO_32000.UserSpace.Dx, dy: ISO_32000.UserSpace.Dy) {
+            emit(.transform(a: 1, b: 0, c: 0, d: 1, e: dx, f: dy))
         }
 
         /// Scale (convenience wrapper for cm)
         ///
         /// Scale factors are dimensionless multipliers.
-        public mutating func scale(x: Double, y: Double) {
+        public mutating func scale(x: Scale<1, Double>, y: Scale<1, Double>) {
             emit(.transform(a: x, b: 0, c: 0, d: y, e: .init(0), f: .init(0)))
         }
 
@@ -242,25 +242,25 @@ extension ISO_32000.ContentStream {
         }
 
         /// Set text font and size (Tf)
-        public mutating func setFont(_ font: ISO_32000.Font, size: ISO_32000.UserSpace.Unit) {
+        public mutating func setFont(_ font: ISO_32000.Font, size: ISO_32000.UserSpace.Size<1>) {
             fontsUsed.insert(font)
             emit(.setFont(name: font.resourceName, size: size))
         }
 
-        /// Move text position (Td)
+        /// Move text position by displacement (Td)
         public mutating func moveText(
-            x: ISO_32000.UserSpace.X,
-            y: ISO_32000.UserSpace.Y
+            dx: ISO_32000.UserSpace.Dx,
+            dy: ISO_32000.UserSpace.Dy
         ) {
-            emit(.moveTextPosition(tx: x, ty: y))
+            emit(.moveTextPosition(tx: dx, ty: dy))
         }
 
-        /// Move to next line with leading (TD)
+        /// Move text position by displacement and set leading (TD)
         public mutating func moveTextWithLeading(
-            x: ISO_32000.UserSpace.X,
-            y: ISO_32000.UserSpace.Y
+            dx: ISO_32000.UserSpace.Dx,
+            dy: ISO_32000.UserSpace.Dy
         ) {
-            emit(.moveTextPositionWithLeading(tx: x, ty: y))
+            emit(.moveTextPositionWithLeading(tx: dx, ty: dy))
         }
 
         /// Set text matrix (Tm)
@@ -269,12 +269,12 @@ extension ISO_32000.ContentStream {
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
         ///   - e, f: Translation (displacement) in user space units
         public mutating func setTextMatrix(
-            a: Double,
-            b: Double,
-            c: Double,
-            d: Double,
-            e: ISO_32000.UserSpace.Width,
-            f: ISO_32000.UserSpace.Height
+            a: Scale<1, Double>,
+            b: Scale<1, Double>,
+            c: Scale<1, Double>,
+            d: Scale<1, Double>,
+            e: ISO_32000.UserSpace.Dx,
+            f: ISO_32000.UserSpace.Dy
         ) {
             emit(.setTextMatrix(a: a, b: b, c: c, d: d, e: e, f: f))
         }
@@ -389,12 +389,19 @@ extension ISO_32000.ContentStream {
         /// for type uniformity), while tx,ty are actual spatial translations (displacements).
         public mutating func transform(_ t: ISO_32000.UserSpace.AffineTransform) {
             emit(
-                .transform(a: t.a, b: t.b, c: t.c, d: t.d, e: t.tx, f: t.ty)
+                .transform(
+                    a: t.a,
+                    b: t.b,
+                    c: t.c,
+                    d: t.d,
+                    e: t.tx,
+                    f: t.ty
+                )
             )
         }
 
         /// Rotate by angle in radians (convenience wrapper for cm)
-        public mutating func rotate(_ angle: Radian) {
+        public mutating func rotate(_ angle: Radian<Double>) {
             emit(
                 .transform(
                     a: angle.cos,
@@ -408,7 +415,7 @@ extension ISO_32000.ContentStream {
         }
 
         /// Rotate by angle in degrees (convenience wrapper for cm)
-        public mutating func rotate(_ angle: Degree) {
+        public mutating func rotate(_ angle: Degree<Double>) {
             rotate(angle.radians)
         }
 
@@ -466,47 +473,47 @@ extension ISO_32000.ContentStream {
         public mutating func circle(_ circle: ISO_32000.UserSpace.Circle) {
             // Standard bezier approximation constant: k = 4/3 * (√2 - 1) ≈ 0.5522847498
             let k = 0.5522847498
-            let cx = circle.center.x.value
-            let cy = circle.center.y.value
-            let r = circle.radius.value
+            let cx = circle.center.x
+            let cy = circle.center.y
+            let r = circle.radius
 
             // Start at rightmost point (3 o'clock position)
-            emit(.moveTo(x: .init(cx + r), y: .init(cy)))
+            emit(.moveTo(x: cx + r, y: cy))
 
             // First quadrant: right to top
             emit(.curveTo(
-                x1: .init(cx + r), y1: .init(cy + r * k),
-                x2: .init(cx + r * k), y2: .init(cy + r),
-                x3: .init(cx), y3: .init(cy + r)
+                x1: cx + r, y1: cy + r * k,
+                x2: cx + r * k, y2: cy + r,
+                x3: cx, y3: cy + r
             ))
 
             // Second quadrant: top to left
             emit(.curveTo(
-                x1: .init(cx - r * k), y1: .init(cy + r),
-                x2: .init(cx - r), y2: .init(cy + r * k),
-                x3: .init(cx - r), y3: .init(cy)
+                x1: cx - r * k, y1: cy + r,
+                x2: cx - r, y2: cy + r * k,
+                x3: cx - r, y3: cy
             ))
 
             // Third quadrant: left to bottom
             emit(.curveTo(
-                x1: .init(cx - r), y1: .init(cy - r * k),
-                x2: .init(cx - r * k), y2: .init(cy - r),
-                x3: .init(cx), y3: .init(cy - r)
+                x1: cx - r, y1: cy - r * k,
+                x2: cx - r * k, y2: cy - r,
+                x3: cx, y3: cy - r
             ))
 
             // Fourth quadrant: bottom to right
             emit(.curveTo(
-                x1: .init(cx + r * k), y1: .init(cy - r),
-                x2: .init(cx + r), y2: .init(cy - r * k),
-                x3: .init(cx + r), y3: .init(cy)
+                x1: cx + r * k, y1: cy - r,
+                x2: cx + r, y2: cy - r * k,
+                x3: cx + r, y3: cy
             ))
 
             emit(.closePath)
         }
 
-        /// Move text position to a point (Td)
-        public mutating func moveText(_ position: ISO_32000.UserSpace.Coordinate) {
-            emit(.moveTextPosition(tx: position.x, ty: position.y))
+        /// Move text position by a displacement vector (Td)
+        public mutating func moveText(_ displacement: ISO_32000.UserSpace.Vector<2>) {
+            emit(.moveTextPosition(tx: displacement.dx, ty: displacement.dy))
         }
 
         /// Set text matrix from an AffineTransform (Tm)

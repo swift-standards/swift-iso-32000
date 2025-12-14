@@ -73,6 +73,7 @@ let package = Package(
                 "ISO 32000 Shared",
                 "ISO 32000 7 Syntax",
                 .product(name: "IEC 61966", package: "swift-iec-61966"),
+                .product(name: "Dimension", package: "swift-standards"),
             ]
         ),
         .target(

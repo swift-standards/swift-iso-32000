@@ -43,7 +43,7 @@ extension ISO_32000.Text {
         /// Expressed in unscaled text space units.
         ///
         /// Initial value: 0
-        public var characterSpacing: ISO_32000.UserSpace.Unit
+        public var characterSpacing: ISO_32000.UserSpace.Dx
 
         /// Word spacing (Tw)
         ///
@@ -51,7 +51,7 @@ extension ISO_32000.Text {
         /// Expressed in unscaled text space units.
         ///
         /// Initial value: 0
-        public var wordSpacing: ISO_32000.UserSpace.Unit
+        public var wordSpacing: ISO_32000.UserSpace.Dx
 
         /// Horizontal scaling (Th)
         ///
@@ -59,7 +59,7 @@ extension ISO_32000.Text {
         /// Affects glyph shape and horizontal displacement.
         ///
         /// Initial value: 100
-        public var horizontalScaling: ISO_32000.UserSpace.Unit
+        public var horizontalScaling: Scale<1, Double>
 
         /// Leading (Tl)
         ///
@@ -68,7 +68,7 @@ extension ISO_32000.Text {
         /// Used by T*, ', and " operators.
         ///
         /// Initial value: 0
-        public var leading: ISO_32000.UserSpace.Unit
+        public var leading: ISO_32000.UserSpace.Dy
 
         /// Text font reference (Tf)
         ///
@@ -79,11 +79,12 @@ extension ISO_32000.Text {
 
         /// Text font size (Tfs)
         ///
-        /// Scale factor for the font.
+        /// Scale factor for the font, represented as a 1-dimensional size.
+        /// This allows proper projection to Width or Height as needed.
         /// Note: Negative font size is permitted per spec.
         ///
         /// Initial value: none (must be set explicitly)
-        public var fontSize: ISO_32000.UserSpace.Unit?
+        public var fontSize: ISO_32000.UserSpace.Size<1>?
 
         /// Text rendering mode (Tmode)
         ///
@@ -99,7 +100,7 @@ extension ISO_32000.Text {
         /// Expressed in unscaled text space units.
         ///
         /// Initial value: 0
-        public var rise: ISO_32000.UserSpace.Unit
+        public var rise: ISO_32000.UserSpace.Dy
 
         /// Text knockout (Tk)
         ///
@@ -110,14 +111,14 @@ extension ISO_32000.Text {
         public var knockout: Bool
 
         public init(
-            characterSpacing: ISO_32000.UserSpace.Unit = 0,
-            wordSpacing: ISO_32000.UserSpace.Unit = 0,
-            horizontalScaling: ISO_32000.UserSpace.Unit = 100,
-            leading: ISO_32000.UserSpace.Unit = 0,
+            characterSpacing: ISO_32000.UserSpace.Dx = 0,
+            wordSpacing: ISO_32000.UserSpace.Dx = 0,
+            horizontalScaling: Scale<1, Double> = 100,
+            leading: ISO_32000.UserSpace.Dy = 0,
             font: Font.Reference? = nil,
-            fontSize: ISO_32000.UserSpace.Unit? = nil,
+            fontSize: ISO_32000.UserSpace.Size<1>? = nil,
             renderingMode: Rendering.Mode = .fill,
-            rise: ISO_32000.UserSpace.Unit = 0,
+            rise: ISO_32000.UserSpace.Dy = 0,
             knockout: Bool = true
         ) {
             self.characterSpacing = characterSpacing
@@ -129,12 +130,6 @@ extension ISO_32000.Text {
             self.renderingMode = renderingMode
             self.rise = rise
             self.knockout = knockout
-        }
-
-        /// Horizontal scaling as a multiplier (Th / 100)
-        @inlinable
-        public var horizontalScalingFactor: Double {
-            horizontalScaling.value / 100.0
         }
     }
 }

@@ -5,7 +5,7 @@
 //   9.8.2  Font descriptor flags
 //   9.8.3  Font metrics
 
-public import ISO_32000_8_Graphics
+import ISO_32000_8_Graphics
 import ISO_32000_Annex_D
 public import ISO_32000_Shared
 
@@ -50,88 +50,70 @@ extension ISO_32000.`9`.`8`.FontDesign {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 9.8.3 — Font metrics
-    public struct Unit: Sendable, Codable {
-        /// The measurement value in font design units (1/1000 em for Type 1)
-        public var value: Int
 
-        /// Create a font design unit measurement
-        ///
-        /// - Parameter value: The measurement in font design units
-        @inlinable
-        public init(_ value: Int) {
-            self.value = value
-        }
+    public typealias Unit = Tagged<ISO_32000.FontDesign, Int>
 
-        /// Convert to user space units at a specific font size
-        ///
-        /// Returns an untyped user space measurement. Use the typed accessors
-        /// on `Metrics` (like `ascender(atSize:)` or `width(of:atSize:)`) when
-        /// you need Width or Height specifically.
-        ///
-        /// - Parameter fontSize: The font size in user space units
-        /// - Returns: The measurement in user space units (untyped)
-        @inlinable
-        public func atSize(
-            _ fontSize: ISO_32000.UserSpace.Unit
-        ) -> ISO_32000.UserSpace.Unit {
-            ISO_32000.UserSpace.Unit(Double(value) * fontSize.value / 1000.0)
-        }
-    }
 }
 
-// MARK: - AdditiveArithmetic
+// MARK: - FontDesign Tagged Arithmetic
 
-extension ISO_32000.`9`.`8`.FontDesign.Unit: AdditiveArithmetic {
-    /// Zero
-    public static var zero: Self { Self(0) }
+extension Tagged: AdditiveArithmetic
+where Tag == ISO_32000.FontDesign, RawValue: AdditiveArithmetic {
+    /// The zero value in font design units.
+    @inlinable
+    public static var zero: Self { Self(RawValue.zero) }
 
-    /// Add two measurements
+    /// Adds two font design unit values.
+    ///
+    /// Valid for accumulating glyph widths (e.g., total string width).
     @inlinable
     public static func + (lhs: Self, rhs: Self) -> Self {
-        Self(lhs.value + rhs.value)
+        Self(lhs._rawValue + rhs._rawValue)
     }
 
-    /// Subtract two measurements
+    /// Subtracts one font design unit value from another.
+    ///
+    /// Valid for computing differences (e.g., `ascender - descender` for line height).
     @inlinable
     public static func - (lhs: Self, rhs: Self) -> Self {
-        Self(lhs.value - rhs.value)
+        Self(lhs._rawValue - rhs._rawValue)
     }
 }
 
-// MARK: - Comparable
+// MARK: - FontDesign to UserSpace Conversion
 
-extension ISO_32000.`9`.`8`.FontDesign.Unit: Comparable {
+extension ISO_32000.FontDesign.Unit {
+    /// Convert font design units to user space at the given font size.
+    ///
+    /// Per ISO 32000-2:2020, Section 9.8.3, Type 1 fonts use a 1000-unit em square.
+    /// The conversion formula is: `userSpaceValue = fontDesignUnits × (fontSize / 1000)`
+    ///
+    /// - Parameter size: The font size in user space units (typically points at 1/72 inch)
+    /// - Returns: A 1D size in user space, accessible as `.width` or `.height`
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// let glyphWidth: FontDesign.Unit = 556  // Helvetica 'a' width
+    /// let fontSize: UserSpace.Size<1> = .init(12)
+    /// let actualWidth = glyphWidth.atSize(fontSize).width  // 6.672 points
+    /// ```
     @inlinable
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        lhs.value < rhs.value
+    public func atSize(_ size: ISO_32000.UserSpace.Size<1>) -> ISO_32000.UserSpace.Size<1> {
+        .init(self, at: size)
     }
 }
 
-// MARK: - Hashable
-
-extension ISO_32000.`9`.`8`.FontDesign.Unit: Hashable {
-    @inlinable
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(value)
-    }
-}
-
-// MARK: - ExpressibleByIntegerLiteral
-
-extension ISO_32000.`9`.`8`.FontDesign.Unit: ExpressibleByIntegerLiteral {
-    @inlinable
-    public init(integerLiteral value: Int) {
-        self.value = value
-    }
-}
-
-// MARK: - Negation
-
-extension ISO_32000.`9`.`8`.FontDesign.Unit {
-    /// Negate
-    @inlinable
-    public static prefix func - (value: Self) -> Self {
-        Self(-value.value)
+extension ISO_32000.UserSpace.Size<1> {
+    public init(
+        _ unit: ISO_32000.FontDesign.Unit,
+        at size: ISO_32000.UserSpace.Size<1>
+    ) {
+        // FontDesign units are Int, fontSize is Double
+        // Formula: fontDesignUnits * fontSize / 1000
+        let scale = size.length._rawValue / 1000.0
+        let result = Double(unit._rawValue) * scale
+        self = ISO_32000.UserSpace.Size<1>(result)
     }
 }
 
@@ -234,9 +216,9 @@ extension ISO_32000.`9`.`8` {
         /// Calculate width of a String at a specific font size
         public func width(
             of text: String,
-            atSize size: ISO_32000.UserSpace.Unit
+            atSize size: ISO_32000.UserSpace.Size<1>
         ) -> ISO_32000.UserSpace.Width {
-            ISO_32000.UserSpace.Width(width(of: text).atSize(size).value)
+            width(of: text).atSize(size).width
         }
 
         /// WinAnsi encoding operations on this font metrics
@@ -261,9 +243,9 @@ extension ISO_32000.`9`.`8` {
             /// Calculate width of WinAnsi-encoded bytes at a specific font size
             public func width<Bytes: Collection>(
                 of bytes: Bytes,
-                atSize size: ISO_32000.UserSpace.Unit
+                atSize size: ISO_32000.UserSpace.Size<1>
             ) -> ISO_32000.UserSpace.Width where Bytes.Element == UInt8 {
-                ISO_32000.UserSpace.Width(width(of: bytes).atSize(size).value)
+                width(of: bytes).atSize(size).width
             }
         }
 
@@ -284,44 +266,44 @@ extension ISO_32000.`9`.`8` {
 
         /// Line height at a specific font size
         public func lineHeight(
-            atSize size: ISO_32000.UserSpace.Unit
+            atSize size: ISO_32000.UserSpace.Size<1>
         ) -> ISO_32000.UserSpace.Height {
-            ISO_32000.UserSpace.Height(lineHeight.atSize(size).value)
+            lineHeight.atSize(size).height
         }
 
         /// Normal line height at a specific font size (includes leading)
         public func normalLineHeight(
-            atSize size: ISO_32000.UserSpace.Unit
+            atSize size: ISO_32000.UserSpace.Size<1>
         ) -> ISO_32000.UserSpace.Height {
-            ISO_32000.UserSpace.Height(normalLineHeight.atSize(size).value)
+            normalLineHeight.atSize(size).height
         }
 
         /// Ascender at a specific font size
         public func ascender(
-            atSize size: ISO_32000.UserSpace.Unit
+            atSize size: ISO_32000.UserSpace.Size<1>
         ) -> ISO_32000.UserSpace.Height {
-            ISO_32000.UserSpace.Height(ascender.atSize(size).value)
+            ascender.atSize(size).height
         }
 
         /// Descender at a specific font size (negative value)
         public func descender(
-            atSize size: ISO_32000.UserSpace.Unit
+            atSize size: ISO_32000.UserSpace.Size<1>
         ) -> ISO_32000.UserSpace.Height {
-            ISO_32000.UserSpace.Height(descender.atSize(size).value)
+            descender.atSize(size).height
         }
 
         /// x-height at a specific font size
         public func xHeight(
-            atSize size: ISO_32000.UserSpace.Unit
+            atSize size: ISO_32000.UserSpace.Size<1>
         ) -> ISO_32000.UserSpace.Height {
-            ISO_32000.UserSpace.Height(xHeight.atSize(size).value)
+            xHeight.atSize(size).height
         }
 
         /// Cap height at a specific font size
         public func capHeight(
-            atSize size: ISO_32000.UserSpace.Unit
+            atSize size: ISO_32000.UserSpace.Size<1>
         ) -> ISO_32000.UserSpace.Height {
-            ISO_32000.UserSpace.Height(capHeight.atSize(size).value)
+            capHeight.atSize(size).height
         }
 
         // MARK: - Glyph Accessors
@@ -352,9 +334,9 @@ extension ISO_32000.`9`.`8` {
 
             /// Glyph width at a specific font size
             public func width(
-                atSize size: ISO_32000.UserSpace.Unit
+                atSize size: ISO_32000.UserSpace.Size<1>
             ) -> ISO_32000.UserSpace.Width {
-                ISO_32000.UserSpace.Width(width.atSize(size).value)
+                width.atSize(size).width
             }
         }
     }

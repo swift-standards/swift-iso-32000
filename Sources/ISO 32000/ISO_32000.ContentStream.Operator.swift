@@ -25,12 +25,12 @@ extension ISO_32000.ContentStream {
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
         ///   - e, f: Translation (displacement) in user space units
         case transform(
-            a: Double,
-            b: Double,
-            c: Double,
-            d: Double,
-            e: ISO_32000.UserSpace.Width,
-            f: ISO_32000.UserSpace.Height
+            a: Scale<1, Double>,
+            b: Scale<1, Double>,
+            c: Scale<1, Double>,
+            d: Scale<1, Double>,
+            e: ISO_32000.UserSpace.Dx,
+            f: ISO_32000.UserSpace.Dy
         )
 
         // MARK: - Color (Section 8.6)
@@ -125,7 +125,7 @@ extension ISO_32000.ContentStream {
         case endText
 
         /// Set text font and size (/name size Tf)
-        case setFont(name: ISO_32000.COS.Name, size: ISO_32000.UserSpace.Unit)
+        case setFont(name: ISO_32000.COS.Name, size: ISO_32000.UserSpace.Size<1>)
 
         /// Set text leading (leading TL)
         case setTextLeading(ISO_32000.UserSpace.Height)
@@ -145,11 +145,11 @@ extension ISO_32000.ContentStream {
 
         // MARK: - Text Positioning (Section 9.4.2)
 
-        /// Move text position (tx ty Td)
-        case moveTextPosition(tx: ISO_32000.UserSpace.X, ty: ISO_32000.UserSpace.Y)
+        /// Move text position by displacement (tx ty Td)
+        case moveTextPosition(tx: ISO_32000.UserSpace.Dx, ty: ISO_32000.UserSpace.Dy)
 
-        /// Move text position and set leading (tx ty TD)
-        case moveTextPositionWithLeading(tx: ISO_32000.UserSpace.X, ty: ISO_32000.UserSpace.Y)
+        /// Move text position by displacement and set leading (tx ty TD)
+        case moveTextPositionWithLeading(tx: ISO_32000.UserSpace.Dx, ty: ISO_32000.UserSpace.Dy)
 
         /// Set text matrix (a b c d e f Tm)
         ///
@@ -157,12 +157,12 @@ extension ISO_32000.ContentStream {
         ///   - a, b, c, d: Dimensionless scale/rotation coefficients
         ///   - e, f: Translation (displacement) in user space units
         case setTextMatrix(
-            a: Double,
-            b: Double,
-            c: Double,
-            d: Double,
-            e: ISO_32000.UserSpace.Width,
-            f: ISO_32000.UserSpace.Height
+            a: Scale<1, Double>,
+            b: Scale<1, Double>,
+            c: Scale<1, Double>,
+            d: Scale<1, Double>,
+            e: ISO_32000.UserSpace.Dx,
+            f: ISO_32000.UserSpace.Dy
         )
 
         /// Move to next line (T*)
@@ -222,17 +222,17 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(.ascii.Q)
 
         case .transform(let a, let b, let c, let d, let e, let f):
-            a.pdf.serialize(into: &buffer)
+            a.value.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            b.pdf.serialize(into: &buffer)
+            b.value.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            c.pdf.serialize(into: &buffer)
+            c.value.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            d.pdf.serialize(into: &buffer)
+            d.value.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            e.value.pdf.serialize(into: &buffer)
+            e._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            f.value.pdf.serialize(into: &buffer)
+            f._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.c, .ascii.m])
 
         // Color
@@ -282,39 +282,39 @@ extension ISO_32000.ContentStream.Operator {
 
         // Path Construction
         case .moveTo(let x, let y):
-            x.value.pdf.serialize(into: &buffer)
+            x._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            y.value.pdf.serialize(into: &buffer)
+            y._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.m])
 
         case .lineTo(let x, let y):
-            x.value.pdf.serialize(into: &buffer)
+            x._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            y.value.pdf.serialize(into: &buffer)
+            y._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.l])
 
         case .curveTo(let x1, let y1, let x2, let y2, let x3, let y3):
-            x1.value.pdf.serialize(into: &buffer)
+            x1._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            y1.value.pdf.serialize(into: &buffer)
+            y1._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            x2.value.pdf.serialize(into: &buffer)
+            x2._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            y2.value.pdf.serialize(into: &buffer)
+            y2._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            x3.value.pdf.serialize(into: &buffer)
+            x3._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            y3.value.pdf.serialize(into: &buffer)
+            y3._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.c])
 
         case .rectangle(let x, let y, let width, let height):
-            x.value.pdf.serialize(into: &buffer)
+            x._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            y.value.pdf.serialize(into: &buffer)
+            y._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            width.value.pdf.serialize(into: &buffer)
+            width._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            height.value.pdf.serialize(into: &buffer)
+            height._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.r, .ascii.e])
 
         case .closePath:
@@ -357,19 +357,19 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(.ascii.forwardSlash)
             buffer.append(contentsOf: name.rawValue.utf8)
             buffer.append(.ascii.space)
-            size.value.pdf.serialize(into: &buffer)
+            size.length._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.f])
 
         case .setTextLeading(let leading):
-            leading.value.pdf.serialize(into: &buffer)
+            leading._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.L])
 
         case .setCharacterSpacing(let spacing):
-            spacing.value.pdf.serialize(into: &buffer)
+            spacing._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.c])
 
         case .setWordSpacing(let spacing):
-            spacing.value.pdf.serialize(into: &buffer)
+            spacing._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.w])
 
         case .setHorizontalScaling(let scale):
@@ -377,34 +377,34 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.z])
 
         case .setTextRise(let rise):
-            rise.value.pdf.serialize(into: &buffer)
+            rise._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.s])
 
         // Text Positioning
         case .moveTextPosition(let tx, let ty):
-            tx.value.pdf.serialize(into: &buffer)
+            tx._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            ty.value.pdf.serialize(into: &buffer)
+            ty._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.d])
 
         case .moveTextPositionWithLeading(let tx, let ty):
-            tx.value.pdf.serialize(into: &buffer)
+            tx._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            ty.value.pdf.serialize(into: &buffer)
+            ty._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.D])
 
         case .setTextMatrix(let a, let b, let c, let d, let e, let f):
-            a.pdf.serialize(into: &buffer)
+            a.value.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            b.pdf.serialize(into: &buffer)
+            b.value.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            c.pdf.serialize(into: &buffer)
+            c.value.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            d.pdf.serialize(into: &buffer)
+            d.value.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            e.value.pdf.serialize(into: &buffer)
+            e._rawValue.pdf.serialize(into: &buffer)
             buffer.append(.ascii.space)
-            f.value.pdf.serialize(into: &buffer)
+            f._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.T, .ascii.m])
 
         case .nextLine:
@@ -418,7 +418,7 @@ extension ISO_32000.ContentStream.Operator {
 
         // Line Style
         case .setLineWidth(let width):
-            width.value.pdf.serialize(into: &buffer)
+            width._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.w])
 
         case .setLineCap(let cap):
@@ -430,17 +430,17 @@ extension ISO_32000.ContentStream.Operator {
             buffer.append(contentsOf: [.ascii.space, .ascii.j])
 
         case .setMiterLimit(let limit):
-            limit.value.pdf.serialize(into: &buffer)
+            limit._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.M])
 
         case .setDashPattern(let array, let phase):
             buffer.append(.ascii.leftSquareBracket)
             for (index, value) in array.enumerated() {
                 if index > 0 { buffer.append(.ascii.space) }
-                value.value.pdf.serialize(into: &buffer)
+                value._rawValue.pdf.serialize(into: &buffer)
             }
             buffer.append(contentsOf: [.ascii.rightSquareBracket, .ascii.space])
-            phase.value.pdf.serialize(into: &buffer)
+            phase._rawValue.pdf.serialize(into: &buffer)
             buffer.append(contentsOf: [.ascii.space, .ascii.d])
 
         // Marked Content

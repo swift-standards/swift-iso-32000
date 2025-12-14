@@ -166,7 +166,7 @@ extension ISO_32000 {
                 }
 
                 if let rotation = page.rotation, rotation != 0 {
-                    pageDict[.rotate] = .integer(Int64(rotation.value))
+                    pageDict[.rotate] = .integer(Int64(rotation._rawValue))
                 }
 
                 // Contents
@@ -518,8 +518,8 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.xyz),
-                    left.map { .real($0.value) } ?? .null,
-                    top.map { .real($0.value) } ?? .null,
+                    left.map { .real($0._rawValue) } ?? .null,
+                    top.map { .real($0._rawValue) } ?? .null,
                     zoom.map { .real($0) } ?? .null
                 ])
 
@@ -532,7 +532,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitH),
-                    top.map { .real($0.value) } ?? .null
+                    top.map { .real($0._rawValue) } ?? .null
                 ])
 
             case .fitV(let page, let left):
@@ -540,7 +540,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitV),
-                    left.map { .real($0.value) } ?? .null
+                    left.map { .real($0._rawValue) } ?? .null
                 ])
 
             case .fitR(let page, let left, let bottom, let right, let top):
@@ -548,10 +548,10 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitR),
-                    .real(left.value),
-                    .real(bottom.value),
-                    .real(right.value),
-                    .real(top.value)
+                    .real(left._rawValue),
+                    .real(bottom._rawValue),
+                    .real(right._rawValue),
+                    .real(top._rawValue)
                 ])
 
             case .fitB(let page):
@@ -563,7 +563,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitBH),
-                    top.map { .real($0.value) } ?? .null
+                    top.map { .real($0._rawValue) } ?? .null
                 ])
 
             case .fitBV(let page, let left):
@@ -571,7 +571,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitBV),
-                    left.map { .real($0.value) } ?? .null
+                    left.map { .real($0._rawValue) } ?? .null
                 ])
 
             case .named(let name):
