@@ -13,6 +13,37 @@ extension ISO_32000.`9` {
     public enum `4` {}
 }
 
+// MARK: - 9.4.4 Text Space
+
+extension ISO_32000.`9`.`4` {
+    /// 9.4.4 Text space details
+    public enum `4` {}
+}
+
+extension ISO_32000.`9`.`4`.`4` {
+    /// Text space marker (ISO 32000-2:2020, Section 9.4.4)
+    ///
+    /// Text space is the coordinate system in which text is shown. It is defined
+    /// by the text matrix (Tm) and text state parameters (Tfs, Th, Trise).
+    ///
+    /// Text state parameters like character spacing (Tc), word spacing (Tw),
+    /// leading (Tl), and text rise (Trise) are expressed in "unscaled text space
+    /// units" - meaning they are in text space but not scaled by font size.
+    ///
+    /// Text space uses Double scalars for continuous positioning.
+    public enum TextSpace {}
+}
+
+extension ISO_32000 {
+    /// Text space (ISO 32000-2:2020, Section 9.4.4)
+    ///
+    /// The coordinate system in which text is shown, before transformation
+    /// to user space via the text rendering matrix (Trm).
+    ///
+    /// Text state parameters are expressed in "unscaled text space units".
+    public typealias TextSpace = Geometry<Double, ISO_32000.`9`.`4`.`4`.TextSpace>
+}
+
 // MARK: - 9.4.1 Text Matrix
 
 extension ISO_32000.`9`.`4` {

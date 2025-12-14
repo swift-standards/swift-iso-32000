@@ -57,15 +57,15 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
 
     /// The measurement in inches
     @inlinable
-    public var inches: Double { _rawValue / 72 }
+    public var inches: ISO_32000.UserSpace.Length { .init(_rawValue / 72) }
 
     /// The measurement in millimeters
     @inlinable
-    public var millimeters: Double { _rawValue / 2.83465 }
+    public var millimeters: ISO_32000.UserSpace.Length { .init(_rawValue / 2.83465) }
 
     /// The measurement in centimeters
     @inlinable
-    public var centimeters: Double { _rawValue / 28.3465 }
+    public var centimeters: ISO_32000.UserSpace.Length { .init(_rawValue / 28.3465) }
 
 }
 

@@ -35,6 +35,7 @@ extension ISO_32000 {
     public typealias UserSpace = Geometry<Double, ISO_32000_Shared.UserSpace>
 }
 
+
 /// PDF User Space coordinate system (ISO 32000-2:2020, 8.3.2.3)
 ///
 /// Quantized to 0.01 points (1/7200 inch) to ensure adjacent
@@ -48,15 +49,23 @@ public enum UserSpace: Quantized {
 // These MUST be in Shared to break circular dependencies.
 // The authoritative documentation is in 8.3 Coordinate systems.
 
+
+extension Geometry {
+    public typealias Unit = Tagged<Space, Scalar>
+}
+
+
 extension ISO_32000.UserSpace {
     /// User space unit (1/72 inch) - Double tagged with UserSpace
     ///
     /// Per ISO 32000-2:2020, Section 8.3.2.3, the default unit is 1/72 inch.
-    public typealias Unit = Tagged<ISO_32000_Shared.UserSpace, Double>
+//    public typealias Unit = Tagged<ISO_32000_Shared.UserSpace, Double>
 
     /// Coordinate in user space (2D point)
     public typealias Coordinate = ISO_32000.Point<ISO_32000_Shared.UserSpace>
 }
+
+
 
 extension ISO_32000.UserSpace.Rectangle {
     /// The lower-left corner of the rectangle (PDF origin convention).
@@ -64,3 +73,5 @@ extension ISO_32000.UserSpace.Rectangle {
         .init(x: llx, y: lly)
     }
 }
+
+

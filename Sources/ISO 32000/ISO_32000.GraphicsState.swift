@@ -87,6 +87,8 @@ extension ISO_32000.GraphicsState {
 extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.GraphicsState {
 
     /// Set the font size on the current state.
+    ///
+    /// Font size is specified in user space units (points).
     @inlinable
     public mutating func setFontSize(_ size: ISO_32000.UserSpace.Size<1>) {
         current.textState.fontSize = size
@@ -95,9 +97,10 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.Graphi
     /// Set the leading (line spacing) on the current state.
     ///
     /// Leading is the vertical distance between baselines of adjacent lines.
+    /// Expressed in unscaled text space units.
     /// Typical value: 1.2 × fontSize for comfortable reading.
     @inlinable
-    public mutating func setLeading(_ leading: ISO_32000.UserSpace.Dy) {
+    public mutating func setLeading(_ leading: ISO_32000.TextSpace.Dy) {
         current.textState.leading = leading
     }
 
@@ -105,20 +108,25 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack where State == ISO_32000.Graphi
     ///
     /// Positive values move the baseline up (superscript).
     /// Negative values move the baseline down (subscript).
+    /// Expressed in unscaled text space units.
     @inlinable
-    public mutating func setRise(_ rise: ISO_32000.UserSpace.Dy) {
+    public mutating func setRise(_ rise: ISO_32000.TextSpace.Dy) {
         current.textState.rise = rise
     }
 
     /// Set the character spacing on the current state.
+    ///
+    /// Expressed in unscaled text space units.
     @inlinable
-    public mutating func setCharacterSpacing(_ spacing: ISO_32000.UserSpace.Dx) {
+    public mutating func setCharacterSpacing(_ spacing: ISO_32000.TextSpace.Dx) {
         current.textState.characterSpacing = spacing
     }
 
     /// Set the word spacing on the current state.
+    ///
+    /// Expressed in unscaled text space units.
     @inlinable
-    public mutating func setWordSpacing(_ spacing: ISO_32000.UserSpace.Dx) {
+    public mutating func setWordSpacing(_ spacing: ISO_32000.TextSpace.Dx) {
         current.textState.wordSpacing = spacing
     }
 }

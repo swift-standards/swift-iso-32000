@@ -3,6 +3,7 @@
 // This file is kept for compatibility.
 
 import ISO_32000_9_Text
+public import ISO_32000_Shared
 
 extension ISO_32000.Font {
     /// Font Metrics (Section 9.8 Font descriptors)

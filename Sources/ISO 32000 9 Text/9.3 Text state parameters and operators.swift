@@ -43,7 +43,7 @@ extension ISO_32000.Text {
         /// Expressed in unscaled text space units.
         ///
         /// Initial value: 0
-        public var characterSpacing: ISO_32000.UserSpace.Dx
+        public var characterSpacing: ISO_32000.TextSpace.Dx
 
         /// Word spacing (Tw)
         ///
@@ -51,7 +51,7 @@ extension ISO_32000.Text {
         /// Expressed in unscaled text space units.
         ///
         /// Initial value: 0
-        public var wordSpacing: ISO_32000.UserSpace.Dx
+        public var wordSpacing: ISO_32000.TextSpace.Dx
 
         /// Horizontal scaling (Th)
         ///
@@ -68,7 +68,7 @@ extension ISO_32000.Text {
         /// Used by T*, ', and " operators.
         ///
         /// Initial value: 0
-        public var leading: ISO_32000.UserSpace.Dy
+        public var leading: ISO_32000.TextSpace.Dy
 
         /// Text font reference (Tf)
         ///
@@ -79,8 +79,8 @@ extension ISO_32000.Text {
 
         /// Text font size (Tfs)
         ///
-        /// Scale factor for the font, represented as a 1-dimensional size.
-        /// This allows proper projection to Width or Height as needed.
+        /// Scale factor for the font, in user space units (points).
+        /// This determines the scaling from text space to user space.
         /// Note: Negative font size is permitted per spec.
         ///
         /// Initial value: none (must be set explicitly)
@@ -100,7 +100,7 @@ extension ISO_32000.Text {
         /// Expressed in unscaled text space units.
         ///
         /// Initial value: 0
-        public var rise: ISO_32000.UserSpace.Dy
+        public var rise: ISO_32000.TextSpace.Dy
 
         /// Text knockout (Tk)
         ///
@@ -111,14 +111,14 @@ extension ISO_32000.Text {
         public var knockout: Bool
 
         public init(
-            characterSpacing: ISO_32000.UserSpace.Dx = 0,
-            wordSpacing: ISO_32000.UserSpace.Dx = 0,
+            characterSpacing: ISO_32000.TextSpace.Dx = 0,
+            wordSpacing: ISO_32000.TextSpace.Dx = 0,
             horizontalScaling: Scale<1, Double> = 100,
-            leading: ISO_32000.UserSpace.Dy = 0,
+            leading: ISO_32000.TextSpace.Dy = 0,
             font: Font.Reference? = nil,
             fontSize: ISO_32000.UserSpace.Size<1>? = nil,
             renderingMode: Rendering.Mode = .fill,
-            rise: ISO_32000.UserSpace.Dy = 0,
+            rise: ISO_32000.TextSpace.Dy = 0,
             knockout: Bool = true
         ) {
             self.characterSpacing = characterSpacing
