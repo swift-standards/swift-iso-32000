@@ -464,49 +464,22 @@ extension ISO_32000.ContentStream {
             )
         }
 
-        /// Append a circle path using 4 cubic Bézier curves
+        /// Append a circle path using 4 cubic Bézier curves.
         ///
-        /// This approximation uses the standard constant k = 0.5522847498 (4/3 * (√2 - 1))
-        /// which provides an excellent approximation of a circle.
+        /// Uses the Circle's built-in Bézier approximation with constant k ≈ 0.5522847498.
         ///
         /// - Parameter circle: The circle to draw (from Geometry package)
         public mutating func circle(_ circle: ISO_32000.UserSpace.Circle) {
-            // Standard bezier approximation constant: k = 4/3 * (√2 - 1) ≈ 0.5522847498
-            let k = 0.5522847498
-            let cx = circle.center.x
-            let cy = circle.center.y
-            let r = circle.radius
+            let start = circle.bezierStartPoint
+            emit(.moveTo(x: start.x, y: start.y))
 
-            // Start at rightmost point (3 o'clock position)
-            emit(.moveTo(x: cx + r, y: cy))
-
-            // First quadrant: right to top
-            emit(.curveTo(
-                x1: cx + r, y1: cy + r * k,
-                x2: cx + r * k, y2: cy + r,
-                x3: cx, y3: cy + r
-            ))
-
-            // Second quadrant: top to left
-            emit(.curveTo(
-                x1: cx - r * k, y1: cy + r,
-                x2: cx - r, y2: cy + r * k,
-                x3: cx - r, y3: cy
-            ))
-
-            // Third quadrant: left to bottom
-            emit(.curveTo(
-                x1: cx - r, y1: cy - r * k,
-                x2: cx - r * k, y2: cy - r,
-                x3: cx, y3: cy - r
-            ))
-
-            // Fourth quadrant: bottom to right
-            emit(.curveTo(
-                x1: cx + r * k, y1: cy - r,
-                x2: cx + r, y2: cy - r * k,
-                x3: cx + r, y3: cy
-            ))
+            for segment in circle.bezierCurves {
+                emit(.curveTo(
+                    x1: segment.control1.x, y1: segment.control1.y,
+                    x2: segment.control2.x, y2: segment.control2.y,
+                    x3: segment.end.x, y3: segment.end.y
+                ))
+            }
 
             emit(.closePath)
         }
