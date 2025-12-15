@@ -1,8 +1,9 @@
 // ISO 32000-2:2020, 8.3 Coordinate systems
 
+import Dimension
 public import Geometry
 public import ISO_32000_Shared
-import Dimension
+
 @_spi(Internal) import struct Dimension.Tagged
 
 extension ISO_32000.`8` {
@@ -33,9 +34,9 @@ extension ISO_32000.`8`.`3`.`2`.`3` {
     public typealias UserSpace = ISO_32000.UserSpace
 }
 
-// MARK: - Unit Extensions (additional functionality beyond Shared)
+// MARK: - Length/Width/Height Unit Conversions
 
-extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
+extension ISO_32000.UserSpace.Length {
     /// One inch (72 user space units)
     public static let inch: Self = 72
 
@@ -57,16 +58,57 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Unit {
 
     /// The measurement in inches
     @inlinable
-    public var inches: ISO_32000.UserSpace.Length { .init(_rawValue / 72) }
+    public var inches: Self { Self(_rawValue / 72) }
 
     /// The measurement in millimeters
     @inlinable
-    public var millimeters: ISO_32000.UserSpace.Length { .init(_rawValue / 2.83465) }
+    public var millimeters: Self { Self(_rawValue / 2.83465) }
 
     /// The measurement in centimeters
     @inlinable
-    public var centimeters: ISO_32000.UserSpace.Length { .init(_rawValue / 28.3465) }
+    public var centimeters: Self { Self(_rawValue / 28.3465) }
+}
 
+extension ISO_32000.UserSpace.Width {
+    /// One inch (72 user space units)
+    public static let inch: Self = 72
+
+    /// Create from inches (1 inch = 72 units)
+    @inlinable
+    public static func inches(_ value: Double) -> Self { Self(value * 72) }
+
+    /// Create from millimeters (1mm ≈ 2.83465 units)
+    @inlinable
+    public static func millimeters(_ value: Double) -> Self { Self(value * 2.83465) }
+
+    /// Create from centimeters (1cm ≈ 28.3465 units)
+    @inlinable
+    public static func centimeters(_ value: Double) -> Self { Self(value * 28.3465) }
+
+    /// Create from pixels at given DPI (default 96 DPI)
+    @inlinable
+    public static func pixels(_ value: Double, dpi: Double = 96) -> Self { Self(value * 72 / dpi) }
+}
+
+extension ISO_32000.UserSpace.Height {
+    /// One inch (72 user space units)
+    public static let inch: Self = 72
+
+    /// Create from inches (1 inch = 72 units)
+    @inlinable
+    public static func inches(_ value: Double) -> Self { Self(value * 72) }
+
+    /// Create from millimeters (1mm ≈ 2.83465 units)
+    @inlinable
+    public static func millimeters(_ value: Double) -> Self { Self(value * 2.83465) }
+
+    /// Create from centimeters (1cm ≈ 28.3465 units)
+    @inlinable
+    public static func centimeters(_ value: Double) -> Self { Self(value * 28.3465) }
+
+    /// Create from pixels at given DPI (default 96 DPI)
+    @inlinable
+    public static func pixels(_ value: Double, dpi: Double = 96) -> Self { Self(value * 72 / dpi) }
 }
 
 // MARK: - Standard Paper Sizes (ISO 216 / ANSI)
@@ -94,31 +136,30 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
 // MARK: - Rectangle Orientation
 
 extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
-     /// Return the landscape version (width > height)
-     public var landscape: Self {
-         // Compare raw values since Extent.X and Extent.Y are different types
-         if width >= height { return self }
-         var result = self
-         // Retag: Y extent becomes X, X extent becomes Y
-         result.halfExtents = Geometry.Size(
-             width: halfExtents.height.retag(Extent.X<UserSpace>.self),
-             height: halfExtents.width.retag(Extent.Y<UserSpace>.self)
-         )
-         return result
-     }
+    /// Return the landscape version (width > height)
+    public var landscape: Self {
+        // Compare raw values since Extent.X and Extent.Y are different types
+        if width >= height { return self }
+        var result = self
+        // Retag: Y extent becomes X, X extent becomes Y
+        result.halfExtents = Geometry.Size(
+            width: halfExtents.height.retag(Extent.X<UserSpace>.self),
+            height: halfExtents.width.retag(Extent.Y<UserSpace>.self)
+        )
+        return result
+    }
 
-     /// Return the portrait version (height > width)
-     public var portrait: Self {
-         if height >= width { return self }
-         var result = self
-         result.halfExtents = Geometry.Size(
-             width: halfExtents.height.retag(Extent.X<UserSpace>.self),
-             height: halfExtents.width.retag(Extent.Y<UserSpace>.self)
-         )
-         return result
-     }
- }
-
+    /// Return the portrait version (height > width)
+    public var portrait: Self {
+        if height >= width { return self }
+        var result = self
+        result.halfExtents = Geometry.Size(
+            width: halfExtents.height.retag(Extent.X<UserSpace>.self),
+            height: halfExtents.width.retag(Extent.Y<UserSpace>.self)
+        )
+        return result
+    }
+}
 
 // MARK: - Coordinate Conversion
 
@@ -176,7 +217,8 @@ extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
         // In bottom-left coords: need to find bottom-left corner
         // bottomLeftY = pageTop - topY - height
         let topLeftY: ISO_32000.UserSpace.Y = pageTop - topY
-        let bottomLeftY: ISO_32000.UserSpace.Y = topLeftY - height.retag(Displacement.Y<UserSpace>.self)
+        let bottomLeftY: ISO_32000.UserSpace.Y =
+            topLeftY - height.retag(Displacement.Y<UserSpace>.self)
         return Self(
             x: x,
             y: bottomLeftY,

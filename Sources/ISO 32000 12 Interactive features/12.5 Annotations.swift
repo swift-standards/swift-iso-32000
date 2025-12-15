@@ -337,12 +337,12 @@ extension ISO_32000.`12`.`5`.Annotation {
         public var isMarkup: Bool {
             switch self {
             case .text, .freeText, .line, .square, .circle,
-                 .polygon, .polyLine, .highlight, .underline,
-                 .squiggly, .strikeOut, .caret, .stamp, .ink,
-                 .fileAttachment, .sound, .redact, .projection:
+                .polygon, .polyLine, .highlight, .underline,
+                .squiggly, .strikeOut, .caret, .stamp, .ink,
+                .fileAttachment, .sound, .redact, .projection:
                 return true
             case .link, .popup, .movie, .screen, .widget,
-                 .printerMark, .trapNet, .watermark, .threeD, .richMedia:
+                .printerMark, .trapNet, .watermark, .threeD, .richMedia:
                 return false
             }
         }

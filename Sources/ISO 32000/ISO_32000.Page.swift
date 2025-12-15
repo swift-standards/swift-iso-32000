@@ -4,8 +4,8 @@
 // from multiple chapters (ContentStream, Resources, Annotation).
 // This file corresponds to ISO 32000-2:2020, 7.7.3 Page tree.
 
-import ISO_32000_8_Graphics
 public import ISO_32000_12_Interactive_features
+import ISO_32000_8_Graphics
 
 // MARK: - Page (7.7.3)
 

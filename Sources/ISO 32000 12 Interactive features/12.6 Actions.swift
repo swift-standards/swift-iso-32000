@@ -1065,64 +1065,64 @@ extension ISO_32000.`12`.`6` {
 
 // MARK: - Raw Spec Text (for reference)
 
-//12.6 Actions
-//12.6.1 General
-//In addition to jumping to a destination in the document, an annotation or outline item may specify an
-//action (PDF 1.1) to perform, such as launching an application, playing a sound, changing an
-//annotation's appearance state.
+// 12.6 Actions
+// 12.6.1 General
+// In addition to jumping to a destination in the document, an annotation or outline item may specify an
+// action (PDF 1.1) to perform, such as launching an application, playing a sound, changing an
+// annotation's appearance state.
 
-//Table 196 — Entries common to all action dictionaries
-//Key Type Value
-//Type name (Optional) The type of PDF object that this dictionary describes;
-//if present, shall be Action for an action dictionary.
-//S name (Required) The type of action that this dictionary describes; see
-//"Table 201 — Action types" for specific values.
-//Next dictionary or array (Optional; PDF 1.2) The next action or sequence of actions.
+// Table 196 — Entries common to all action dictionaries
+// Key Type Value
+// Type name (Optional) The type of PDF object that this dictionary describes;
+// if present, shall be Action for an action dictionary.
+// S name (Required) The type of action that this dictionary describes; see
+// "Table 201 — Action types" for specific values.
+// Next dictionary or array (Optional; PDF 1.2) The next action or sequence of actions.
 
-//Table 201 — Action types
-//GoTo Go to a destination in the current document. 12.6.4.2
-//GoToR Go to a destination in another document. 12.6.4.3
-//GoToE Go to a destination in an embedded file. 12.6.4.4
-//GoToDp Go to a specified DPart. 12.6.4.5
-//Launch Launch an application. 12.6.4.6
-//Thread Begin reading an article thread. 12.6.4.7
-//URI Resolve a URI. 12.6.4.8
-//Sound Play a sound. 12.6.4.9
-//Movie Play a movie. 12.6.4.10
-//Hide Set an annotation's Hidden flag. 12.6.4.11
-//Named Execute a predefined action. 12.6.4.12
-//SubmitForm Send data to a URL. 12.7.6.2
-//ResetForm Set fields to their default values. 12.7.6.3
-//ImportData Import field values from a file. 12.7.6.4
-//SetOCGState Set the states of optional content groups. 12.6.4.13
-//Rendition Controls multimedia playback. 12.6.4.14
-//Trans Updates display using a transition. 12.6.4.15
-//GoTo3DView Set the view of a 3D annotation. 12.6.4.16
-//JavaScript Execute an ECMAScript script. 12.6.4.17
-//RichMediaExecute Send a command to a RichMedia annotation. 12.6.4.18
+// Table 201 — Action types
+// GoTo Go to a destination in the current document. 12.6.4.2
+// GoToR Go to a destination in another document. 12.6.4.3
+// GoToE Go to a destination in an embedded file. 12.6.4.4
+// GoToDp Go to a specified DPart. 12.6.4.5
+// Launch Launch an application. 12.6.4.6
+// Thread Begin reading an article thread. 12.6.4.7
+// URI Resolve a URI. 12.6.4.8
+// Sound Play a sound. 12.6.4.9
+// Movie Play a movie. 12.6.4.10
+// Hide Set an annotation's Hidden flag. 12.6.4.11
+// Named Execute a predefined action. 12.6.4.12
+// SubmitForm Send data to a URL. 12.7.6.2
+// ResetForm Set fields to their default values. 12.7.6.3
+// ImportData Import field values from a file. 12.7.6.4
+// SetOCGState Set the states of optional content groups. 12.6.4.13
+// Rendition Controls multimedia playback. 12.6.4.14
+// Trans Updates display using a transition. 12.6.4.15
+// GoTo3DView Set the view of a 3D annotation. 12.6.4.16
+// JavaScript Execute an ECMAScript script. 12.6.4.17
+// RichMediaExecute Send a command to a RichMedia annotation. 12.6.4.18
 
-//Table 202 — Additional entries specific to a go-to action
-//S name (Required) shall be GoTo
-//D name, byte string, or array (Required) The destination to jump to
-//SD array (Optional; PDF 2.0) The structure destination
+// Table 202 — Additional entries specific to a go-to action
+// S name (Required) shall be GoTo
+// D name, byte string, or array (Required) The destination to jump to
+// SD array (Optional; PDF 2.0) The structure destination
 
-//Table 210 — Additional entries specific to a URI action
-//S name (Required) shall be URI
-//URI ASCII string (Required) The URI to resolve, encoded in UTF-8
-//IsMap boolean (Optional) Track mouse position. Default: false
+// Table 210 — Additional entries specific to a URI action
+// S name (Required) shall be URI
+// URI ASCII string (Required) The URI to resolve, encoded in UTF-8
+// IsMap boolean (Optional) Track mouse position. Default: false
 
-//Table 214 — Additional entries specific to a hide action
-//S name (Required) shall be Hide
-//T dictionary, text string, or array (Required) The annotations to hide/show
-//H boolean (Optional) Hide (true) or show (false). Default: true
+// Table 214 — Additional entries specific to a hide action
+// S name (Required) shall be Hide
+// T dictionary, text string, or array (Required) The annotations to hide/show
+// H boolean (Optional) Hide (true) or show (false). Default: true
 
-//Table 215 — Named actions
-//NextPage, PrevPage, FirstPage, LastPage
+// Table 215 — Named actions
+// NextPage, PrevPage, FirstPage, LastPage
 
-//Table 216 — Additional entries specific to named actions
-//S name (Required) shall be Named
-//N name (Required) The action name
+// Table 216 — Additional entries specific to named actions
+// S name (Required) shall be Named
+// N name (Required) The action name
 
-//Table 221 — Additional entries specific to an ECMAScript action
-//S name (Required) shall be JavaScript
-//JS text string or stream (Required) The script to execute
+// Table 221 — Additional entries specific to an ECMAScript action
+// S name (Required) shall be JavaScript
+// JS text string or stream (Required) The script to execute

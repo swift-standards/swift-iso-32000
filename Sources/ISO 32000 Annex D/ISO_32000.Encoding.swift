@@ -155,74 +155,74 @@ extension ISO_32000 {
     /// for ASCII-only environments.
     public static let unicodeFallbackMap: [UInt32: [UInt8]] = [
         // MARK: Checkmarks and crosses (ZapfDingbats U+2700 block)
-        0x2713: [0x2A],           // ✓ CHECK MARK → *
-        0x2714: [0x2A],           // ✔ HEAVY CHECK MARK → *
-        0x2715: [0x78],           // ✕ MULTIPLICATION X → x
-        0x2716: [0x78],           // ✖ HEAVY MULTIPLICATION X → x
-        0x2717: [0x78],           // ✗ BALLOT X → x
-        0x2718: [0x58],           // ✘ HEAVY BALLOT X → X
-        0x2610: [0x5B, 0x20, 0x5D], // ☐ BALLOT BOX → [ ]
-        0x2611: [0x5B, 0x2A, 0x5D], // ☑ BALLOT BOX WITH CHECK → [*]
-        0x2612: [0x5B, 0x78, 0x5D], // ☒ BALLOT BOX WITH X → [x]
+        0x2713: [0x2A],  // ✓ CHECK MARK → *
+        0x2714: [0x2A],  // ✔ HEAVY CHECK MARK → *
+        0x2715: [0x78],  // ✕ MULTIPLICATION X → x
+        0x2716: [0x78],  // ✖ HEAVY MULTIPLICATION X → x
+        0x2717: [0x78],  // ✗ BALLOT X → x
+        0x2718: [0x58],  // ✘ HEAVY BALLOT X → X
+        0x2610: [0x5B, 0x20, 0x5D],  // ☐ BALLOT BOX → [ ]
+        0x2611: [0x5B, 0x2A, 0x5D],  // ☑ BALLOT BOX WITH CHECK → [*]
+        0x2612: [0x5B, 0x78, 0x5D],  // ☒ BALLOT BOX WITH X → [x]
 
         // MARK: Arrows
-        0x2190: [0x3C, 0x2D],     // ← LEFTWARDS ARROW → <-
-        0x2191: [0x5E],           // ↑ UPWARDS ARROW → ^
-        0x2192: [0x2D, 0x3E],     // → RIGHTWARDS ARROW → ->
-        0x2193: [0x76],           // ↓ DOWNWARDS ARROW → v
-        0x2194: [0x3C, 0x2D, 0x3E], // ↔ LEFT RIGHT ARROW → <->
-        0x21D0: [0x3C, 0x3D],     // ⇐ LEFTWARDS DOUBLE ARROW → <=
-        0x21D2: [0x3D, 0x3E],     // ⇒ RIGHTWARDS DOUBLE ARROW → =>
-        0x21D4: [0x3C, 0x3D, 0x3E], // ⇔ LEFT RIGHT DOUBLE ARROW → <=>
-        0x27A1: [0x2D, 0x3E],     // ➡ BLACK RIGHTWARDS ARROW → ->
+        0x2190: [0x3C, 0x2D],  // ← LEFTWARDS ARROW → <-
+        0x2191: [0x5E],  // ↑ UPWARDS ARROW → ^
+        0x2192: [0x2D, 0x3E],  // → RIGHTWARDS ARROW → ->
+        0x2193: [0x76],  // ↓ DOWNWARDS ARROW → v
+        0x2194: [0x3C, 0x2D, 0x3E],  // ↔ LEFT RIGHT ARROW → <->
+        0x21D0: [0x3C, 0x3D],  // ⇐ LEFTWARDS DOUBLE ARROW → <=
+        0x21D2: [0x3D, 0x3E],  // ⇒ RIGHTWARDS DOUBLE ARROW → =>
+        0x21D4: [0x3C, 0x3D, 0x3E],  // ⇔ LEFT RIGHT DOUBLE ARROW → <=>
+        0x27A1: [0x2D, 0x3E],  // ➡ BLACK RIGHTWARDS ARROW → ->
 
         // MARK: Math symbols
-        0x2260: [0x21, 0x3D],     // ≠ NOT EQUAL TO → !=
-        0x2264: [0x3C, 0x3D],     // ≤ LESS-THAN OR EQUAL TO → <=
-        0x2265: [0x3E, 0x3D],     // ≥ GREATER-THAN OR EQUAL TO → >=
-        0x2248: [0x7E, 0x3D],     // ≈ ALMOST EQUAL TO → ~=
-        0x221E: [0x69, 0x6E, 0x66], // ∞ INFINITY → inf
-        0x2212: [0x2D],           // − MINUS SIGN → -
+        0x2260: [0x21, 0x3D],  // ≠ NOT EQUAL TO → !=
+        0x2264: [0x3C, 0x3D],  // ≤ LESS-THAN OR EQUAL TO → <=
+        0x2265: [0x3E, 0x3D],  // ≥ GREATER-THAN OR EQUAL TO → >=
+        0x2248: [0x7E, 0x3D],  // ≈ ALMOST EQUAL TO → ~=
+        0x221E: [0x69, 0x6E, 0x66],  // ∞ INFINITY → inf
+        0x2212: [0x2D],  // − MINUS SIGN → -
 
         // MARK: Dashes (beyond WinAnsi)
-        0x2010: [0x2D],           // ‐ HYPHEN → -
-        0x2011: [0x2D],           // ‑ NON-BREAKING HYPHEN → -
-        0x2012: [0x2D],           // ‒ FIGURE DASH → -
-        0x2015: [0x2D, 0x2D],     // ― HORIZONTAL BAR → --
+        0x2010: [0x2D],  // ‐ HYPHEN → -
+        0x2011: [0x2D],  // ‑ NON-BREAKING HYPHEN → -
+        0x2012: [0x2D],  // ‒ FIGURE DASH → -
+        0x2015: [0x2D, 0x2D],  // ― HORIZONTAL BAR → --
 
         // MARK: Quotes (beyond WinAnsi)
-        0x2018: [0x27],           // ' LEFT SINGLE QUOTATION MARK → '
-        0x2019: [0x27],           // ' RIGHT SINGLE QUOTATION MARK → '
-        0x201A: [0x2C],           // ‚ SINGLE LOW-9 QUOTATION MARK → ,
-        0x201C: [0x22],           // " LEFT DOUBLE QUOTATION MARK → "
-        0x201D: [0x22],           // " RIGHT DOUBLE QUOTATION MARK → "
-        0x201E: [0x2C, 0x2C],     // „ DOUBLE LOW-9 QUOTATION MARK → ,,
-        0x2039: [0x3C],           // ‹ SINGLE LEFT-POINTING ANGLE QUOTATION → <
-        0x203A: [0x3E],           // › SINGLE RIGHT-POINTING ANGLE QUOTATION → >
+        0x2018: [0x27],  // ' LEFT SINGLE QUOTATION MARK → '
+        0x2019: [0x27],  // ' RIGHT SINGLE QUOTATION MARK → '
+        0x201A: [0x2C],  // ‚ SINGLE LOW-9 QUOTATION MARK → ,
+        0x201C: [0x22],  // " LEFT DOUBLE QUOTATION MARK → "
+        0x201D: [0x22],  // " RIGHT DOUBLE QUOTATION MARK → "
+        0x201E: [0x2C, 0x2C],  // „ DOUBLE LOW-9 QUOTATION MARK → ,,
+        0x2039: [0x3C],  // ‹ SINGLE LEFT-POINTING ANGLE QUOTATION → <
+        0x203A: [0x3E],  // › SINGLE RIGHT-POINTING ANGLE QUOTATION → >
 
         // MARK: Bullets and list markers
-        0x2022: [0x2A],           // • BULLET → *
-        0x25CF: [0x2A],           // ● BLACK CIRCLE → *
-        0x25CB: [0x6F],           // ○ WHITE CIRCLE → o
-        0x25A0: [0x23],           // ■ BLACK SQUARE → #
-        0x25A1: [0x5B, 0x5D],     // □ WHITE SQUARE → []
-        0x25AA: [0x2A],           // ▪ BLACK SMALL SQUARE → *
-        0x25AB: [0x2D],           // ▫ WHITE SMALL SQUARE → -
-        0x25B6: [0x3E],           // ▶ BLACK RIGHT-POINTING TRIANGLE → >
-        0x25C0: [0x3C],           // ◀ BLACK LEFT-POINTING TRIANGLE → <
-        0x25B2: [0x5E],           // ▲ BLACK UP-POINTING TRIANGLE → ^
-        0x25BC: [0x76],           // ▼ BLACK DOWN-POINTING TRIANGLE → v
+        0x2022: [0x2A],  // • BULLET → *
+        0x25CF: [0x2A],  // ● BLACK CIRCLE → *
+        0x25CB: [0x6F],  // ○ WHITE CIRCLE → o
+        0x25A0: [0x23],  // ■ BLACK SQUARE → #
+        0x25A1: [0x5B, 0x5D],  // □ WHITE SQUARE → []
+        0x25AA: [0x2A],  // ▪ BLACK SMALL SQUARE → *
+        0x25AB: [0x2D],  // ▫ WHITE SMALL SQUARE → -
+        0x25B6: [0x3E],  // ▶ BLACK RIGHT-POINTING TRIANGLE → >
+        0x25C0: [0x3C],  // ◀ BLACK LEFT-POINTING TRIANGLE → <
+        0x25B2: [0x5E],  // ▲ BLACK UP-POINTING TRIANGLE → ^
+        0x25BC: [0x76],  // ▼ BLACK DOWN-POINTING TRIANGLE → v
 
         // MARK: Stars
-        0x2605: [0x2A],           // ★ BLACK STAR → *
-        0x2606: [0x2A],           // ☆ WHITE STAR → *
+        0x2605: [0x2A],  // ★ BLACK STAR → *
+        0x2606: [0x2A],  // ☆ WHITE STAR → *
 
         // MARK: Zero-width and invisible characters
-        0x00A0: [0x20],           // NO-BREAK SPACE → regular space
-        0x200B: [],               // ZERO WIDTH SPACE → nothing
-        0x200C: [],               // ZERO WIDTH NON-JOINER → nothing
-        0x200D: [],               // ZERO WIDTH JOINER → nothing
-        0xFEFF: [],               // BYTE ORDER MARK → nothing
+        0x00A0: [0x20],  // NO-BREAK SPACE → regular space
+        0x200B: [],  // ZERO WIDTH SPACE → nothing
+        0x200C: [],  // ZERO WIDTH NON-JOINER → nothing
+        0x200D: [],  // ZERO WIDTH JOINER → nothing
+        0xFEFF: [],  // BYTE ORDER MARK → nothing
     ]
 }
 

@@ -4,7 +4,6 @@ import Formatting
 import Geometry
 import ISO_32000_7_Syntax
 
-
 extension ISO_32000.ContentStream {
     /// PDF Content Stream Operator
     ///
@@ -199,7 +198,10 @@ extension ISO_32000.ContentStream {
         case beginMarkedContent(tag: ISO_32000.COS.Name)
 
         /// Begin marked-content sequence with property list (/tag <<...>> BDC)
-        case beginMarkedContentWithProperties(tag: ISO_32000.COS.Name, properties: ISO_32000.COS.Dictionary)
+        case beginMarkedContentWithProperties(
+            tag: ISO_32000.COS.Name,
+            properties: ISO_32000.COS.Dictionary
+        )
 
         /// End marked-content sequence (EMC)
         case endMarkedContent

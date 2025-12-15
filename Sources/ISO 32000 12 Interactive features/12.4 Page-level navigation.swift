@@ -7,8 +7,8 @@
 //   12.4.4  Presentations
 
 public import Geometry
-public import ISO_32000_Shared
 public import ISO_32000_8_Graphics
+public import ISO_32000_Shared
 
 extension ISO_32000.`12` {
     /// ISO 32000-2:2020, 12.4 Page-level navigation
@@ -395,59 +395,59 @@ extension ISO_32000.`12`.`4` {
 
 // MARK: - Raw Spec Text (for reference)
 
-//12.4 Page-level navigation
-//12.4.1 General
-//This subclause describes PDF facilities that enable the user to navigate from page to page:
-//• Page labels for numbering or otherwise identifying individual pages (12.4.2)
-//• Article threads, which chain together logically connected content (12.4.3)
-//• Presentations that display the document as a slide show (12.4.4)
+// 12.4 Page-level navigation
+// 12.4.1 General
+// This subclause describes PDF facilities that enable the user to navigate from page to page:
+// • Page labels for numbering or otherwise identifying individual pages (12.4.2)
+// • Article threads, which chain together logically connected content (12.4.3)
+// • Presentations that display the document as a slide show (12.4.4)
 
-//12.4.2 Page labels
-//Table 161 — Entries in a page label dictionary
-//Key Type Value
-//Type name (Optional) shall be PageLabel
-//S name (Optional) Numbering style: D (decimal), R (Roman upper), r (Roman lower),
+// 12.4.2 Page labels
+// Table 161 — Entries in a page label dictionary
+// Key Type Value
+// Type name (Optional) shall be PageLabel
+// S name (Optional) Numbering style: D (decimal), R (Roman upper), r (Roman lower),
 //       A (letters upper), a (letters lower). No default - omit for no numeric portion.
-//P text string (Optional) Label prefix for this range
-//St integer (Optional) Starting value for numeric portion. Default: 1
+// P text string (Optional) Label prefix for this range
+// St integer (Optional) Starting value for numeric portion. Default: 1
 
-//12.4.3 Articles
-//Table 162 — Entries in a thread dictionary
-//Key Type Value
-//Type name (Optional) shall be Thread
-//F dictionary (Required) First bead in the thread
-//I dictionary (Optional) Thread information dictionary
+// 12.4.3 Articles
+// Table 162 — Entries in a thread dictionary
+// Key Type Value
+// Type name (Optional) shall be Thread
+// F dictionary (Required) First bead in the thread
+// I dictionary (Optional) Thread information dictionary
 
-//Table 163 — Entries in a bead dictionary
-//Key Type Value
-//Type name (Optional) shall be Bead
-//T dictionary (Required for first bead) The thread
-//N dictionary (Required) Next bead (last bead refers to first)
-//V dictionary (Required) Previous bead (first bead refers to last)
-//P dictionary (Required) Page object
-//R rectangle (Required) Location on page
+// Table 163 — Entries in a bead dictionary
+// Key Type Value
+// Type name (Optional) shall be Bead
+// T dictionary (Required for first bead) The thread
+// N dictionary (Required) Next bead (last bead refers to first)
+// V dictionary (Required) Previous bead (first bead refers to last)
+// P dictionary (Required) Page object
+// R rectangle (Required) Location on page
 
-//12.4.4 Presentations
-//Table 164 — Entries in a transition dictionary
-//Key Type Value
-//Type name (Optional) shall be Trans
-//S name (Optional) Style: Split, Blinds, Box, Wipe, Dissolve, Glitter, R (default),
+// 12.4.4 Presentations
+// Table 164 — Entries in a transition dictionary
+// Key Type Value
+// Type name (Optional) shall be Trans
+// S name (Optional) Style: Split, Blinds, Box, Wipe, Dissolve, Glitter, R (default),
 //       Fly, Push, Cover, Uncover, Fade
-//D number (Optional) Duration in seconds. Default: 1
-//Dm name (Optional; Split/Blinds) Dimension: H (horizontal), V (vertical). Default: H
-//M name (Optional; Split/Box/Fly) Motion: I (inward), O (outward). Default: I
-//Di number/name (Optional; Wipe/Glitter/Fly/Cover/Uncover/Push) Direction:
+// D number (Optional) Duration in seconds. Default: 1
+// Dm name (Optional; Split/Blinds) Dimension: H (horizontal), V (vertical). Default: H
+// M name (Optional; Split/Box/Fly) Motion: I (inward), O (outward). Default: I
+// Di number/name (Optional; Wipe/Glitter/Fly/Cover/Uncover/Push) Direction:
 //       0 (left-right), 90 (bottom-top), 180 (right-left), 270 (top-bottom),
 //       315 (diagonal, Glitter only), or None (Fly only). Default: 0
-//SS number (Optional; Fly, PDF 1.5) Starting/ending scale. Default: 1.0
-//B boolean (Optional; Fly, PDF 1.5) Rectangular and opaque. Default: false
+// SS number (Optional; Fly, PDF 1.5) Starting/ending scale. Default: 1.0
+// B boolean (Optional; Fly, PDF 1.5) Rectangular and opaque. Default: false
 
-//12.4.4.2 Sub-page navigation
-//Table 165 — Entries in a navigation node dictionary
-//Key Type Value
-//Type name (Optional) shall be NavNode
-//NA dictionary (Optional) Action for navigating forward
-//PA dictionary (Optional) Action for navigating backward
-//Next dictionary (Optional) Next navigation node
-//Prev dictionary (Optional) Previous navigation node
-//Dur number (Optional) Auto-advance duration in seconds
+// 12.4.4.2 Sub-page navigation
+// Table 165 — Entries in a navigation node dictionary
+// Key Type Value
+// Type name (Optional) shall be NavNode
+// NA dictionary (Optional) Action for navigating forward
+// PA dictionary (Optional) Action for navigating backward
+// Next dictionary (Optional) Next navigation node
+// Prev dictionary (Optional) Previous navigation node
+// Dur number (Optional) Auto-advance duration in seconds

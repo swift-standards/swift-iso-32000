@@ -10,9 +10,9 @@
 //   9.3.7  Text rise
 //   9.3.8  Text knockout
 
+public import Dimension
 public import ISO_32000_8_Graphics
 public import ISO_32000_Shared
-public import Dimension
 
 extension ISO_32000.`9` {
     /// ISO 32000-2:2020, 9.3 Text state parameters and operators
@@ -135,7 +135,7 @@ extension ISO_32000.Text {
 }
 
 #if Codable
-extension ISO_32000.Text.State: Codable {}
+    extension ISO_32000.Text.State: Codable {}
 #endif
 
 // MARK: - Font Reference
@@ -164,7 +164,7 @@ extension ISO_32000.Text.Font {
 }
 
 #if Codable
-extension ISO_32000.Text.Font.Reference: Codable {}
+    extension ISO_32000.Text.Font.Reference: Codable {}
 #endif
 
 // MARK: - 9.3.6 Text Rendering Mode

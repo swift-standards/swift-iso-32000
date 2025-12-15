@@ -172,7 +172,7 @@ extension ISO_32000.DigitalSignature.SignatureDictionary {
         case reason = "Reason"
         case contactInfo = "ContactInfo"
         case handlerVersion = "R"  // PDF uses "R" for handler version (Revision)
-        case formatVersion = "V"   // PDF uses "V" for format version (Version)
+        case formatVersion = "V"  // PDF uses "V" for format version (Version)
         case propBuild = "Prop_Build"
         case propAuthTime = "Prop_AuthTime"
         case propAuthType = "Prop_AuthType"
@@ -580,7 +580,7 @@ extension ISO_32000.DigitalSignature {
             case crl = "CRL"
             case ocsp = "OCSP"
             case createdTime = "TU"  // PDF uses "TU" for creation time (TimeStamp Unix)
-            case timestamp = "TS"    // PDF uses "TS" for timestamp stream
+            case timestamp = "TS"  // PDF uses "TS" for timestamp stream
         }
 
         /// Certificate streams used for validation. Optional.

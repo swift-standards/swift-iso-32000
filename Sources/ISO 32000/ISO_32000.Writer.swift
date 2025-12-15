@@ -188,7 +188,8 @@ extension ISO_32000 {
                 if !page.resources.fonts.isEmpty {
                     var fontResourceDict = COS.Dictionary()
                     for name in page.resources.fonts.keys
-                        .sorted(by: { $0.rawValue < $1.rawValue }) {
+                        .sorted(by: { $0.rawValue < $1.rawValue })
+                    {
                         if let ref = fontRefs[name] {
                             fontResourceDict[name] = .reference(ref)
                         }
@@ -205,7 +206,11 @@ extension ISO_32000 {
                 pageDict[.resources] = .dictionary(resourcesDict)
 
                 state.objectOffsets[pageRef.objectNumber] = buffer.count
-                writeIndirectObject(pageRef.objectNumber, object: .dictionary(pageDict), into: &buffer)
+                writeIndirectObject(
+                    pageRef.objectNumber,
+                    object: .dictionary(pageDict),
+                    into: &buffer
+                )
             }
 
             // Pages dictionary
@@ -413,15 +418,17 @@ extension ISO_32000 {
                         }
                     }
 
-                    flatItems.append(OutlineFlatItem(
-                        item: item,
-                        objNum: myObjNum,
-                        parentObjNum: parentObjNum,
-                        prevObjNum: prevObjNum,
-                        nextObjNum: nextObjNum,
-                        firstChildObjNum: firstChildObjNum,
-                        lastChildObjNum: lastChildObjNum
-                    ))
+                    flatItems.append(
+                        OutlineFlatItem(
+                            item: item,
+                            objNum: myObjNum,
+                            parentObjNum: parentObjNum,
+                            prevObjNum: prevObjNum,
+                            nextObjNum: nextObjNum,
+                            firstChildObjNum: firstChildObjNum,
+                            lastChildObjNum: lastChildObjNum
+                        )
+                    )
 
                     if !item.children.isEmpty {
                         buildFlatList(item.children, parentObjNum: myObjNum)
@@ -446,7 +453,9 @@ extension ISO_32000 {
             outlineDict[.type] = .name(.outlines)
 
             if !outline.items.isEmpty {
-                outlineDict[.first] = .reference(COS.IndirectReference(objectNumber: itemObjNums[0]))
+                outlineDict[.first] = .reference(
+                    COS.IndirectReference(objectNumber: itemObjNums[0])
+                )
                 // Find last top-level item's object number
                 var lastTopLevelIndex = 0
                 for (i, item) in outline.items.enumerated() {
@@ -456,7 +465,9 @@ extension ISO_32000 {
                     lastTopLevelIndex += 1
                     lastTopLevelIndex += countDescendants(item)
                 }
-                outlineDict[.last] = .reference(COS.IndirectReference(objectNumber: itemObjNums[lastTopLevelIndex]))
+                outlineDict[.last] = .reference(
+                    COS.IndirectReference(objectNumber: itemObjNums[lastTopLevelIndex])
+                )
             }
 
             outlineDict[.count] = .integer(Int64(outline.count))
@@ -520,7 +531,7 @@ extension ISO_32000 {
                     .name(.xyz),
                     left.map { .real($0._rawValue) } ?? .null,
                     top.map { .real($0._rawValue) } ?? .null,
-                    zoom.map { .real($0) } ?? .null
+                    zoom.map { .real($0) } ?? .null,
                 ])
 
             case .fit(let page):
@@ -532,7 +543,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitH),
-                    top.map { .real($0._rawValue) } ?? .null
+                    top.map { .real($0._rawValue) } ?? .null,
                 ])
 
             case .fitV(let page, let left):
@@ -540,7 +551,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitV),
-                    left.map { .real($0._rawValue) } ?? .null
+                    left.map { .real($0._rawValue) } ?? .null,
                 ])
 
             case .fitR(let page, let left, let bottom, let right, let top):
@@ -551,7 +562,7 @@ extension ISO_32000 {
                     .real(left._rawValue),
                     .real(bottom._rawValue),
                     .real(right._rawValue),
-                    .real(top._rawValue)
+                    .real(top._rawValue),
                 ])
 
             case .fitB(let page):
@@ -563,7 +574,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitBH),
-                    top.map { .real($0._rawValue) } ?? .null
+                    top.map { .real($0._rawValue) } ?? .null,
                 ])
 
             case .fitBV(let page, let left):
@@ -571,7 +582,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitBV),
-                    left.map { .real($0._rawValue) } ?? .null
+                    left.map { .real($0._rawValue) } ?? .null,
                 ])
 
             case .named(let name):

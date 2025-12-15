@@ -25,8 +25,6 @@ extension ISO_32000.`9`.`8` {
     public enum FontDesign {}
 }
 
-
-
 // MARK: - FontDesign Documentation
 //
 // ISO_32000.FontDesign is defined as Geometry<Int, ISO_32000.`9`.`8`.FontDesign>
@@ -115,7 +113,6 @@ extension ISO_32000.FontDesign.Height {
     }
 }
 
-
 // MARK: - Font Metrics
 
 extension ISO_32000.`9`.`8` {
@@ -134,17 +131,17 @@ extension ISO_32000.`9`.`8` {
     public struct Metrics: Sendable {
         /// Glyph width table (in font design units)
         private let widths: [UInt32: ISO_32000.FontDesign.Width]
-        
+
         /// Default width for missing glyphs (in font design units)
         private let defaultWidth: ISO_32000.FontDesign.Width
-        
+
         /// Ascent: maximum height above the baseline reached by glyphs
         ///
         /// Per ISO 32000-2 Table 121:
         /// > (Required, except for Type 3 fonts) The maximum height above the
         /// > baseline reached by glyphs in this font.
         public let ascender: ISO_32000.FontDesign.Height
-        
+
         /// Descent: maximum depth below the baseline reached by glyphs
         ///
         /// Per ISO 32000-2 Table 121:
@@ -152,7 +149,7 @@ extension ISO_32000.`9`.`8` {
         /// > baseline reached by glyphs in this font. The value shall be a
         /// > negative number.
         public let descender: ISO_32000.FontDesign.Height
-        
+
         /// Cap height: vertical coordinate of the top of flat capital letters
         ///
         /// Per ISO 32000-2 Table 121:
@@ -160,7 +157,7 @@ extension ISO_32000.`9`.`8` {
         /// > fonts) The y coordinate of the top of flat capital letters,
         /// > measured from the baseline.
         public let capHeight: ISO_32000.FontDesign.Height
-        
+
         /// x-height: vertical coordinate of the top of flat nonascending lowercase letters
         ///
         /// Per ISO 32000-2 Table 121:
@@ -168,7 +165,7 @@ extension ISO_32000.`9`.`8` {
         /// > of flat nonascending lowercase letters (like the letter x),
         /// > measured from the baseline.
         public let xHeight: ISO_32000.FontDesign.Height
-        
+
         /// Leading: desired spacing between baselines of consecutive lines of text
         ///
         /// Per ISO 32000-2 Table 121:
@@ -207,7 +204,6 @@ extension ISO_32000.`9`.`8` {
         }
     }
 }
-
 
 extension ISO_32000.`9`.`8`.Metrics {
     /// Get width of a single character in font design units
@@ -343,7 +339,8 @@ extension ISO_32000.`9`.`8`.Metrics {
         /// This corresponds to CSS `line-height: normal` and includes the font's
         /// recommended leading (from the Leading entry in the font descriptor).
         public var normal: Multiplier {
-            let h = metrics.ascender._rawValue - metrics.descender._rawValue + metrics.leading._rawValue
+            let h =
+                metrics.ascender._rawValue - metrics.descender._rawValue + metrics.leading._rawValue
             return Multiplier(Double(h) / Double(metrics.unitsPerEm))
         }
 
@@ -391,7 +388,6 @@ extension ISO_32000.`9`.`8`.Metrics {
         }
     }
 }
-
 
 // MARK: - Pre-defined Metrics (Standard 14 Fonts)
 

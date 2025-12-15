@@ -385,8 +385,8 @@ extension ISO_32000.ContentStream {
 
         /// Set transformation matrix from an AffineTransform (cm)
         ///
-        /// Note: AffineTransform's a,b,c,d are dimensionless coefficients (stored as UserSpace.Unit
-        /// for type uniformity), while tx,ty are actual spatial translations (displacements).
+        /// Note: AffineTransform's a,b,c,d are dimensionless Scale coefficients,
+        /// while tx,ty are actual spatial translations (displacements).
         public mutating func transform(_ t: ISO_32000.UserSpace.AffineTransform) {
             emit(
                 .transform(
@@ -474,11 +474,16 @@ extension ISO_32000.ContentStream {
             emit(.moveTo(x: start.x, y: start.y))
 
             for segment in circle.bezierCurves {
-                emit(.curveTo(
-                    x1: segment.control1.x, y1: segment.control1.y,
-                    x2: segment.control2.x, y2: segment.control2.y,
-                    x3: segment.end.x, y3: segment.end.y
-                ))
+                emit(
+                    .curveTo(
+                        x1: segment.control1.x,
+                        y1: segment.control1.y,
+                        x2: segment.control2.x,
+                        y2: segment.control2.y,
+                        x3: segment.end.x,
+                        y3: segment.end.y
+                    )
+                )
             }
 
             emit(.closePath)

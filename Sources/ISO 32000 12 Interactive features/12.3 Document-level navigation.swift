@@ -10,8 +10,8 @@
 
 public import Geometry
 public import IEC_61966
-public import ISO_32000_Shared
 public import ISO_32000_8_Graphics
+public import ISO_32000_Shared
 
 extension ISO_32000.`12` {
     /// ISO 32000-2:2020, 12.3 Document-level navigation
@@ -47,7 +47,12 @@ extension ISO_32000 {
         ///   - left: Left coordinate, or nil for current value
         ///   - top: Top coordinate, or nil for current value
         ///   - zoom: Zoom factor, or nil/0 for current value
-        case xyz(page: Int, left: ISO_32000.UserSpace.X?, top: ISO_32000.UserSpace.Y?, zoom: Double?)
+        case xyz(
+            page: Int,
+            left: ISO_32000.UserSpace.X?,
+            top: ISO_32000.UserSpace.Y?,
+            zoom: Double?
+        )
 
         /// Fit the entire page within the window.
         ///
@@ -81,7 +86,13 @@ extension ISO_32000 {
         /// If the required horizontal and vertical magnification factors are
         /// different, use the smaller of the two, centring the rectangle
         /// within the window in the other dimension.
-        case fitR(page: Int, left: ISO_32000.UserSpace.X, bottom: ISO_32000.UserSpace.Y, right: ISO_32000.UserSpace.X, top: ISO_32000.UserSpace.Y)
+        case fitR(
+            page: Int,
+            left: ISO_32000.UserSpace.X,
+            bottom: ISO_32000.UserSpace.Y,
+            right: ISO_32000.UserSpace.X,
+            top: ISO_32000.UserSpace.Y
+        )
 
         /// Fit the page's bounding box to the window. (PDF 1.1)
         ///

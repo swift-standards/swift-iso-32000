@@ -309,7 +309,7 @@ extension ISO_32000.`7`.`3`.`5` {
 }
 
 #if Codable
-extension ISO_32000.`7`.`3`.`5`.Name: Codable {}
+    extension ISO_32000.`7`.`3`.`5`.Name: Codable {}
 #endif
 
 extension ISO_32000.`7`.`3`.`5`.Name {
@@ -681,7 +681,7 @@ extension ISO_32000.`7`.`3`.`10` {
 }
 
 #if Codable
-extension ISO_32000.`7`.`3`.`10`.IndirectReference: Codable {}
+    extension ISO_32000.`7`.`3`.`10`.IndirectReference: Codable {}
 #endif
 
 extension ISO_32000.`7`.`3`.`10`.IndirectReference: CustomStringConvertible {
@@ -1152,7 +1152,7 @@ extension ISO_32000.`7`.`3`.`3` {
         public static func serialize<Buffer>(
             _ number: ISO_32000_Shared.ISO_32000.`7`.`3`.`3`.PDFNumber,
             into buffer: inout Buffer
-        ) where Buffer : RangeReplaceableCollection, Buffer.Element == UInt8 {
+        ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
             // Handle special cases (PDF doesn't support infinity/NaN)
             guard number.value.isFinite else {
                 buffer.append(INCITS_4_1986.GraphicCharacters.`0`)
@@ -1202,7 +1202,7 @@ extension ISO_32000.`7`.`3`.`3` {
                 buffer.append(contentsOf: digits)
             }
         }
-        
+
         public let value: Double
 
         /// Maximum decimal places for real numbers (per Annex C recommendations)

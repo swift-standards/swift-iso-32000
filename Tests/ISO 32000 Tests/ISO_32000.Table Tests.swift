@@ -2,6 +2,7 @@
 // Tests for ISO 32000-2:2020 Table structure types (14.8.4.8.3)
 
 import Testing
+
 @testable import ISO_32000
 
 // MARK: - Table Structure Type Tests (Table 371)

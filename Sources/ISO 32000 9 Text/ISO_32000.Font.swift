@@ -1,7 +1,6 @@
 // ISO_32000.Font.swift
 // Typealias to authoritative implementation in Section 9.6
 
-
 public import ISO_32000_Shared
 
 extension ISO_32000 {

@@ -2,8 +2,9 @@
 // Object is defined in Section 7.3 and re-exported via COS typealias.
 // This file provides additional COS.Object convenience initializers.
 
-@_spi(Internal) public import struct Geometry.Tagged
 import ISO_32000_8_Graphics
+
+@_spi(Internal) public import struct Geometry.Tagged
 
 // MARK: - Rectangle Conversions
 

@@ -480,7 +480,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         /// lines should not be used as results are device-dependent.
         ///
         /// Initial value: 1.0
-        public var lineWidth: ISO_32000.UserSpace.Unit
+        public var lineWidth: ISO_32000.UserSpace.Width
 
         /// Line cap style.
         ///
@@ -505,7 +505,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         /// `miterLength / lineWidth = 1 / sin(φ/2)`
         ///
         /// Initial value: 10.0 (converts miters to bevels for angles < ~11.5°)
-        public var miterLimit: ISO_32000.UserSpace.Unit
+        public var miterLimit: Scale<1, Double>
 
         /// Line dash pattern.
         ///
@@ -558,7 +558,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         /// Reset to initial value at beginning of transparency group XObject execution.
         ///
         /// Initial value: 1.0
-        public var strokingAlphaConstant: ISO_32000.UserSpace.Unit
+        public var strokingAlphaConstant: Opacity<Double>
 
         /// Nonstroking alpha constant.
         ///
@@ -566,7 +566,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         /// Reset to initial value at beginning of transparency group XObject execution.
         ///
         /// Initial value: 1.0
-        public var nonstrokingAlphaConstant: ISO_32000.UserSpace.Unit
+        public var nonstrokingAlphaConstant: Opacity<Double>
 
         /// Alpha source flag ("alpha is shape").
         ///
@@ -601,18 +601,18 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
             strokingColor: ISO_32000.`8`.`4`.Graphics.State.Color = .gray(0),
             nonstrokingColor: ISO_32000.`8`.`4`.Graphics.State.Color = .gray(0),
             textState: TextState,
-            lineWidth: ISO_32000.UserSpace.Unit = 1,
+            lineWidth: ISO_32000.UserSpace.Width = 1,
             lineCap: ISO_32000.`8`.`4`.Graphics.State.Line.Cap = .butt,
             lineJoin: ISO_32000.`8`.`4`.Graphics.State.Line.Join = .miter,
-            miterLimit: ISO_32000.UserSpace.Unit = 10,
+            miterLimit: Scale<1, Double> = 10,
             dashPattern: ISO_32000.`8`.`4`.Graphics.State.Line.Dash.Pattern = .solid,
             renderingIntent: ISO_32000.`8`.`4`.Graphics.State.Rendering.Intent =
                 .relativeColorimetric,
             strokeAdjustment: Bool = false,
             blendMode: ISO_32000.`8`.`4`.Graphics.State.Blend.Mode = .normal,
             softMask: ISO_32000.`8`.`4`.Graphics.State.SoftMask? = nil,
-            strokingAlphaConstant: ISO_32000.UserSpace.Unit = 1,
-            nonstrokingAlphaConstant: ISO_32000.UserSpace.Unit = 1,
+            strokingAlphaConstant: Opacity<Double> = 1,
+            nonstrokingAlphaConstant: Opacity<Double> = 1,
             alphaSource: Bool = false,
             blackPointCompensation: ISO_32000.`8`.`4`.Graphics.State.BlackPoint.Compensation =
                 .default
@@ -1164,7 +1164,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
     /// Set the line width on the current state.
     @inlinable
     public mutating func setLineWidth<TextState>(
-        _ width: ISO_32000.UserSpace.Unit
+        _ width: ISO_32000.UserSpace.Width
     ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.lineWidth = width
     }

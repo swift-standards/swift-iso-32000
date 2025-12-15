@@ -280,6 +280,3 @@ struct `ISO_32000.Writer Tests` {
         print("PDF written to: \(path)")
     }
 }
-
-
-
