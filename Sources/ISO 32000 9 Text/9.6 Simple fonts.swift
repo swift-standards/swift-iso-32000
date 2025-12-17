@@ -9,7 +9,7 @@
 //   9.6.6  Type 3 fonts
 
 public import ISO_32000_7_Syntax
-public import ISO_32000_8_Graphics
+import ISO_32000_8_Graphics
 public import ISO_32000_Shared
 
 extension ISO_32000.`9` {

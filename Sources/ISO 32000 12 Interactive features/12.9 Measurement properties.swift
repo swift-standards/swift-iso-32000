@@ -11,7 +11,7 @@
 //   Table 268 — Entries in a number format dictionary
 
 public import Geometry
-public import ISO_32000_8_Graphics
+import ISO_32000_8_Graphics
 public import ISO_32000_Shared
 
 extension ISO_32000.`12` {
