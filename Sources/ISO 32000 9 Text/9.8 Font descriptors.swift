@@ -135,6 +135,12 @@ extension ISO_32000.`9`.`8` {
         /// Default width for missing glyphs (in font design units)
         private let defaultWidth: ISO_32000.FontDesign.Width
 
+        /// Pre-computed WinAnsi byte-to-width lookup table (256 entries)
+        ///
+        /// This enables O(1) width lookups for WinAnsi-encoded bytes without
+        /// needing to decode to Unicode first. Computed once at initialization.
+        private let winAnsiByteWidths: [ISO_32000.FontDesign.Width]
+
         /// Ascent: maximum height above the baseline reached by glyphs
         ///
         /// Per ISO 32000-2 Table 121:
@@ -193,14 +199,27 @@ extension ISO_32000.`9`.`8` {
             leading: Int = 0,
             unitsPerEm: Int = 1000
         ) {
-            self.widths = widths.mapValues { ISO_32000.FontDesign.Width($0) }
-            self.defaultWidth = ISO_32000.FontDesign.Width(defaultWidth)
+            let typedWidths = widths.mapValues { ISO_32000.FontDesign.Width($0) }
+            let typedDefaultWidth = ISO_32000.FontDesign.Width(defaultWidth)
+
+            self.widths = typedWidths
+            self.defaultWidth = typedDefaultWidth
             self.ascender = ISO_32000.FontDesign.Height(ascender)
             self.descender = ISO_32000.FontDesign.Height(descender)
             self.capHeight = ISO_32000.FontDesign.Height(capHeight)
             self.xHeight = ISO_32000.FontDesign.Height(xHeight)
             self.leading = ISO_32000.FontDesign.Height(leading)
             self.unitsPerEm = unitsPerEm
+
+            // Pre-compute WinAnsi byte-to-width lookup table
+            // This eliminates the decode step in the hot path
+            var byteWidths = [ISO_32000.FontDesign.Width](repeating: typedDefaultWidth, count: 256)
+            for byte in UInt8.min...UInt8.max {
+                if let scalar = ISO_32000.WinAnsiEncoding.decode(byte) {
+                    byteWidths[Int(byte)] = typedWidths[scalar.value] ?? typedDefaultWidth
+                }
+            }
+            self.winAnsiByteWidths = byteWidths
         }
     }
 }
@@ -236,15 +255,15 @@ extension ISO_32000.`9`.`8`.Metrics {
         let metrics: ISO_32000.`9`.`8`.Metrics
 
         /// Calculate width of WinAnsi-encoded bytes in font design units
+        ///
+        /// Uses pre-computed byte-to-width lookup table for O(1) per-byte access.
         public func width<Bytes: Collection>(of bytes: Bytes) -> ISO_32000.FontDesign.Width
         where Bytes.Element == UInt8 {
-            var total: ISO_32000.FontDesign.Width = 0
+            var total = 0
             for byte in bytes {
-                if let scalar = ISO_32000.WinAnsiEncoding.decode(byte) {
-                    total += metrics.glyphWidth(for: scalar)
-                }
+                total += metrics.winAnsiByteWidths[Int(byte)]._rawValue
             }
-            return total
+            return ISO_32000.FontDesign.Width(total)
         }
 
         /// Calculate width of WinAnsi-encoded bytes at a specific font size (returns UserSpace)
