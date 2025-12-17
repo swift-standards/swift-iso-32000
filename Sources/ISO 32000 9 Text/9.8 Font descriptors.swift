@@ -225,18 +225,65 @@ extension ISO_32000.`9`.`8` {
 }
 
 extension ISO_32000.`9`.`8`.Metrics {
-    /// Get width of a single character in font design units
-    public func glyphWidth(for scalar: UnicodeScalar) -> ISO_32000.FontDesign.Width {
-        widths[scalar.value] ?? defaultWidth
+
+    // MARK: - Primitive: Byte Width (canonical)
+
+    /// Get width of a single WinAnsi byte in font design units
+    ///
+    /// This is the canonical primitive - all other width calculations are composed from this.
+    /// Uses pre-computed lookup table for O(1) access.
+    public func width(of byte: UInt8) -> ISO_32000.FontDesign.Width {
+        winAnsiByteWidths[Int(byte)]
     }
 
-    /// Calculate width of a String in font design units
-    public func width(of text: String) -> ISO_32000.FontDesign.Width {
-        var total: ISO_32000.FontDesign.Width = 0
-        for scalar in text.unicodeScalars {
-            total += glyphWidth(for: scalar)
+    /// Calculate width of WinAnsi-encoded bytes in font design units
+    ///
+    /// Uses pre-computed byte-to-width lookup table for O(1) per-byte access.
+    public func width<Bytes: Collection>(of bytes: Bytes) -> ISO_32000.FontDesign.Width
+    where Bytes.Element == UInt8 {
+        var total = 0
+        for byte in bytes {
+            total += winAnsiByteWidths[Int(byte)]._rawValue
         }
-        return total
+        return ISO_32000.FontDesign.Width(total)
+    }
+
+    /// Calculate width of WinAnsi-encoded bytes at a specific font size (returns UserSpace)
+    public func width<Bytes: Collection>(
+        of bytes: Bytes,
+        atSize fontSize: ISO_32000.UserSpace.Size<1>
+    ) -> ISO_32000.UserSpace.Width where Bytes.Element == UInt8 {
+        width(of: bytes).scaled(by: fontSize, unitsPerEm: unitsPerEm)
+    }
+
+    // MARK: - Composed: Scalar Width (via byte encoding)
+
+    /// Get width of a single Unicode scalar in font design units
+    ///
+    /// Composed from byte primitive: encodes scalar to WinAnsi byte, then looks up width.
+    /// Returns default width if scalar cannot be encoded in WinAnsi.
+    public func glyphWidth(for scalar: UnicodeScalar) -> ISO_32000.FontDesign.Width {
+        if let byte = ISO_32000.WinAnsiEncoding.encode(scalar) {
+            return width(of: byte)
+        }
+        return defaultWidth
+    }
+
+    // MARK: - Composed: String Width (via byte encoding)
+
+    /// Calculate width of a String in font design units
+    ///
+    /// Composed from byte primitive: encodes each scalar to WinAnsi, then sums widths.
+    public func width(of text: String) -> ISO_32000.FontDesign.Width {
+        var total = 0
+        for scalar in text.unicodeScalars {
+            if let byte = ISO_32000.WinAnsiEncoding.encode(scalar) {
+                total += winAnsiByteWidths[Int(byte)]._rawValue
+            } else {
+                total += defaultWidth._rawValue
+            }
+        }
+        return ISO_32000.FontDesign.Width(total)
     }
 
     /// Calculate width of a String at a specific font size (returns UserSpace)
@@ -247,23 +294,27 @@ extension ISO_32000.`9`.`8`.Metrics {
         width(of: text).scaled(by: fontSize, unitsPerEm: unitsPerEm)
     }
 
+    // MARK: - WinAnsi Namespace (convenience)
+
     /// WinAnsi encoding operations on this font metrics
+    ///
+    /// Provides namespaced access to byte-based width calculations.
+    /// The underlying implementation uses the same byte primitives.
     public var winAnsi: WinAnsi { WinAnsi(metrics: self) }
 
     /// WinAnsi encoding namespace for font metrics
     public struct WinAnsi: Sendable {
         let metrics: ISO_32000.`9`.`8`.Metrics
 
+        /// Get width of a single WinAnsi byte in font design units
+        public func width(of byte: UInt8) -> ISO_32000.FontDesign.Width {
+            metrics.width(of: byte)
+        }
+
         /// Calculate width of WinAnsi-encoded bytes in font design units
-        ///
-        /// Uses pre-computed byte-to-width lookup table for O(1) per-byte access.
         public func width<Bytes: Collection>(of bytes: Bytes) -> ISO_32000.FontDesign.Width
         where Bytes.Element == UInt8 {
-            var total = 0
-            for byte in bytes {
-                total += metrics.winAnsiByteWidths[Int(byte)]._rawValue
-            }
-            return ISO_32000.FontDesign.Width(total)
+            metrics.width(of: bytes)
         }
 
         /// Calculate width of WinAnsi-encoded bytes at a specific font size (returns UserSpace)
@@ -271,7 +322,7 @@ extension ISO_32000.`9`.`8`.Metrics {
             of bytes: Bytes,
             atSize fontSize: ISO_32000.UserSpace.Size<1>
         ) -> ISO_32000.UserSpace.Width where Bytes.Element == UInt8 {
-            width(of: bytes).scaled(by: fontSize, unitsPerEm: metrics.unitsPerEm)
+            metrics.width(of: bytes, atSize: fontSize)
         }
     }
 
