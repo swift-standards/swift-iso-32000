@@ -46,6 +46,9 @@ extension ISO_32000.`7`.`3`.Table.`3` {
     ///
     /// Per Section 7.3.4.2:
     /// > Within a literal string, the REVERSE SOLIDUS is used as an escape character.
+    ///
+    /// Legacy dictionary version - kept for compatibility.
+    /// Use `serializeLiteralString` which uses optimized array lookup.
     public static let escapeTable: [UInt8: [UInt8]] = [
         .ascii.lf: [.ascii.backslash, .ascii.n],  // \n
         .ascii.cr: [.ascii.backslash, .ascii.r],  // \r
@@ -57,12 +60,34 @@ extension ISO_32000.`7`.`3`.Table.`3` {
         .ascii.backslash: [.ascii.backslash, .ascii.backslash],  // \\
     ]
 
+    /// Optimized escape lookup - 256-entry array for O(1) access
+    ///
+    /// Returns the escape character for bytes that need escaping, or 0 for passthrough.
+    /// Format: (needsEscape: Bool, escapeChar: UInt8)
+    /// - For escaped bytes: returns the character after backslash (n, r, t, b, f, (, ), \)
+    /// - For non-escaped bytes: returns 0
+    @usableFromInline
+    internal static let escapeCharLookup: [UInt8] = {
+        var table = [UInt8](repeating: 0, count: 256)
+        table[Int(UInt8.ascii.lf)] = .ascii.n              // \n
+        table[Int(UInt8.ascii.cr)] = .ascii.r              // \r
+        table[Int(UInt8.ascii.htab)] = .ascii.t            // \t
+        table[Int(UInt8.ascii.bs)] = .ascii.b              // \b
+        table[Int(UInt8.ascii.ff)] = .ascii.f              // \f
+        table[Int(UInt8.ascii.leftParenthesis)] = .ascii.leftParenthesis   // \(
+        table[Int(UInt8.ascii.rightParenthesis)] = .ascii.rightParenthesis // \)
+        table[Int(UInt8.ascii.backslash)] = .ascii.backslash               // \\
+        return table
+    }()
+
     /// Serialize pre-encoded bytes as a PDF literal string.
     ///
     /// This is the canonical function for creating PDF literal strings from
     /// already-encoded bytes (e.g., WinAnsiEncoding bytes for content streams).
     ///
     /// Output format: `(bytes with escaping)`
+    ///
+    /// Uses O(1) array lookup instead of dictionary for performance.
     ///
     /// - Parameters:
     ///   - bytes: Pre-encoded bytes to serialize
@@ -77,8 +102,10 @@ extension ISO_32000.`7`.`3`.Table.`3` {
     ) where Bytes.Element == UInt8, Buffer.Element == UInt8 {
         buffer.append(.ascii.leftParenthesis)
         for byte in bytes {
-            if let escaped = escapeTable[byte] {
-                buffer.append(contentsOf: escaped)
+            let escapeChar = escapeCharLookup[Int(byte)]
+            if escapeChar != 0 {
+                buffer.append(.ascii.backslash)
+                buffer.append(escapeChar)
             } else {
                 buffer.append(byte)
             }
@@ -1188,18 +1215,28 @@ extension ISO_32000.`7`.`3`.`3` {
             if fracDigits != 0 {
                 buffer.append(INCITS_4_1986.GraphicCharacters.period)
                 // Serialize fractional digits with leading zeros, then strip trailing zeros
+                // Use InlineArray for fixed-size stack storage (no heap allocation)
                 var fracValue = fracDigits
-                var digits: [UInt8] = []
                 let digit0 = INCITS_4_1986.GraphicCharacters.`0`
-                for _ in 0..<5 {
-                    digits.insert(digit0 + UInt8(fracValue % 10), at: 0)
-                    fracValue /= 10
+
+                // Build digits in reverse order into InlineArray (most significant at index 0)
+                var digits = InlineArray<5, UInt8>(repeating: digit0)
+                digits[4] = digit0 + UInt8(fracValue % 10); fracValue /= 10
+                digits[3] = digit0 + UInt8(fracValue % 10); fracValue /= 10
+                digits[2] = digit0 + UInt8(fracValue % 10); fracValue /= 10
+                digits[1] = digit0 + UInt8(fracValue % 10); fracValue /= 10
+                digits[0] = digit0 + UInt8(fracValue % 10)
+
+                // Find last non-zero digit (strip trailing zeros)
+                var count = 5
+                while count > 1 && digits[count - 1] == digit0 {
+                    count -= 1
                 }
-                // Strip trailing zeros
-                while digits.last == digit0 {
-                    digits.removeLast()
+
+                // Append digits
+                for i in 0..<count {
+                    buffer.append(digits[i])
                 }
-                buffer.append(contentsOf: digits)
             }
         }
 
