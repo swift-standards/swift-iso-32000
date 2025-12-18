@@ -608,6 +608,10 @@ extension ISO_32000.`7`.`3`.`5`.Name {
     public static let row = Self(__unchecked: (), rawValue: "Row")
     public static let column = Self(__unchecked: (), rawValue: "Column")
     public static let both = Self(__unchecked: (), rawValue: "Both")
+
+    // Marked content (Section 14.9.4)
+    public static let span = Self(__unchecked: (), rawValue: "Span")
+    public static let actualText = Self(__unchecked: (), rawValue: "ActualText")
 }
 
 // MARK: - 7.3.8 Stream Objects

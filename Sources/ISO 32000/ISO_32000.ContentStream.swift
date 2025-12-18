@@ -381,6 +381,30 @@ extension ISO_32000.ContentStream {
             emit(.endMarkedContent)
         }
 
+        /// Begin marked-content span with ActualText for text extraction (BDC)
+        ///
+        /// Per ISO 32000-2:2020, Section 14.9.4 (Replacement Text):
+        /// > The ActualText entry in the property list of a marked-content sequence,
+        /// > or in the structure element dictionary of a structure element that contains
+        /// > marked content, provides an alternate description of the marked content
+        /// > for extraction and accessibility purposes.
+        ///
+        /// Use this to provide semantic text that should be extracted when copying,
+        /// while allowing the visual representation to differ (e.g., word-wrapped lines).
+        ///
+        /// - Parameter actualText: The text that should be extracted when copying from the PDF
+        public mutating func beginActualTextSpan(_ actualText: String) {
+            let properties: ISO_32000.COS.Dictionary = [
+                .actualText: .string(actualText)
+            ]
+            emit(.beginMarkedContentWithProperties(tag: .span, properties: properties))
+        }
+
+        /// End marked-content span (convenience alias for endMarkedContent)
+        public mutating func endActualTextSpan() {
+            emit(.endMarkedContent)
+        }
+
         // MARK: - UserSpace Type Overloads
 
         /// Set transformation matrix from an AffineTransform (cm)
