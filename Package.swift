@@ -35,7 +35,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-standards/swift-standards", from: "0.16.1", traits: [.trait(name: "Codable", condition: .when(traits: ["Codable"]))]),
+        .package(url: "https://github.com/swift-standards/swift-standards", from: "0.20.0", traits: [.trait(name: "Codable", condition: .when(traits: ["Codable"]))]),
         .package(url: "https://github.com/swift-standards/swift-iso-9899", from: "0.2.3"),
         .package(url: "https://github.com/swift-standards/swift-ieee-754", from: "0.3.3"),
         .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.5"),
