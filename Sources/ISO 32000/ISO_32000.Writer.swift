@@ -2,6 +2,7 @@
 
 import Standards
 import ISO_32000_9_Text
+import RFC_4648
 
 extension ISO_32000 {
     /// PDF Writer - serializes documents to PDF format
@@ -749,7 +750,28 @@ extension ISO_32000 {
             state.objectOffsets[descriptorObjNum] = buffer.count
             writeIndirectObject(descriptorObjNum, object: .dictionary(descriptorDict), into: &buffer)
 
-            // 3. Write Font dictionary
+            // 3. Write ToUnicode CMap stream
+            let toUnicodeObjNum = state.nextObjectNumber()
+            let toUnicodeRef = COS.IndirectReference(objectNumber: toUnicodeObjNum)
+
+            var toUnicodeData = generateToUnicodeCMap()
+            var toUnicodeDict = COS.Dictionary()
+
+            // Apply compression if available
+            if let compress = compression {
+                var compressed: [UInt8] = []
+                compress.compress(toUnicodeData, into: &compressed)
+                if compressed.count < toUnicodeData.count {
+                    toUnicodeData = compressed
+                    toUnicodeDict[.filter] = .name(.flateDecode)
+                }
+            }
+
+            let toUnicodeStream = COS.Stream(dictionary: toUnicodeDict, data: toUnicodeData)
+            state.objectOffsets[toUnicodeObjNum] = buffer.count
+            writeIndirectObject(toUnicodeObjNum, object: .stream(toUnicodeStream), into: &buffer)
+
+            // 4. Write Font dictionary
             let fontObjNum = state.nextObjectNumber()
             let fontRef = COS.IndirectReference(objectNumber: fontObjNum)
 
@@ -759,6 +781,7 @@ extension ISO_32000 {
             fontDict[.baseFont] = .name(font.baseFontName)
             fontDict[.fontDescriptor] = .reference(descriptorRef)
             fontDict[.encoding] = .name(.winAnsiEncoding)
+            fontDict[.toUnicode] = .reference(toUnicodeRef)
 
             // Build Widths array for WinAnsi range (32-255)
             // Per ISO 32000-2, FirstChar and LastChar define the range,
@@ -784,6 +807,106 @@ extension ISO_32000 {
 
             return fontRef
         }
+
+        /// Generate ToUnicode CMap for WinAnsi encoding
+        ///
+        /// Per ISO 32000-2:2020, Section 9.10.3:
+        /// > A ToUnicode CMap is used to map character codes to Unicode values.
+        /// > This is essential for text extraction and accessibility.
+        ///
+        /// - Returns: The CMap data as UTF-8 bytes
+        private func generateToUnicodeCMap() -> [UInt8] {
+            var cmap = ""
+
+            // CMap header
+            cmap += "/CIDInit /ProcSet findresource begin\n"
+            cmap += "12 dict begin\n"
+            cmap += "begincmap\n"
+            cmap += "/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def\n"
+            cmap += "/CMapName /Adobe-Identity-UCS def\n"
+            cmap += "/CMapType 2 def\n"
+
+            // Code space range (single byte: 00-FF)
+            cmap += "1 begincodespacerange\n"
+            cmap += "<00> <FF>\n"
+            cmap += "endcodespacerange\n"
+
+            // Character mappings (WinAnsi to Unicode)
+            // WinAnsi codes 32-255 map to Unicode
+            let mappings = Self.winAnsiToUnicode
+            let mappingCount = mappings.count
+
+            cmap += "\(mappingCount) beginbfchar\n"
+            for (charCode, unicodeValue) in mappings.sorted(by: { $0.key < $1.key }) {
+                // Use RFC 4648 Base16 encoding (uppercase)
+                var charCodeHex: [UInt8] = []
+                RFC_4648.Base16.encode(UInt8(charCode), into: &charCodeHex, uppercase: true)
+                var unicodeHex: [UInt8] = []
+                RFC_4648.Base16.encode(UInt16(unicodeValue), into: &unicodeHex, uppercase: true)
+                cmap += "<\(String(decoding: charCodeHex, as: UTF8.self))> <\(String(decoding: unicodeHex, as: UTF8.self))>\n"
+            }
+            cmap += "endbfchar\n"
+
+            // CMap footer
+            cmap += "endcmap\n"
+            cmap += "CMapName currentdict /CMap defineresource pop\n"
+            cmap += "end\n"
+            cmap += "end\n"
+
+            return [UInt8](cmap.utf8)
+        }
+
+        /// WinAnsi (Windows-1252) to Unicode mapping table
+        ///
+        /// Codes 32-127 and 160-255 map directly to the same Unicode code point.
+        /// Codes 128-159 have special mappings per Windows-1252.
+        private static let winAnsiToUnicode: [Int: Int] = {
+            var mapping: [Int: Int] = [:]
+
+            // Direct mappings: 32-127 (ASCII) and 160-255 (ISO-8859-1)
+            for code in 32...127 {
+                mapping[code] = code
+            }
+            for code in 160...255 {
+                mapping[code] = code
+            }
+
+            // Windows-1252 specific mappings (128-159)
+            // These differ from ISO-8859-1
+            mapping[128] = 0x20AC  // € Euro sign
+            // 129 is undefined in Windows-1252
+            mapping[130] = 0x201A  // ‚ Single low-9 quotation mark
+            mapping[131] = 0x0192  // ƒ Latin small letter f with hook
+            mapping[132] = 0x201E  // „ Double low-9 quotation mark
+            mapping[133] = 0x2026  // … Horizontal ellipsis
+            mapping[134] = 0x2020  // † Dagger
+            mapping[135] = 0x2021  // ‡ Double dagger
+            mapping[136] = 0x02C6  // ˆ Modifier letter circumflex accent
+            mapping[137] = 0x2030  // ‰ Per mille sign
+            mapping[138] = 0x0160  // Š Latin capital letter S with caron
+            mapping[139] = 0x2039  // ‹ Single left-pointing angle quotation mark
+            mapping[140] = 0x0152  // Œ Latin capital ligature OE
+            // 141 is undefined in Windows-1252
+            mapping[142] = 0x017D  // Ž Latin capital letter Z with caron
+            // 143, 144 are undefined in Windows-1252
+            mapping[145] = 0x2018  // ' Left single quotation mark
+            mapping[146] = 0x2019  // ' Right single quotation mark
+            mapping[147] = 0x201C  // " Left double quotation mark
+            mapping[148] = 0x201D  // " Right double quotation mark
+            mapping[149] = 0x2022  // • Bullet
+            mapping[150] = 0x2013  // – En dash
+            mapping[151] = 0x2014  // — Em dash
+            mapping[152] = 0x02DC  // ˜ Small tilde
+            mapping[153] = 0x2122  // ™ Trade mark sign
+            mapping[154] = 0x0161  // š Latin small letter s with caron
+            mapping[155] = 0x203A  // › Single right-pointing angle quotation mark
+            mapping[156] = 0x0153  // œ Latin small ligature oe
+            // 157 is undefined in Windows-1252
+            mapping[158] = 0x017E  // ž Latin small letter z with caron
+            mapping[159] = 0x0178  // Ÿ Latin capital letter Y with diaeresis
+
+            return mapping
+        }()
     }
 }
 

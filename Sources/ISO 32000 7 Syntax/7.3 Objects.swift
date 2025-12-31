@@ -584,6 +584,7 @@ extension ISO_32000.`7`.`3`.`5`.Name {
     public static let lastChar = Self(__unchecked: (), rawValue: "LastChar")
     public static let widths = Self(__unchecked: (), rawValue: "Widths")
     public static let length1 = Self(__unchecked: (), rawValue: "Length1")
+    public static let toUnicode = Self(__unchecked: (), rawValue: "ToUnicode")
 
     // Procedure sets
     public static let pdf = Self(__unchecked: (), rawValue: "PDF")

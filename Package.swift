@@ -40,6 +40,7 @@ let package = Package(
         .package(url: "https://github.com/swift-standards/swift-ieee-754", from: "0.3.3"),
         .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.5"),
         .package(url: "https://github.com/swift-standards/swift-rfc-1950", from: "0.1.0"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-4648", from: "0.6.0"),
         .package(url: "https://github.com/swift-standards/swift-iec-61966", from: "0.1.0"),
         .package(path: "../swift-w3c-png"),
         .package(path: "../swift-iso-14496-22"),
@@ -136,6 +137,7 @@ let package = Package(
                 .product(name: "Formatting", package: "swift-standards"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
                 .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
+                .product(name: "RFC 4648", package: "swift-rfc-4648"),
                 .product(name: "Formatting", package: "swift-standards"),
             ]
         ),
