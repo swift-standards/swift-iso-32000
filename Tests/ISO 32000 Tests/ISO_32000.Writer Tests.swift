@@ -5,6 +5,7 @@ import Testing
 
 @testable import ISO_32000
 @testable import ISO_32000_Flate
+@testable import ISO_32000_9_Text
 
 @Suite
 struct `ISO_32000.Writer Tests` {
@@ -279,4 +280,93 @@ struct `ISO_32000.Writer Tests` {
         #expect(!pdf.isEmpty)
         print("PDF written to: \(path)")
     }
+
+    #if os(macOS)
+    @Test
+    func `Outputs embedded TrueType font PDF for inspection`() throws {
+        // Load Geneva.ttf from system fonts
+        let fontPath = "/System/Library/Fonts/Geneva.ttf"
+        let fontData = try Data(contentsOf: URL(fileURLWithPath: fontPath))
+        let fontBytes = [UInt8](fontData)
+
+        // Create embedded font with unique resource name (avoiding F1-F14 used by standard fonts)
+        let customFont = try ISO_32000.Font(
+            data: fontBytes,
+            resourceName: try ISO_32000.COS.Name("CF1")
+        )
+
+        // Also include Helvetica for comparison (uses F1 by default)
+        let helvetica = ISO_32000.Font.helvetica
+
+        let document = ISO_32000.Document(
+            info: ISO_32000.Document.Info(
+                title: "Embedded TrueType Font Test",
+                creator: "swift-iso-32000 tests"
+            ),
+            pages: [
+                ISO_32000.Page(
+                    mediaBox: .letter,
+                    content: ISO_32000.ContentStream { builder in
+                        builder.beginText()
+
+                        // Title with embedded font
+                        builder.setFont(customFont, size: 24)
+                        builder.moveText(dx: 72, dy: 700)
+                        builder.showText("Embedded TrueType Font: Geneva")
+
+                        // Subtitle
+                        builder.setFont(customFont, size: 14)
+                        builder.moveText(dx: 0, dy: -30)
+                        builder.showText("This text uses Geneva.ttf embedded in the PDF.")
+
+                        // Sample text
+                        builder.moveText(dx: 0, dy: -25)
+                        builder.showText("The quick brown fox jumps over the lazy dog.")
+
+                        builder.moveText(dx: 0, dy: -25)
+                        builder.showText("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+                        builder.moveText(dx: 0, dy: -25)
+                        builder.showText("abcdefghijklmnopqrstuvwxyz")
+
+                        builder.moveText(dx: 0, dy: -25)
+                        builder.showText("0123456789 !@#$%^&*()[]{}|;':\",./<>?")
+
+                        // Comparison with Helvetica
+                        builder.setFont(helvetica, size: 14)
+                        builder.moveText(dx: 0, dy: -50)
+                        builder.showText("--- Comparison: Helvetica (standard font) ---")
+
+                        builder.moveText(dx: 0, dy: -25)
+                        builder.showText("The quick brown fox jumps over the lazy dog.")
+
+                        builder.moveText(dx: 0, dy: -25)
+                        builder.showText("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+                        builder.endText()
+                    },
+                    resources: ISO_32000.Resources(fonts: [
+                        customFont.resourceName: customFont,
+                        helvetica.resourceName: helvetica
+                    ])
+                )
+            ]
+        )
+
+        var writer = ISO_32000.Writer()
+        let pdf = writer.write(document)
+
+        let path = try PDFOutput.write(pdf, name: "iso32000-embedded-truetype")
+        #expect(!pdf.isEmpty)
+        #expect(pdf.count > 50000)  // Embedded font should make it larger
+        print("PDF written to: \(path)")
+        print("PDF size: \(pdf.count) bytes")
+
+        // Verify the PDF contains TrueType markers
+        let str = String(decoding: pdf, as: UTF8.self)
+        #expect(str.contains("/Subtype /TrueType"))
+        #expect(str.contains("/FontFile2"))
+        #expect(str.contains("/FontDescriptor"))
+    }
+    #endif
 }
