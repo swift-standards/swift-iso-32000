@@ -28,16 +28,25 @@ extension ISO_32000 {
         /// Fonts used in this content stream
         public var fontsUsed: Set<Font>
 
+        /// Images used in this content stream
+        public var imagesUsed: Set<Image>
+
         /// Create an empty content stream
         public init() {
             self.data = []
             self.fontsUsed = []
+            self.imagesUsed = []
         }
 
         /// Create a content stream from raw bytes
-        public init(data: [UInt8], fontsUsed: Set<Font> = []) {
+        public init(
+            data: [UInt8],
+            fontsUsed: Set<Font> = [],
+            imagesUsed: Set<Image> = []
+        ) {
             self.data = data
             self.fontsUsed = fontsUsed
+            self.imagesUsed = imagesUsed
         }
 
         /// Create a content stream using a builder
@@ -46,6 +55,7 @@ extension ISO_32000 {
             build(&builder)
             self.data = builder.data
             self.fontsUsed = builder.fontsUsed
+            self.imagesUsed = builder.imagesUsed
         }
     }
 }
@@ -60,6 +70,9 @@ extension ISO_32000.ContentStream {
 
         /// Fonts used in this content stream
         public var fontsUsed: Set<ISO_32000.Font> = []
+
+        /// Images used in this content stream
+        public var imagesUsed: Set<ISO_32000.Image> = []
 
         /// Create an empty builder
         public init() {}
@@ -403,6 +416,49 @@ extension ISO_32000.ContentStream {
         /// End marked-content span (convenience alias for endMarkedContent)
         public mutating func endActualTextSpan() {
             emit(.endMarkedContent)
+        }
+
+        // MARK: - XObject Operators (Section 8.8)
+
+        /// Paint XObject by name (Do)
+        ///
+        /// Invokes the XObject referenced by name in the current resources.
+        /// Use this when you have an XObject reference but not the Image object.
+        public mutating func paintXObject(name: ISO_32000.COS.Name) {
+            emit(.paintXObject(name: name))
+        }
+
+        /// Draw image at position and size (convenience for image XObjects)
+        ///
+        /// Images in PDF paint into a 1x1 unit square. This method:
+        /// 1. Saves graphics state
+        /// 2. Applies transformation to map 1x1 square to the target rect
+        /// 3. Invokes the image XObject
+        /// 4. Restores graphics state
+        ///
+        /// - Parameters:
+        ///   - image: The image to draw
+        ///   - rect: Target rectangle in user space (bottom-left origin)
+        public mutating func drawImage(
+            _ image: ISO_32000.Image,
+            in rect: ISO_32000.UserSpace.Rectangle
+        ) {
+            imagesUsed.insert(image)
+            emit(.saveState)
+
+            // Get displacement from origin (0,0) to rect.origin
+            // Coordinate - Coordinate.zero = Displacement
+            let dx = rect.origin.x - ISO_32000.UserSpace.X.zero
+            let dy = rect.origin.y - ISO_32000.UserSpace.Y.zero
+
+            // Get scale factors: Width / Width = Scale<1>, Height / Height = Scale<1>
+            // Image paints in 1×1 unit square, scale to target dimensions
+            let scaleX = rect.width / ISO_32000.UserSpace.Width(1)
+            let scaleY = rect.height / ISO_32000.UserSpace.Height(1)
+
+            emit(.transform(a: scaleX, b: 0, c: 0, d: scaleY, e: dx, f: dy))
+            emit(.paintXObject(name: image.resourceName))
+            emit(.restoreState)
         }
 
         // MARK: - UserSpace Type Overloads

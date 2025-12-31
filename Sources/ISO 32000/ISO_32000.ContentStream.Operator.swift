@@ -205,6 +205,14 @@ extension ISO_32000.ContentStream {
 
         /// End marked-content sequence (EMC)
         case endMarkedContent
+
+        // MARK: - XObject (Section 8.8)
+
+        /// Paint XObject (/name Do)
+        ///
+        /// Invokes the XObject referenced by name in the current resources.
+        /// Used for images, form XObjects, etc.
+        case paintXObject(name: ISO_32000.COS.Name)
     }
 }
 
@@ -460,6 +468,12 @@ extension ISO_32000.ContentStream.Operator {
 
         case .endMarkedContent:
             buffer.append(contentsOf: [.ascii.E, .ascii.M, .ascii.C])
+
+        // XObject
+        case .paintXObject(let name):
+            buffer.append(.ascii.forwardSlash)
+            buffer.append(contentsOf: name.rawValue.utf8)
+            buffer.append(contentsOf: [.ascii.space, .ascii.D, .ascii.o])
         }
     }
 }

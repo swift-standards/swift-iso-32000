@@ -42,6 +42,14 @@ extension ISO_32000 {
                 }
             }
 
+            // Collect all images used
+            var allImages: [COS.Name: Image] = [:]
+            for page in document.pages {
+                for (name, image) in page.resources.xObjects {
+                    allImages[name] = image
+                }
+            }
+
             // Create font objects
             var fontRefs: [COS.Name: COS.IndirectReference] = [:]
             for (name, font) in allFonts.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
@@ -61,6 +69,42 @@ extension ISO_32000 {
 
                 state.objectOffsets[objNum] = buffer.count
                 writeIndirectObject(objNum, object: .dictionary(fontDict), into: &buffer)
+            }
+
+            // Create image XObject streams
+            var imageRefs: [COS.Name: COS.IndirectReference] = [:]
+            for (name, image) in allImages.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
+                let objNum = state.nextObjectNumber()
+                imageRefs[name] = COS.IndirectReference(objectNumber: objNum)
+
+                var imageDict = COS.Dictionary()
+                imageDict[.type] = .name(.xObject)
+                imageDict[.subtype] = .name(.image)
+                imageDict[.width] = .integer(Int64(image.pixelWidth))
+                imageDict[.height] = .integer(Int64(image.pixelHeight))
+                imageDict[.bitsPerComponent] = .integer(Int64(image.bitsPerComponent))
+
+                // Color space
+                switch image.colorSpace {
+                case .deviceGray:
+                    imageDict[.colorSpace] = .name(.deviceGray)
+                case .deviceRGB:
+                    imageDict[.colorSpace] = .name(.deviceRGB)
+                case .deviceCMYK:
+                    imageDict[.colorSpace] = .name(.deviceCMYK)
+                }
+
+                // Filter
+                switch image.filter {
+                case .dctDecode:
+                    imageDict[.filter] = .name(.dctDecode)
+                case .flateDecode:
+                    imageDict[.filter] = .name(.flateDecode)
+                }
+
+                let stream = COS.Stream(dictionary: imageDict, data: image.data)
+                state.objectOffsets[objNum] = buffer.count
+                writeIndirectObject(objNum, object: .stream(stream), into: &buffer)
             }
 
             // Create page content streams
@@ -197,11 +241,26 @@ extension ISO_32000 {
                     resourcesDict[.font] = .dictionary(fontResourceDict)
                 }
 
-                // ProcSet
-                resourcesDict[.procSet] = .array([
-                    .name(.pdf),
-                    .name(.text),
-                ])
+                // XObject resources (images)
+                if !page.resources.xObjects.isEmpty {
+                    var xObjectDict = COS.Dictionary()
+                    for name in page.resources.xObjects.keys
+                        .sorted(by: { $0.rawValue < $1.rawValue })
+                    {
+                        if let ref = imageRefs[name] {
+                            xObjectDict[name] = .reference(ref)
+                        }
+                    }
+                    resourcesDict[.xObject] = .dictionary(xObjectDict)
+                }
+
+                // ProcSet - include ImageC/ImageB if we have images
+                var procSetArray: [COS.Object] = [.name(.pdf), .name(.text)]
+                if !page.resources.xObjects.isEmpty {
+                    procSetArray.append(COS.Object.name(.imagec))  // Color images
+                    procSetArray.append(COS.Object.name(.imageb))  // Grayscale images
+                }
+                resourcesDict[.procSet] = .array(procSetArray)
 
                 pageDict[.resources] = .dictionary(resourcesDict)
 

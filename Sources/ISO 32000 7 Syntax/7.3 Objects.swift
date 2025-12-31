@@ -533,6 +533,19 @@ extension ISO_32000.`7`.`3`.`5`.Name {
     public static let flateDecode = Self(__unchecked: (), rawValue: "FlateDecode")
     public static let decodeParms = Self(__unchecked: (), rawValue: "DecodeParms")
 
+    // Image XObject attributes (Table 87, 89)
+    public static let image = Self(__unchecked: (), rawValue: "Image")
+    public static let width = Self(__unchecked: (), rawValue: "Width")
+    public static let height = Self(__unchecked: (), rawValue: "Height")
+    public static let colorSpace = Self(__unchecked: (), rawValue: "ColorSpace")
+    public static let bitsPerComponent = Self(__unchecked: (), rawValue: "BitsPerComponent")
+    public static let dctDecode = Self(__unchecked: (), rawValue: "DCTDecode")
+
+    // Color spaces (Table 57)
+    public static let deviceRGB = Self(__unchecked: (), rawValue: "DeviceRGB")
+    public static let deviceGray = Self(__unchecked: (), rawValue: "DeviceGray")
+    public static let deviceCMYK = Self(__unchecked: (), rawValue: "DeviceCMYK")
+
     // Standard 14 font names (Table 111)
     public static let helvetica = Self(__unchecked: (), rawValue: "Helvetica")
     public static let helveticaBold = Self(__unchecked: (), rawValue: "Helvetica-Bold")

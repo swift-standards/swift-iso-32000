@@ -166,14 +166,19 @@ extension ISO_32000 {
         /// Font dictionary: name -> font reference
         public var fonts: [COS.Name: Font]
 
+        /// XObject dictionary: name -> image/form XObject
+        public var xObjects: [COS.Name: Image]
+
         /// Create empty resources
         public init() {
             self.fonts = [:]
+            self.xObjects = [:]
         }
 
         /// Create resources with fonts
-        public init(fonts: [COS.Name: Font]) {
+        public init(fonts: [COS.Name: Font], xObjects: [COS.Name: Image] = [:]) {
             self.fonts = fonts
+            self.xObjects = xObjects
         }
 
         /// Add a font and return its resource name
@@ -181,6 +186,14 @@ extension ISO_32000 {
         public mutating func addFont(_ font: Font) -> COS.Name {
             let name = font.resourceName
             fonts[name] = font
+            return name
+        }
+
+        /// Add an image and return its resource name
+        @discardableResult
+        public mutating func addImage(_ image: Image) -> COS.Name {
+            let name = image.resourceName
+            xObjects[name] = image
             return name
         }
     }

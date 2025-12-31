@@ -41,6 +41,7 @@ let package = Package(
         .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.5"),
         .package(url: "https://github.com/swift-standards/swift-rfc-1950", from: "0.1.0"),
         .package(url: "https://github.com/swift-standards/swift-iec-61966", from: "0.1.0"),
+        .package(path: "../swift-w3c-png"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0"),
     ],
     targets: [
@@ -137,6 +138,7 @@ let package = Package(
                 "ISO 32000",
                 "ISO 32000 Shared",
                 .product(name: "RFC 1950", package: "swift-rfc-1950"),
+                .product(name: "W3C PNG", package: "swift-w3c-png"),
             ]
         ),
         .testTarget(
