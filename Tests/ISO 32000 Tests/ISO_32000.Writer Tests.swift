@@ -368,5 +368,97 @@ struct `ISO_32000.Writer Tests` {
         #expect(str.contains("/FontFile2"))
         #expect(str.contains("/FontDescriptor"))
     }
+
+    @Test
+    func `Outputs subsetted TrueType font PDF for inspection`() throws {
+        // Load Geneva.ttf from system fonts
+        let fontPath = "/System/Library/Fonts/Geneva.ttf"
+        let fontData = try Data(contentsOf: URL(fileURLWithPath: fontPath))
+        let fontBytes = [UInt8](fontData)
+
+        // Create embedded font
+        let fullEmbedded = try ISO_32000.`9`.`6`.Embedded(data: fontBytes)
+        let fullSize = fullEmbedded.data.count
+
+        // Define ALL the text we'll use - must include every character that appears in the PDF
+        let allText = """
+        Subsetted Font: Geneva
+        Hello World! This is a subset font test.
+        The font above has been subsetted.
+        It only contains glyphs for the characters used.
+        """
+        let usedChars = Set(allText)
+        let text = "Hello World! This is a subset font test."
+
+        // Create subset
+        let subsetEmbedded = try fullEmbedded.subsetted(for: usedChars)
+        let subsetSize = subsetEmbedded.data.count
+
+        print("Full font size: \(fullSize) bytes")
+        print("Subset font size: \(subsetSize) bytes")
+        print("Reduction: \(100 - (subsetSize * 100 / fullSize))%")
+        print("Characters used: \(usedChars.count)")
+
+        // Verify substantial reduction
+        #expect(subsetSize < fullSize / 5)
+
+        // Create font from subset
+        let customFont = try ISO_32000.Font(
+            embedded: subsetEmbedded,
+            resourceName: try ISO_32000.COS.Name("CF1")
+        )
+
+        let document = ISO_32000.Document(
+            info: ISO_32000.Document.Info(
+                title: "Subsetted TrueType Font Test",
+                creator: "swift-iso-32000 tests"
+            ),
+            pages: [
+                ISO_32000.Page(
+                    mediaBox: .letter,
+                    content: ISO_32000.ContentStream { builder in
+                        builder.beginText()
+
+                        // Title
+                        builder.setFont(customFont, size: 24)
+                        builder.moveText(dx: 72, dy: 700)
+                        builder.showText("Subsetted Font: Geneva")
+
+                        // Info
+                        builder.setFont(customFont, size: 14)
+                        builder.moveText(dx: 0, dy: -30)
+                        builder.showText(text)
+
+                        builder.moveText(dx: 0, dy: -25)
+                        builder.showText("The font above has been subsetted.")
+
+                        builder.moveText(dx: 0, dy: -25)
+                        builder.showText("It only contains glyphs for the characters used.")
+
+                        builder.endText()
+                    },
+                    resources: ISO_32000.Resources(fonts: [
+                        customFont.resourceName: customFont
+                    ])
+                )
+            ]
+        )
+
+        var writer = ISO_32000.Writer()
+        let pdf = writer.write(document)
+
+        let path = try PDFOutput.write(pdf, name: "iso32000-subsetted-truetype")
+        #expect(!pdf.isEmpty)
+        print("PDF written to: \(path)")
+        print("PDF size: \(pdf.count) bytes (vs ~740KB with full font)")
+
+        // Subsetted PDF should be much smaller than full font PDF
+        #expect(pdf.count < 100000)  // Should be under 100KB
+
+        // Verify the PDF is valid
+        let str = String(decoding: pdf, as: UTF8.self)
+        #expect(str.contains("/Subtype /TrueType"))
+        #expect(str.contains("/FontFile2"))
+    }
     #endif
 }

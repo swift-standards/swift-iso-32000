@@ -66,6 +66,33 @@ extension ISO_32000.`9`.`6` {
         public func descriptor(fontName: ISO_32000.`7`.`3`.COS.Name) -> ISO_32000.`9`.`8`.Descriptor {
             ISO_32000.`9`.`8`.Descriptor(fontFile: fontFile, fontName: fontName)
         }
+
+        /// Create a subset of this font containing only the specified characters.
+        ///
+        /// Font subsetting significantly reduces PDF file size by including only
+        /// the glyphs that are actually used. A typical font is 200KB+ but a subset
+        /// with just ASCII characters might be 5-20KB.
+        ///
+        /// - Parameter characters: The characters to include in the subset
+        /// - Returns: A new `Embedded` instance with subset font data
+        /// - Throws: `ISO_14496_22.FontSubsetter.SubsetError` if subsetting fails
+        ///
+        /// ## Example
+        ///
+        /// ```swift
+        /// let fontData: [UInt8] = ... // Full TrueType font (500KB)
+        /// let embedded = try Embedded(data: fontData)
+        /// let usedChars: Set<Character> = ["H", "e", "l", "o", " ", "W", "r", "d", "!"]
+        /// let subset = try embedded.subsetted(for: usedChars)
+        /// // subset.data is now ~5KB instead of 500KB
+        /// ```
+        public func subsetted(for characters: Set<Character>) throws -> Embedded {
+            let subsetter = ISO_14496_22.FontSubsetter(fontFile: fontFile)
+            let subsetData = try subsetter.subset(characters: characters)
+
+            // Parse the subset font to get updated metrics
+            return try Embedded(data: subsetData)
+        }
     }
 }
 
