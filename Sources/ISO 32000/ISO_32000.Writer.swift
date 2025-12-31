@@ -1,6 +1,7 @@
 // ISO_32000.Writer.swift
 
 import Standards
+import ISO_32000_9_Text
 
 extension ISO_32000 {
     /// PDF Writer - serializes documents to PDF format
@@ -50,25 +51,37 @@ extension ISO_32000 {
                 }
             }
 
-            // Create font objects
+            // Create font objects (and embedded font resources)
             var fontRefs: [COS.Name: COS.IndirectReference] = [:]
             for (name, font) in allFonts.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
-                let objNum = state.nextObjectNumber()
-                fontRefs[name] = COS.IndirectReference(objectNumber: objNum)
+                if let embedded = font.embeddedSource {
+                    // TrueType embedded font
+                    let fontRef = writeEmbeddedTrueTypeFont(
+                        font: font,
+                        embedded: embedded,
+                        state: &state,
+                        into: &buffer
+                    )
+                    fontRefs[name] = fontRef
+                } else {
+                    // Standard Type1 font (Standard 14)
+                    let objNum = state.nextObjectNumber()
+                    fontRefs[name] = COS.IndirectReference(objectNumber: objNum)
 
-                var fontDict = COS.Dictionary()
-                fontDict[.type] = .name(.font)
-                fontDict[.subtype] = .name(.type1)
-                fontDict[.baseFont] = .name(font.baseFontName)
+                    var fontDict = COS.Dictionary()
+                    fontDict[.type] = .name(.font)
+                    fontDict[.subtype] = .name(.type1)
+                    fontDict[.baseFont] = .name(font.baseFontName)
 
-                // ZapfDingbats and Symbol have built-in encodings (ISO 32000-2 Annex D)
-                // Other Standard 14 fonts use WinAnsiEncoding for proper glyph mapping
-                if font.family != .zapfDingbats && font.family != .symbol {
-                    fontDict[.encoding] = .name(.winAnsiEncoding)
+                    // ZapfDingbats and Symbol have built-in encodings (ISO 32000-2 Annex D)
+                    // Other Standard 14 fonts use WinAnsiEncoding for proper glyph mapping
+                    if font.family != .zapfDingbats && font.family != .symbol {
+                        fontDict[.encoding] = .name(.winAnsiEncoding)
+                    }
+
+                    state.objectOffsets[objNum] = buffer.count
+                    writeIndirectObject(objNum, object: .dictionary(fontDict), into: &buffer)
                 }
-
-                state.objectOffsets[objNum] = buffer.count
-                writeIndirectObject(objNum, object: .dictionary(fontDict), into: &buffer)
             }
 
             // Create image XObject streams
@@ -671,6 +684,105 @@ extension ISO_32000 {
             buffer.append(contentsOf: "\nstartxref\n".utf8)
             buffer.append(contentsOf: "\(xrefOffset)\n".utf8)
             buffer.append(contentsOf: "%%EOF\n".utf8)
+        }
+
+        // MARK: - Embedded TrueType Font Writing
+
+        /// Write an embedded TrueType font to the PDF.
+        ///
+        /// This creates:
+        /// 1. FontFile2 stream (raw TrueType data)
+        /// 2. FontDescriptor dictionary
+        /// 3. Font dictionary (referencing the above)
+        ///
+        /// Per ISO 32000-2:2020, Section 9.6.3 (TrueType fonts) and 9.9.1 (Font embedding).
+        private mutating func writeEmbeddedTrueTypeFont<Buffer: RangeReplaceableCollection>(
+            font: Font,
+            embedded: ISO_32000.`9`.`6`.Embedded,
+            state: inout Writer.State,
+            into buffer: inout Buffer
+        ) -> COS.IndirectReference where Buffer.Element == UInt8 {
+            // 1. Write FontFile2 stream (the raw TrueType font program)
+            let fontFileObjNum = state.nextObjectNumber()
+            let fontFileRef = COS.IndirectReference(objectNumber: fontFileObjNum)
+
+            var fontFileData = embedded.data
+            var fontFileDict = COS.Dictionary()
+            fontFileDict[.length1] = .integer(Int64(embedded.data.count))
+
+            // Apply compression if available
+            if let compress = compression {
+                var compressed: [UInt8] = []
+                compress.compress(fontFileData, into: &compressed)
+                if compressed.count < fontFileData.count {
+                    fontFileData = compressed
+                    fontFileDict[.filter] = .name(.flateDecode)
+                }
+            }
+
+            let fontFileStream = COS.Stream(dictionary: fontFileDict, data: fontFileData)
+            state.objectOffsets[fontFileObjNum] = buffer.count
+            writeIndirectObject(fontFileObjNum, object: .stream(fontFileStream), into: &buffer)
+
+            // 2. Write FontDescriptor dictionary
+            let descriptorObjNum = state.nextObjectNumber()
+            let descriptorRef = COS.IndirectReference(objectNumber: descriptorObjNum)
+
+            let descriptor = embedded.descriptor(fontName: font.baseFontName)
+            var descriptorDict = COS.Dictionary()
+            descriptorDict[.type] = .name(.fontDescriptor)
+            descriptorDict[.fontName] = .name(font.baseFontName)
+            descriptorDict[.fontFlags] = .integer(Int64(descriptor.flags.rawValue))
+            descriptorDict[.fontBBox] = .array([
+                .integer(Int64(descriptor.fontBBox.llx)),
+                .integer(Int64(descriptor.fontBBox.lly)),
+                .integer(Int64(descriptor.fontBBox.urx)),
+                .integer(Int64(descriptor.fontBBox.ury)),
+            ])
+            descriptorDict[.italicAngle] = .real(descriptor.italicAngle)
+            descriptorDict[.ascent] = .integer(Int64(descriptor.ascent._rawValue))
+            descriptorDict[.descent] = .integer(Int64(descriptor.descent._rawValue))
+            descriptorDict[.capHeight] = .integer(Int64(descriptor.capHeight._rawValue))
+            descriptorDict[.stemV] = .integer(Int64(descriptor.stemV._rawValue))
+            descriptorDict[.fontFile2] = .reference(fontFileRef)
+
+            state.objectOffsets[descriptorObjNum] = buffer.count
+            writeIndirectObject(descriptorObjNum, object: .dictionary(descriptorDict), into: &buffer)
+
+            // 3. Write Font dictionary
+            let fontObjNum = state.nextObjectNumber()
+            let fontRef = COS.IndirectReference(objectNumber: fontObjNum)
+
+            var fontDict = COS.Dictionary()
+            fontDict[.type] = .name(.font)
+            fontDict[.subtype] = .name(.trueType)
+            fontDict[.baseFont] = .name(font.baseFontName)
+            fontDict[.fontDescriptor] = .reference(descriptorRef)
+            fontDict[.encoding] = .name(.winAnsiEncoding)
+
+            // Build Widths array for WinAnsi range (32-255)
+            // Per ISO 32000-2, FirstChar and LastChar define the range,
+            // and Widths is an array of glyph widths for each character code
+            let firstChar = 32
+            let lastChar = 255
+            fontDict[.firstChar] = .integer(Int64(firstChar))
+            fontDict[.lastChar] = .integer(Int64(lastChar))
+
+            var widthsArray: [COS.Object] = []
+            let unitsPerEm = embedded.metrics.unitsPerEm
+            for charCode in firstChar...lastChar {
+                // Get width for this character code
+                let width = embedded.metrics.width(forCodePoint: UInt32(charCode))
+                // Scale to 1000 units (PDF standard for glyph widths)
+                let scaledWidth = (width * 1000) / unitsPerEm
+                widthsArray.append(.integer(Int64(scaledWidth)))
+            }
+            fontDict[.widths] = .array(widthsArray)
+
+            state.objectOffsets[fontObjNum] = buffer.count
+            writeIndirectObject(fontObjNum, object: .dictionary(fontDict), into: &buffer)
+
+            return fontRef
         }
     }
 }

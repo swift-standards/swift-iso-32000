@@ -42,6 +42,7 @@ let package = Package(
         .package(url: "https://github.com/swift-standards/swift-rfc-1950", from: "0.1.0"),
         .package(url: "https://github.com/swift-standards/swift-iec-61966", from: "0.1.0"),
         .package(path: "../swift-w3c-png"),
+        .package(path: "../swift-iso-14496-22"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0"),
     ],
     targets: [
@@ -79,7 +80,13 @@ let package = Package(
         ),
         .target(
             name: "ISO 32000 9 Text",
-            dependencies: ["ISO 32000 Shared", "ISO 32000 7 Syntax", "ISO 32000 8 Graphics", "ISO 32000 Annex D"]
+            dependencies: [
+                "ISO 32000 Shared",
+                "ISO 32000 7 Syntax",
+                "ISO 32000 8 Graphics",
+                "ISO 32000 Annex D",
+                .product(name: "ISO 14496-22", package: "swift-iso-14496-22"),
+            ]
         ),
         .target(
             name: "ISO 32000 10 Rendering",

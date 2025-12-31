@@ -188,6 +188,22 @@ extension ISO_32000.`9`.`8` {
         /// - TrueType fonts: typically 2048 units per em (but variable)
         public let unitsPerEm: Int
 
+        /// Get the width for a Unicode code point.
+        ///
+        /// Returns the glyph width in font design units, or the default width
+        /// if the code point is not in the width table.
+        ///
+        /// - Parameter codePoint: Unicode code point (e.g., 65 for 'A')
+        /// - Returns: Width in font design units
+        public func width(forCodePoint codePoint: UInt32) -> Int {
+            (widths[codePoint] ?? defaultWidth)._rawValue
+        }
+
+        /// The default width for missing glyphs (in font design units).
+        ///
+        /// Used for characters not in the width table.
+        public var missingWidth: Int { defaultWidth._rawValue }
+
         /// Create metrics with a width table and vertical metrics
         public init(
             widths: [UInt32: Int],

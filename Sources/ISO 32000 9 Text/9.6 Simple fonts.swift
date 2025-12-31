@@ -64,6 +64,15 @@ extension ISO_32000.`9`.`6` {
         /// Font family
         public let family: Family
 
+        /// Embedded font source (nil for standard 14 fonts).
+        ///
+        /// When present, contains the raw TrueType/OpenType data and descriptor
+        /// needed for embedding in the PDF.
+        public let embeddedSource: Embedded?
+
+        /// Whether this is an embedded font (TrueType/OpenType)
+        public var isEmbedded: Bool { embeddedSource != nil }
+
         /// Create a font with explicit properties
         public init(
             baseFontName: ISO_32000.`7`.`3`.COS.Name,
@@ -72,7 +81,8 @@ extension ISO_32000.`9`.`6` {
             isMonospaced: Bool,
             weight: Weight,
             style: Style,
-            family: Family
+            family: Family,
+            embeddedSource: Embedded? = nil
         ) {
             self.baseFontName = baseFontName
             self.resourceName = resourceName
@@ -81,6 +91,7 @@ extension ISO_32000.`9`.`6` {
             self.weight = weight
             self.style = style
             self.family = family
+            self.embeddedSource = embeddedSource
         }
     }
 }
@@ -120,6 +131,8 @@ extension ISO_32000.`9`.`6`.Font {
         case courier = "Courier"
         case symbol = "Symbol"
         case zapfDingbats = "ZapfDingbats"
+        /// Custom embedded font (TrueType/OpenType)
+        case custom = "Custom"
     }
 }
 
