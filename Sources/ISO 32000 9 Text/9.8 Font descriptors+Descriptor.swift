@@ -249,18 +249,24 @@ extension ISO_32000.`9`.`8`.Descriptor {
             flags.insert(.italic)
         }
 
-        // Get bounding box from head table
+        // Scale factor: PDF uses 1000-unit glyph space, fonts use unitsPerEm
+        let unitsPerEm = Int(fontFile.head.unitsPerEm)
+        func scale(_ value: Int) -> Int {
+            (value * 1000) / unitsPerEm
+        }
+
+        // Get bounding box from head table (scaled to 1000 units)
         let fontBBox = BoundingBox(
-            llx: Int(fontFile.head.xMin),
-            lly: Int(fontFile.head.yMin),
-            urx: Int(fontFile.head.xMax),
-            ury: Int(fontFile.head.yMax)
+            llx: scale(Int(fontFile.head.xMin)),
+            lly: scale(Int(fontFile.head.yMin)),
+            urx: scale(Int(fontFile.head.xMax)),
+            ury: scale(Int(fontFile.head.yMax))
         )
 
-        // Get vertical metrics
-        let ascent = ISO_32000.FontDesign.Height(Int(fontFile.hhea.ascender))
-        let descent = ISO_32000.FontDesign.Height(Int(fontFile.hhea.descender))
-        let leading = ISO_32000.FontDesign.Height(Int(fontFile.hhea.lineGap))
+        // Get vertical metrics (scaled to 1000 units)
+        let ascent = ISO_32000.FontDesign.Height(scale(Int(fontFile.hhea.ascender)))
+        let descent = ISO_32000.FontDesign.Height(scale(Int(fontFile.hhea.descender)))
+        let leading = ISO_32000.FontDesign.Height(scale(Int(fontFile.hhea.lineGap)))
 
         // Approximate cap height and x-height (ideally from OS/2 table)
         let capHeight = ascent
@@ -270,8 +276,8 @@ extension ISO_32000.`9`.`8`.Descriptor {
         // This is a rough approximation; accurate values require analyzing glyph outlines
         let stemV = ISO_32000.FontDesign.Width(80)
 
-        // Default width for missing glyphs
-        let missingWidth = ISO_32000.FontDesign.Width(Int(fontFile.hmtx.advanceWidth(for: 0)))
+        // Default width for missing glyphs (scaled to 1000 units)
+        let missingWidth = ISO_32000.FontDesign.Width(scale(Int(fontFile.hmtx.advanceWidth(for: 0))))
 
         self.init(
             fontName: fontName,
