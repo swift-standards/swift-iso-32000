@@ -3,6 +3,7 @@
 import Foundation
 import Testing
 import TestingPerformance
+
 @testable import ISO_32000
 
 extension Tag {
@@ -31,7 +32,10 @@ struct PerformanceTests {
     @Test("String width: 1000 chars", .timed(iterations: 100, warmup: 10))
     func stringWidth1000() {
         let font = ISO_32000.Font.helvetica
-        let text = String(repeating: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ", count: 18)
+        let text = String(
+            repeating: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
+            count: 18
+        )
         let _ = font.width(of: text, atSize: 12)
     }
 
@@ -76,7 +80,8 @@ struct PerformanceTests {
         }
 
         let elapsed = ContinuousClock.now - start
-        let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
+        let seconds =
+            Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
         let throughput = Double(count) / seconds
 
         print("📊 String width throughput: \(Int(throughput)) calculations/sec")
@@ -98,7 +103,8 @@ struct PerformanceTests {
         }
 
         let elapsed = ContinuousClock.now - start
-        let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
+        let seconds =
+            Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
         let throughput = Double(count) / seconds
 
         print("📊 WinAnsi width throughput: \(Int(throughput)) calculations/sec")
@@ -121,7 +127,9 @@ struct PerformanceTests {
                 let start = ContinuousClock.now
                 let _ = font.winAnsi.width(of: bytes, atSize: 12)
                 let elapsed = ContinuousClock.now - start
-                totalTime += Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
+                totalTime +=
+                    Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds)
+                    / 1e18
             }
 
             let avgTime = totalTime / Double(iterations)
@@ -152,7 +160,9 @@ struct PerformanceTests {
                 scaling = "baseline"
             }
 
-            print("│ \(String(format: "%6d", size).padding(toLength: 11, withPad: " ", startingAt: 0)) │ \(String(format: "%8.2f", timeUs).padding(toLength: 12, withPad: " ", startingAt: 0)) │ \(String(format: "%8.4f", perByte).padding(toLength: 11, withPad: " ", startingAt: 0)) │ \(scaling.padding(toLength: 11, withPad: " ", startingAt: 0)) │")
+            print(
+                "│ \(String(format: "%6d", size).padding(toLength: 11, withPad: " ", startingAt: 0)) │ \(String(format: "%8.2f", timeUs).padding(toLength: 12, withPad: " ", startingAt: 0)) │ \(String(format: "%8.4f", perByte).padding(toLength: 11, withPad: " ", startingAt: 0)) │ \(scaling.padding(toLength: 11, withPad: " ", startingAt: 0)) │"
+            )
 
             previousPerByte = perByte
         }
@@ -202,12 +212,18 @@ struct RegressionGuards {
         }
 
         let elapsed = ContinuousClock.now - start
-        let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
+        let seconds =
+            Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
         let throughput = Double(count) / seconds
 
-        print("📊 Width calculation throughput: \(Int(throughput)) calculations/sec (minimum: \(Int(minThroughput)))")
+        print(
+            "📊 Width calculation throughput: \(Int(throughput)) calculations/sec (minimum: \(Int(minThroughput)))"
+        )
 
-        #expect(throughput >= minThroughput, "Performance regression detected: \(Int(throughput)) < \(Int(minThroughput)) calculations/sec")
+        #expect(
+            throughput >= minThroughput,
+            "Performance regression detected: \(Int(throughput)) < \(Int(minThroughput)) calculations/sec"
+        )
     }
 
     @Test("String width regression guard")
@@ -232,11 +248,17 @@ struct RegressionGuards {
         }
 
         let elapsed = ContinuousClock.now - start
-        let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
+        let seconds =
+            Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
         let throughput = Double(count) / seconds
 
-        print("📊 String width throughput: \(Int(throughput)) calculations/sec (minimum: \(Int(minThroughput)))")
+        print(
+            "📊 String width throughput: \(Int(throughput)) calculations/sec (minimum: \(Int(minThroughput)))"
+        )
 
-        #expect(throughput >= minThroughput, "Performance regression detected: \(Int(throughput)) < \(Int(minThroughput)) calculations/sec")
+        #expect(
+            throughput >= minThroughput,
+            "Performance regression detected: \(Int(throughput)) < \(Int(minThroughput)) calculations/sec"
+        )
     }
 }

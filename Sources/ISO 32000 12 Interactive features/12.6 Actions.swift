@@ -536,9 +536,9 @@ extension ISO_32000.Action {
             /// Windows launch operations
             public enum Operation: String, Sendable, Hashable, Codable, CaseIterable {
                 /// Open the document.
-                case open = "open"
+                case open
                 /// Print the document.
-                case print = "print"
+                case print
             }
 
             public init(

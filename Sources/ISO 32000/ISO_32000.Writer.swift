@@ -1,8 +1,8 @@
 // ISO_32000.Writer.swift
 
-import Standards
 import ISO_32000_9_Text
 import RFC_4648
+import Standards
 
 extension ISO_32000 {
     /// PDF Writer - serializes documents to PDF format
@@ -170,8 +170,7 @@ extension ISO_32000 {
 
                     var annotDict = COS.Dictionary()
                     annotDict[.type] = .name(.annot)
-                    // Safe: Subtype raw values are valid PDF names
-                    annotDict[.subtype] = .name(try! COS.Name(annotation.subtype.rawValue))
+                    annotDict[.subtype] = .name(annotation.subtype.name)
                     annotDict[.rect] = COS.Object(annotation.rect)
 
                     // Border (common entry)
@@ -748,7 +747,11 @@ extension ISO_32000 {
             descriptorDict[.fontFile2] = .reference(fontFileRef)
 
             state.objectOffsets[descriptorObjNum] = buffer.count
-            writeIndirectObject(descriptorObjNum, object: .dictionary(descriptorDict), into: &buffer)
+            writeIndirectObject(
+                descriptorObjNum,
+                object: .dictionary(descriptorDict),
+                into: &buffer
+            )
 
             // 3. Write ToUnicode CMap stream
             let toUnicodeObjNum = state.nextObjectNumber()
@@ -843,7 +846,8 @@ extension ISO_32000 {
                 RFC_4648.Base16.encode(UInt8(charCode), into: &charCodeHex, uppercase: true)
                 var unicodeHex: [UInt8] = []
                 RFC_4648.Base16.encode(UInt16(unicodeValue), into: &unicodeHex, uppercase: true)
-                cmap += "<\(String(decoding: charCodeHex, as: UTF8.self))> <\(String(decoding: unicodeHex, as: UTF8.self))>\n"
+                cmap +=
+                    "<\(String(decoding: charCodeHex, as: UTF8.self))> <\(String(decoding: unicodeHex, as: UTF8.self))>\n"
             }
             cmap += "endbfchar\n"
 

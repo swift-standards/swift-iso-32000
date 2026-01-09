@@ -4,9 +4,9 @@
 // > A font descriptor specifies metrics and other attributes of a simple font
 // > or a CIDFont as a whole, as distinct from the metrics of individual glyphs.
 
+public import ISO_14496_22
 public import ISO_32000_7_Syntax
 public import ISO_32000_Shared
-public import ISO_14496_22
 
 extension ISO_32000.`9`.`8` {
     /// Font descriptor containing font-wide metrics and attributes.
@@ -277,7 +277,9 @@ extension ISO_32000.`9`.`8`.Descriptor {
         let stemV = ISO_32000.FontDesign.Width(80)
 
         // Default width for missing glyphs (scaled to 1000 units)
-        let missingWidth = ISO_32000.FontDesign.Width(scale(Int(fontFile.hmtx.advanceWidth(for: 0))))
+        let missingWidth = ISO_32000.FontDesign.Width(
+            scale(Int(fontFile.hmtx.advanceWidth(for: 0)))
+        )
 
         self.init(
             fontName: fontName,

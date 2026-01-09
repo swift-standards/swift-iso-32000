@@ -63,7 +63,8 @@ extension ISO_32000.`9`.`6` {
         ///
         /// - Parameter fontName: The sanitized PostScript name for PDF
         /// - Returns: A font descriptor suitable for PDF embedding
-        public func descriptor(fontName: ISO_32000.`7`.`3`.COS.Name) -> ISO_32000.`9`.`8`.Descriptor {
+        public func descriptor(fontName: ISO_32000.`7`.`3`.COS.Name) -> ISO_32000.`9`.`8`.Descriptor
+        {
             ISO_32000.`9`.`8`.Descriptor(fontFile: fontFile, fontName: fontName)
         }
 
@@ -227,4 +228,3 @@ extension ISO_32000.`9`.`6`.Font {
         try self.init(embedded: embedded, resourceName: resourceName, weight: weight, style: style)
     }
 }
-

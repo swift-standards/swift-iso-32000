@@ -1,7 +1,7 @@
 // ISO 32000-2:2020, 8.9 Images
 
-public import ISO_32000_Shared
 public import ISO_32000_7_Syntax
+public import ISO_32000_Shared
 import Synchronization
 
 // MARK: - Section Namespace
@@ -193,8 +193,9 @@ extension ISO_32000.`8`.`9`.Image {
     public init(jpeg jpegData: [UInt8]) throws(Parse.Error) {
         // Verify JPEG magic bytes: 0xFF 0xD8 (SOI)
         guard jpegData.count >= 2,
-              jpegData[0] == 0xFF,
-              jpegData[1] == 0xD8 else {
+            jpegData[0] == 0xFF,
+            jpegData[1] == 0xD8
+        else {
             throw .invalidHeader
         }
 

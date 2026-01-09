@@ -69,14 +69,14 @@ extension ISO_32000.`7`.`3`.Table.`3` {
     @usableFromInline
     internal static let escapeCharLookup: [UInt8] = {
         var table = [UInt8](repeating: 0, count: 256)
-        table[Int(UInt8.ascii.lf)] = .ascii.n              // \n
-        table[Int(UInt8.ascii.cr)] = .ascii.r              // \r
-        table[Int(UInt8.ascii.htab)] = .ascii.t            // \t
-        table[Int(UInt8.ascii.bs)] = .ascii.b              // \b
-        table[Int(UInt8.ascii.ff)] = .ascii.f              // \f
-        table[Int(UInt8.ascii.leftParenthesis)] = .ascii.leftParenthesis   // \(
-        table[Int(UInt8.ascii.rightParenthesis)] = .ascii.rightParenthesis // \)
-        table[Int(UInt8.ascii.backslash)] = .ascii.backslash               // \\
+        table[Int(UInt8.ascii.lf)] = .ascii.n  // \n
+        table[Int(UInt8.ascii.cr)] = .ascii.r  // \r
+        table[Int(UInt8.ascii.htab)] = .ascii.t  // \t
+        table[Int(UInt8.ascii.bs)] = .ascii.b  // \b
+        table[Int(UInt8.ascii.ff)] = .ascii.f  // \f
+        table[Int(UInt8.ascii.leftParenthesis)] = .ascii.leftParenthesis  // \(
+        table[Int(UInt8.ascii.rightParenthesis)] = .ascii.rightParenthesis  // \)
+        table[Int(UInt8.ascii.backslash)] = .ascii.backslash  // \\
         return table
     }()
 
@@ -335,7 +335,7 @@ extension ISO_32000.`7`.`3`.`5` {
     }
 }
 
-#if Codable
+#if !hasFeature(Embedded)
     extension ISO_32000.`7`.`3`.`5`.Name: Codable {}
 #endif
 
@@ -745,7 +745,7 @@ extension ISO_32000.`7`.`3`.`10` {
     }
 }
 
-#if Codable
+#if !hasFeature(Embedded)
     extension ISO_32000.`7`.`3`.`10`.IndirectReference: Codable {}
 #endif
 
@@ -1259,10 +1259,14 @@ extension ISO_32000.`7`.`3`.`3` {
 
                 // Build digits in reverse order into InlineArray (most significant at index 0)
                 var digits = InlineArray<5, UInt8>(repeating: digit0)
-                digits[4] = digit0 + UInt8(fracValue % 10); fracValue /= 10
-                digits[3] = digit0 + UInt8(fracValue % 10); fracValue /= 10
-                digits[2] = digit0 + UInt8(fracValue % 10); fracValue /= 10
-                digits[1] = digit0 + UInt8(fracValue % 10); fracValue /= 10
+                digits[4] = digit0 + UInt8(fracValue % 10)
+                fracValue /= 10
+                digits[3] = digit0 + UInt8(fracValue % 10)
+                fracValue /= 10
+                digits[2] = digit0 + UInt8(fracValue % 10)
+                fracValue /= 10
+                digits[1] = digit0 + UInt8(fracValue % 10)
+                fracValue /= 10
                 digits[0] = digit0 + UInt8(fracValue % 10)
 
                 // Find last non-zero digit (strip trailing zeros)

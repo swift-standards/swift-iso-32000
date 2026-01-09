@@ -2,8 +2,8 @@
 // PNG support for ISO_32000.Image using W3C PNG and RFC 1950
 
 public import ISO_32000
-public import W3C_PNG
 public import RFC_1950
+public import W3C_PNG
 
 extension ISO_32000.Image {
     /// Create an image from PNG data
@@ -76,7 +76,7 @@ extension ISO_32000.Image {
             var rgb: [UInt8] = []
             rgb.reserveCapacity(image.width * image.height * 3)
             for i in stride(from: 0, to: image.rawPixels.count, by: 4) {
-                rgb.append(image.rawPixels[i])      // R
+                rgb.append(image.rawPixels[i])  // R
                 rgb.append(image.rawPixels[i + 1])  // G
                 rgb.append(image.rawPixels[i + 2])  // B
                 // Skip alpha at i+3

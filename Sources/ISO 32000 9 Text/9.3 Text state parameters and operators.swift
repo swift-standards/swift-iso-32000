@@ -134,7 +134,7 @@ extension ISO_32000.Text {
     }
 }
 
-#if Codable
+#if !hasFeature(Embedded)
     extension ISO_32000.Text.State: Codable {}
 #endif
 
@@ -163,7 +163,7 @@ extension ISO_32000.Text.Font {
     }
 }
 
-#if Codable
+#if !hasFeature(Embedded)
     extension ISO_32000.Text.Font.Reference: Codable {}
 #endif
 

@@ -356,6 +356,14 @@ extension ISO_32000.`12`.`5`.Annotation {
                 return false
             }
         }
+
+        /// The COS name representation of this subtype.
+        ///
+        /// All annotation subtype raw values are valid PDF name objects
+        /// (non-empty, no whitespace, no null bytes, within length limits).
+        public var name: ISO_32000.`7`.`3`.COS.Name {
+            ISO_32000.`7`.`3`.COS.Name(__unchecked: (), rawValue)
+        }
     }
 }
 
