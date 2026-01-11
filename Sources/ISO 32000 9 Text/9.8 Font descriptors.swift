@@ -51,7 +51,7 @@ where Tag == ISO_32000.`9`.`8`.FontDesign, RawValue: AdditiveArithmetic {
     /// Valid for accumulating glyph widths (e.g., total string width).
     @inlinable
     public static func + (lhs: Self, rhs: Self) -> Self {
-        Self(lhs._rawValue + rhs._rawValue)
+        Self(lhs.rawValue + rhs.rawValue)
     }
 
     /// Subtracts one font design unit value from another.
@@ -59,7 +59,7 @@ where Tag == ISO_32000.`9`.`8`.FontDesign, RawValue: AdditiveArithmetic {
     /// Valid for computing differences (e.g., `ascender - descender` for line height).
     @inlinable
     public static func - (lhs: Self, rhs: Self) -> Self {
-        Self(lhs._rawValue - rhs._rawValue)
+        Self(lhs.rawValue - rhs.rawValue)
     }
 }
 
@@ -88,8 +88,8 @@ extension ISO_32000.FontDesign.Width {
         by fontSize: ISO_32000.UserSpace.Size<1>,
         unitsPerEm: Int = 1000
     ) -> ISO_32000.UserSpace.Width {
-        let scale = fontSize.length._rawValue / Double(unitsPerEm)
-        return ISO_32000.UserSpace.Width(Double(self._rawValue) * scale)
+        let scale = fontSize.length.rawValue / Double(unitsPerEm)
+        return ISO_32000.UserSpace.Width(Double(self.rawValue) * scale)
     }
 }
 
@@ -108,8 +108,8 @@ extension ISO_32000.FontDesign.Height {
         by fontSize: ISO_32000.UserSpace.Size<1>,
         unitsPerEm: Int = 1000
     ) -> ISO_32000.UserSpace.Height {
-        let scale = fontSize.length._rawValue / Double(unitsPerEm)
-        return ISO_32000.UserSpace.Height(Double(self._rawValue) * scale)
+        let scale = fontSize.length.rawValue / Double(unitsPerEm)
+        return ISO_32000.UserSpace.Height(Double(self.rawValue) * scale)
     }
 }
 
@@ -196,13 +196,13 @@ extension ISO_32000.`9`.`8` {
         /// - Parameter codePoint: Unicode code point (e.g., 65 for 'A')
         /// - Returns: Width in font design units
         public func width(forCodePoint codePoint: UInt32) -> Int {
-            (widths[codePoint] ?? defaultWidth)._rawValue
+            (widths[codePoint] ?? defaultWidth).rawValue
         }
 
         /// The default width for missing glyphs (in font design units).
         ///
         /// Used for characters not in the width table.
-        public var missingWidth: Int { defaultWidth._rawValue }
+        public var missingWidth: Int { defaultWidth.rawValue }
 
         /// Create metrics with a width table and vertical metrics
         public init(
@@ -259,7 +259,7 @@ extension ISO_32000.`9`.`8`.Metrics {
     where Bytes.Element == UInt8 {
         var total = 0
         for byte in bytes {
-            total += winAnsiByteWidths[Int(byte)]._rawValue
+            total += winAnsiByteWidths[Int(byte)].rawValue
         }
         return ISO_32000.FontDesign.Width(total)
     }
@@ -294,9 +294,9 @@ extension ISO_32000.`9`.`8`.Metrics {
         var total = 0
         for scalar in text.unicodeScalars {
             if let byte = ISO_32000.WinAnsiEncoding.encode(scalar) {
-                total += winAnsiByteWidths[Int(byte)]._rawValue
+                total += winAnsiByteWidths[Int(byte)].rawValue
             } else {
-                total += defaultWidth._rawValue
+                total += defaultWidth.rawValue
             }
         }
         return ISO_32000.FontDesign.Width(total)
@@ -416,7 +416,7 @@ extension ISO_32000.`9`.`8`.Metrics {
         ///
         /// This is the ratio of the typographic line height to the em square.
         public var height: Multiplier {
-            let h = metrics.ascender._rawValue - metrics.descender._rawValue
+            let h = metrics.ascender.rawValue - metrics.descender.rawValue
             return Multiplier(Double(h) / Double(metrics.unitsPerEm))
         }
 
@@ -426,7 +426,7 @@ extension ISO_32000.`9`.`8`.Metrics {
         /// recommended leading (from the Leading entry in the font descriptor).
         public var normal: Multiplier {
             let h =
-                metrics.ascender._rawValue - metrics.descender._rawValue + metrics.leading._rawValue
+                metrics.ascender.rawValue - metrics.descender.rawValue + metrics.leading.rawValue
             return Multiplier(Double(h) / Double(metrics.unitsPerEm))
         }
 

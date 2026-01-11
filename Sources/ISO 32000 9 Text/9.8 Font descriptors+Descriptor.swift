@@ -270,7 +270,7 @@ extension ISO_32000.`9`.`8`.Descriptor {
 
         // Approximate cap height and x-height (ideally from OS/2 table)
         let capHeight = ascent
-        let xHeight = ISO_32000.FontDesign.Height(ascent._rawValue * 2 / 3)
+        let xHeight = ISO_32000.FontDesign.Height(ascent.rawValue * 2 / 3)
 
         // Estimate stemV (vertical stem width) - typically around 80-100 for regular weight
         // This is a rough approximation; accurate values require analyzing glyph outlines

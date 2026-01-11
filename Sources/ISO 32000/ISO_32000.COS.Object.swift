@@ -17,10 +17,10 @@ extension ISO_32000.COS.Object {
     /// - Parameter rect: The rectangle in user space coordinates
     public init(_ rect: ISO_32000.UserSpace.Rectangle) {
         self = .array([
-            .real(rect.llx._rawValue),
-            .real(rect.lly._rawValue),
-            .real(rect.urx._rawValue),
-            .real(rect.ury._rawValue),
+            .real(rect.llx.rawValue),
+            .real(rect.lly.rawValue),
+            .real(rect.urx.rawValue),
+            .real(rect.ury.rawValue),
         ])
     }
 }

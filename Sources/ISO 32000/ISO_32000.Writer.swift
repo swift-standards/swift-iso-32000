@@ -224,7 +224,7 @@ extension ISO_32000 {
                 }
 
                 if let rotation = page.rotation, rotation != 0 {
-                    pageDict[.rotate] = .integer(Int64(rotation._rawValue))
+                    pageDict[.rotate] = .integer(Int64(rotation.rawValue))
                 }
 
                 // Contents
@@ -602,8 +602,8 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.xyz),
-                    left.map { .real($0._rawValue) } ?? .null,
-                    top.map { .real($0._rawValue) } ?? .null,
+                    left.map { .real($0.rawValue) } ?? .null,
+                    top.map { .real($0.rawValue) } ?? .null,
                     zoom.map { .real($0) } ?? .null,
                 ])
 
@@ -616,7 +616,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitH),
-                    top.map { .real($0._rawValue) } ?? .null,
+                    top.map { .real($0.rawValue) } ?? .null,
                 ])
 
             case .fitV(let page, let left):
@@ -624,7 +624,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitV),
-                    left.map { .real($0._rawValue) } ?? .null,
+                    left.map { .real($0.rawValue) } ?? .null,
                 ])
 
             case .fitR(let page, let left, let bottom, let right, let top):
@@ -632,10 +632,10 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitR),
-                    .real(left._rawValue),
-                    .real(bottom._rawValue),
-                    .real(right._rawValue),
-                    .real(top._rawValue),
+                    .real(left.rawValue),
+                    .real(bottom.rawValue),
+                    .real(right.rawValue),
+                    .real(top.rawValue),
                 ])
 
             case .fitB(let page):
@@ -647,7 +647,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitBH),
-                    top.map { .real($0._rawValue) } ?? .null,
+                    top.map { .real($0.rawValue) } ?? .null,
                 ])
 
             case .fitBV(let page, let left):
@@ -655,7 +655,7 @@ extension ISO_32000 {
                 return .array([
                     .reference(pageRef),
                     .name(.fitBV),
-                    left.map { .real($0._rawValue) } ?? .null,
+                    left.map { .real($0.rawValue) } ?? .null,
                 ])
 
             case .named(let name):
@@ -741,10 +741,10 @@ extension ISO_32000 {
                 .integer(Int64(descriptor.fontBBox.ury)),
             ])
             descriptorDict[.italicAngle] = .real(descriptor.italicAngle)
-            descriptorDict[.ascent] = .integer(Int64(descriptor.ascent._rawValue))
-            descriptorDict[.descent] = .integer(Int64(descriptor.descent._rawValue))
-            descriptorDict[.capHeight] = .integer(Int64(descriptor.capHeight._rawValue))
-            descriptorDict[.stemV] = .integer(Int64(descriptor.stemV._rawValue))
+            descriptorDict[.ascent] = .integer(Int64(descriptor.ascent.rawValue))
+            descriptorDict[.descent] = .integer(Int64(descriptor.descent.rawValue))
+            descriptorDict[.capHeight] = .integer(Int64(descriptor.capHeight.rawValue))
+            descriptorDict[.stemV] = .integer(Int64(descriptor.stemV.rawValue))
             descriptorDict[.fontFile2] = .reference(fontFileRef)
 
             state.objectOffsets[descriptorObjNum] = buffer.count
