@@ -1,7 +1,7 @@
 // ISO_32000.Dimensions.swift
 // Generic dimension types (X, Y, Width, Height) parameterized by coordinate space
 
-public import Geometry
+public import Geometry_Primitives
 
 extension ISO_32000 {
     /// A type-safe horizontal coordinate value, parameterized by its coordinate space

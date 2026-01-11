@@ -6,7 +6,7 @@
 //   12.4.3  Articles
 //   12.4.4  Presentations
 
-public import Geometry
+public import Geometry_Primitives
 import ISO_32000_8_Graphics
 public import ISO_32000_Shared
 

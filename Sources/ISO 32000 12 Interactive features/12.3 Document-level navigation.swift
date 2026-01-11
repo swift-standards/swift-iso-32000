@@ -8,7 +8,7 @@
 //   12.3.5  Collections
 //   12.3.6  Navigators
 
-public import Geometry
+public import Geometry_Primitives
 public import IEC_61966
 import ISO_32000_8_Graphics
 public import ISO_32000_Shared

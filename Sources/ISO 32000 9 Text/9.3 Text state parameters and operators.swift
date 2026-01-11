@@ -10,7 +10,7 @@
 //   9.3.7  Text rise
 //   9.3.8  Text knockout
 
-public import Dimension
+public import Dimension_Primitives
 import ISO_32000_8_Graphics
 public import ISO_32000_Shared
 

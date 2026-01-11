@@ -1,7 +1,7 @@
 // ISO_32000.AffineTransform.swift
 // Generic 2D affine transformation parameterized by coordinate space
 
-public import Geometry
+public import Geometry_Primitives
 
 extension ISO_32000 {
     /// A generic 2D affine transformation matrix parameterized by its coordinate space

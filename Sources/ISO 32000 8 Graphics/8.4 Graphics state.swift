@@ -4,9 +4,9 @@
 // that holds current graphics control parameters. These parameters define the global
 // framework within which the graphics operators execute.
 
-public import Geometry
+public import Geometry_Primitives
 public import ISO_32000_Shared
-public import RealModule
+public import Real_Primitives
 
 extension ISO_32000.`8` {
     /// ISO 32000-2:2020, 8.4 Graphics state

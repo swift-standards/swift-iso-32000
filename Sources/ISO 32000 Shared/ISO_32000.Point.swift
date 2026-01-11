@@ -1,7 +1,7 @@
 // ISO_32000.Point.swift
 // Generic 2D point parameterized by coordinate space
 
-public import Geometry
+public import Geometry_Primitives
 
 extension ISO_32000 {
     /// A generic 2D point parameterized by its coordinate space

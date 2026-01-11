@@ -28,13 +28,21 @@ let package = Package(
         .library(name: "ISO 32000 Annex D", targets: ["ISO 32000 Annex D"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-standards/swift-standards", from: "0.30.0"),
-        .package(url: "https://github.com/swift-standards/swift-iso-9899", from: "0.2.3"),
-        .package(url: "https://github.com/swift-standards/swift-ieee-754", from: "0.3.3"),
-        .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.5"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-1950", from: "0.1.0"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-4648", from: "0.6.0"),
-        .package(url: "https://github.com/swift-standards/swift-iec-61966", from: "0.1.0"),
+        // Primitives
+        .package(path: "../../swift-primitives/swift-geometry-primitives"),
+        .package(path: "../../swift-primitives/swift-formatting-primitives"),
+        .package(path: "../../swift-primitives/swift-dimension-primitives"),
+        .package(path: "../../swift-primitives/swift-numeric-primitives"),
+        .package(path: "../../swift-primitives/swift-binary-primitives"),
+        .package(path: "../../swift-primitives/swift-standard-library-extensions"),
+        .package(path: "../../swift-primitives/swift-test-primitives"),
+        // Standards
+        .package(path: "../swift-iso-9899"),
+        .package(path: "../swift-ieee-754"),
+        .package(path: "../swift-incits-4-1986"),
+        .package(path: "../swift-rfc-1950"),
+        .package(path: "../swift-rfc-4648"),
+        .package(path: "../swift-iec-61966"),
         .package(path: "../swift-w3c-png"),
         .package(path: "../swift-iso-14496-22"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0"),
@@ -44,7 +52,8 @@ let package = Package(
         .target(
             name: "ISO 32000 Shared",
             dependencies: [
-                .product(name: "Geometry", package: "swift-standards"),
+                .product(name: "Geometry Primitives", package: "swift-geometry-primitives"),
+                .product(name: "Numeric Primitives", package: "swift-numeric-primitives"),
             ]
         ),
         
@@ -59,7 +68,8 @@ let package = Package(
                 "ISO 32000 Shared",
                 "ISO 32000 3 Terms and definitions",
                 .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
-                .product(name: "Formatting", package: "swift-standards"),
+                .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
+                .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "IEEE 754", package: "swift-ieee-754"),
             ]
         ),
@@ -69,7 +79,7 @@ let package = Package(
                 "ISO 32000 Shared",
                 "ISO 32000 7 Syntax",
                 .product(name: "IEC 61966", package: "swift-iec-61966"),
-                .product(name: "Dimension", package: "swift-standards"),
+                .product(name: "Dimension Primitives", package: "swift-dimension-primitives"),
             ]
         ),
         .target(
@@ -103,7 +113,8 @@ let package = Package(
             dependencies: [
                 "ISO 32000 Shared",
                 "ISO 32000 7 Syntax",
-                .product(name: "Standards", package: "swift-standards"),
+                .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
+                .product(name: "Binary Primitives", package: "swift-binary-primitives"),
             ]
         ),
         .target(
@@ -125,13 +136,13 @@ let package = Package(
                 "ISO 32000 13 Multimedia features",
                 "ISO 32000 14 Document interchange",
                 "ISO 32000 Annex D",
-                .product(name: "Standards", package: "swift-standards"),
-                .product(name: "Geometry", package: "swift-standards"),
-                .product(name: "Formatting", package: "swift-standards"),
+                .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
+                .product(name: "Geometry Primitives", package: "swift-geometry-primitives"),
+                .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
+                .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
                 .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
-                .product(name: "Formatting", package: "swift-standards"),
             ]
         ),
         .target(
@@ -149,7 +160,7 @@ let package = Package(
                 "ISO 32000",
                 "ISO 32000 Flate",
                 .product(name: "InlineSnapshotTesting", package: "swift-snapshot-testing"),
-                .product(name: "StandardsTestSupport", package: "swift-standards"),
+                .product(name: "Test Primitives", package: "swift-test-primitives"),
             ]
         ),
         .testTarget(

@@ -1,7 +1,8 @@
 // ISO_32000.ContentStream.Operator.swift
 
-import Formatting
-import Geometry
+import Formatting_Primitives
+import Geometry_Primitives
+import Binary_Primitives
 import ISO_32000_7_Syntax
 
 extension ISO_32000.ContentStream {

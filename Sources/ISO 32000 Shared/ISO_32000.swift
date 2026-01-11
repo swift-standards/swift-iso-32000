@@ -1,7 +1,8 @@
 // ISO 32000-2:2020 — Document management — Portable document format — Part 2: PDF 2.0
 
-public import Dimension
-@_exported public import Geometry
+public import Dimension_Primitives
+import Numeric_Primitives
+@_exported public import Geometry_Primitives
 
 /// The root namespace for ISO 32000-2:2020 (PDF 2.0) definitions.
 ///
@@ -39,7 +40,7 @@ extension ISO_32000 {
 ///
 /// Quantized to 0.01 points (1/7200 inch) to ensure adjacent
 /// geometric elements share exact boundary values.
-public enum UserSpace: Quantized {
+public enum UserSpace: Numeric.Quantized {
     public typealias Scalar = Double
     public static var quantum: Double { 0.01 }
 }

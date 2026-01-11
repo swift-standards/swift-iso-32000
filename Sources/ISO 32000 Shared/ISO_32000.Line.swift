@@ -1,7 +1,7 @@
 // ISO_32000.Line.swift
 // Generic line types (infinite Line and bounded LineSegment) parameterized by coordinate space
 
-public import Geometry
+public import Geometry_Primitives
 
 extension ISO_32000 {
     /// An infinite line defined by a point and direction, parameterized by its coordinate space

@@ -4,7 +4,7 @@
 
 import ISO_32000_8_Graphics
 
-@_spi(Internal) public import struct Geometry.Tagged
+@_spi(Internal) public import struct Geometry_Primitives.Tagged
 
 // MARK: - Rectangle Conversions
 

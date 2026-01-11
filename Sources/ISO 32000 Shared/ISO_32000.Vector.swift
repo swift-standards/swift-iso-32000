@@ -1,7 +1,7 @@
 // ISO_32000.Vector.swift
 // Generic 2D displacement vector parameterized by coordinate space
 
-public import Geometry
+public import Geometry_Primitives
 
 extension ISO_32000 {
     /// A generic 2D displacement vector parameterized by its coordinate space

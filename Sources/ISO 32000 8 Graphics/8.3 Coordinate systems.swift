@@ -1,10 +1,10 @@
 // ISO 32000-2:2020, 8.3 Coordinate systems
 
-import Dimension
-public import Geometry
+import Dimension_Primitives
+public import Geometry_Primitives
 public import ISO_32000_Shared
 
-@_spi(Internal) import struct Dimension.Tagged
+@_spi(Internal) import struct Dimension_Primitives.Tagged
 
 extension ISO_32000.`8` {
     /// ISO 32000-2:2020, 8.3 Coordinate systems

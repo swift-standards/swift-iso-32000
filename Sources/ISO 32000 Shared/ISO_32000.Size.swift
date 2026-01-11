@@ -1,7 +1,7 @@
 // ISO_32000.Size.swift
 // Generic size parameterized by coordinate space
 
-public import Geometry
+public import Geometry_Primitives
 
 extension ISO_32000 {
     /// A generic 2D size parameterized by its coordinate space

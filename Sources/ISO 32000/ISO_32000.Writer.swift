@@ -2,7 +2,8 @@
 
 import ISO_32000_9_Text
 import RFC_4648
-import Standards
+import Standard_Library_Extensions
+public import Binary_Primitives
 
 extension ISO_32000 {
     /// PDF Writer - serializes documents to PDF format

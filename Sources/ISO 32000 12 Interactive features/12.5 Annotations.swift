@@ -25,8 +25,9 @@
 //     12.5.6.16 Sound annotations (Table 188) - deprecated
 //     12.5.6.23 Redaction annotations (Table 195)
 
-public import Geometry
+public import Geometry_Primitives
 public import ISO_32000_8_Graphics
+public import ISO_32000_7_Syntax
 public import ISO_32000_Shared
 
 extension ISO_32000.`12` {
@@ -362,7 +363,7 @@ extension ISO_32000.`12`.`5`.Annotation {
         /// All annotation subtype raw values are valid PDF name objects
         /// (non-empty, no whitespace, no null bytes, within length limits).
         public var name: ISO_32000.`7`.`3`.COS.Name {
-            ISO_32000.`7`.`3`.COS.Name(__unchecked: (), rawValue)
+            try! ISO_32000.`7`.`3`.COS.Name(rawValue)
         }
     }
 }

@@ -1,8 +1,9 @@
 // ISO_32000.ContentStream.swift
 
-public import Geometry
+public import Geometry_Primitives
+public import Binary_Primitives
 import ISO_9899
-import Standards
+import Standard_Library_Extensions
 
 extension ISO_32000 {
     /// PDF Content Stream

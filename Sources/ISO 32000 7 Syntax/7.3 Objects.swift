@@ -12,11 +12,12 @@
 //   7.3.9  Null object
 //   7.3.10 Indirect objects
 
-public import Formatting
+public import Formatting_Primitives
+public import Binary_Primitives
 import IEEE_754
 public import INCITS_4_1986
 public import ISO_32000_Shared
-import Standards
+import Standard_Library_Extensions
 
 extension ISO_32000.`7` {
     /// ISO 32000-2:2020, 7.3 Objects

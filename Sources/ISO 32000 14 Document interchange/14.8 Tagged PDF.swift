@@ -10,7 +10,8 @@
 
 public import ISO_32000_7_Syntax
 public import ISO_32000_Shared
-public import Standards
+public import Standard_Library_Extensions
+public import Binary_Primitives
 
 // MARK: - 14.8 Tagged PDF
 
