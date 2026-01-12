@@ -2,7 +2,7 @@
 
 import Foundation
 import Testing
-import TestingPerformance
+import Testing_Extras
 
 @testable import ISO_32000
 

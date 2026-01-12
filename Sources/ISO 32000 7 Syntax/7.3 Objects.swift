@@ -15,7 +15,7 @@
 public import Formatting_Primitives
 public import Binary_Primitives
 import IEEE_754
-public import INCITS_4_1986
+public import ASCII
 public import ISO_32000_Shared
 import Standard_Library_Extensions
 

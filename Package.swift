@@ -35,11 +35,11 @@ let package = Package(
         .package(path: "../../swift-primitives/swift-numeric-primitives"),
         .package(path: "../../swift-primitives/swift-binary-primitives"),
         .package(path: "../../swift-primitives/swift-standard-library-extensions"),
-        .package(path: "../../swift-primitives/swift-test-primitives"),
+        .package(path: "../../swift-foundations/swift-testing-extras"),
         // Standards
         .package(path: "../swift-iso-9899"),
         .package(path: "../swift-ieee-754"),
-        .package(path: "../swift-incits-4-1986"),
+        .package(path: "../../swift-foundations/swift-ascii"),
         .package(path: "../swift-rfc-1950"),
         .package(path: "../swift-rfc-4648"),
         .package(path: "../swift-iec-61966"),
@@ -67,7 +67,7 @@ let package = Package(
             dependencies: [
                 "ISO 32000 Shared",
                 "ISO 32000 3 Terms and definitions",
-                .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
+                .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "IEEE 754", package: "swift-ieee-754"),
@@ -141,7 +141,7 @@ let package = Package(
                 .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
-                .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
+                .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
             ]
         ),
@@ -160,7 +160,7 @@ let package = Package(
                 "ISO 32000",
                 "ISO 32000 Flate",
                 .product(name: "InlineSnapshotTesting", package: "swift-snapshot-testing"),
-                .product(name: "Test Primitives", package: "swift-test-primitives"),
+                .product(name: "Testing Extras", package: "swift-testing-extras"),
             ]
         ),
         .testTarget(
