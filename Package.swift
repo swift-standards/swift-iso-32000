@@ -10,7 +10,7 @@ let package = Package(
         .iOS(.v26),
         .tvOS(.v26),
         .watchOS(.v26),
-        .visionOS(.v26),
+        .visionOS(.v26)
     ],
     products: [
         .library(name: "ISO 32000", targets: ["ISO 32000"]),
@@ -25,7 +25,7 @@ let package = Package(
         .library(name: "ISO 32000 12 Interactive features", targets: ["ISO 32000 12 Interactive features"]),
         .library(name: "ISO 32000 13 Multimedia features", targets: ["ISO 32000 13 Multimedia features"]),
         .library(name: "ISO 32000 14 Document interchange", targets: ["ISO 32000 14 Document interchange"]),
-        .library(name: "ISO 32000 Annex D", targets: ["ISO 32000 Annex D"]),
+        .library(name: "ISO 32000 Annex D", targets: ["ISO 32000 Annex D"])
     ],
     dependencies: [
         // Primitives
@@ -35,7 +35,6 @@ let package = Package(
         .package(path: "../../swift-primitives/swift-numeric-primitives"),
         .package(path: "../../swift-primitives/swift-binary-primitives"),
         .package(path: "../../swift-primitives/swift-standard-library-extensions"),
-        .package(path: "../../swift-foundations/swift-testing-extras"),
         // Standards
         .package(path: "../swift-iso-9899"),
         .package(path: "../swift-ieee-754"),
@@ -45,7 +44,7 @@ let package = Package(
         .package(path: "../swift-iec-61966"),
         .package(path: "../swift-w3c-png"),
         .package(path: "../swift-iso-14496-22"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0")
     ],
     targets: [
         // MARK: - Shared
@@ -53,7 +52,7 @@ let package = Package(
             name: "ISO 32000 Shared",
             dependencies: [
                 .product(name: "Geometry Primitives", package: "swift-geometry-primitives"),
-                .product(name: "Numeric Primitives", package: "swift-numeric-primitives"),
+                .product(name: "Numeric Primitives", package: "swift-numeric-primitives")
             ]
         ),
         
@@ -70,7 +69,7 @@ let package = Package(
                 .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
-                .product(name: "IEEE 754", package: "swift-ieee-754"),
+                .product(name: "IEEE 754", package: "swift-ieee-754")
             ]
         ),
         .target(
@@ -79,7 +78,7 @@ let package = Package(
                 "ISO 32000 Shared",
                 "ISO 32000 7 Syntax",
                 .product(name: "IEC 61966", package: "swift-iec-61966"),
-                .product(name: "Dimension Primitives", package: "swift-dimension-primitives"),
+                .product(name: "Dimension Primitives", package: "swift-dimension-primitives")
             ]
         ),
         .target(
@@ -89,7 +88,7 @@ let package = Package(
                 "ISO 32000 7 Syntax",
                 "ISO 32000 8 Graphics",
                 "ISO 32000 Annex D",
-                .product(name: "ISO 14496-22", package: "swift-iso-14496-22"),
+                .product(name: "ISO 14496-22", package: "swift-iso-14496-22")
             ]
         ),
         .target(
@@ -114,7 +113,7 @@ let package = Package(
                 "ISO 32000 Shared",
                 "ISO 32000 7 Syntax",
                 .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
-                .product(name: "Binary Primitives", package: "swift-binary-primitives"),
+                .product(name: "Binary Primitives", package: "swift-binary-primitives")
             ]
         ),
         .target(
@@ -142,7 +141,7 @@ let package = Package(
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
                 .product(name: "ASCII", package: "swift-ascii"),
-                .product(name: "RFC 4648", package: "swift-rfc-4648"),
+                .product(name: "RFC 4648", package: "swift-rfc-4648")
             ]
         ),
         .target(
@@ -151,24 +150,9 @@ let package = Package(
                 "ISO 32000",
                 "ISO 32000 Shared",
                 .product(name: "RFC 1950", package: "swift-rfc-1950"),
-                .product(name: "W3C PNG", package: "swift-w3c-png"),
+                .product(name: "W3C PNG", package: "swift-w3c-png")
             ]
-        ),
-        .testTarget(
-            name: "ISO 32000".tests,
-            dependencies: [
-                "ISO 32000",
-                "ISO 32000 Flate",
-                .product(name: "InlineSnapshotTesting", package: "swift-snapshot-testing"),
-                .product(name: "Testing Extras", package: "swift-testing-extras"),
-            ]
-        ),
-        .testTarget(
-            name: "ISO 32000 Annex D".tests,
-            dependencies: [
-                "ISO 32000 Annex D",
-            ]
-        ),
+        )
     ],
     swiftLanguageModes: [.v6]
 )
@@ -181,6 +165,6 @@ for target in package.targets where ![.system, .binary, .plugin].contains(target
     target.swiftSettings = (target.swiftSettings ?? []) + [
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
-        .enableUpcomingFeature("MemberImportVisibility"),
+        .enableUpcomingFeature("MemberImportVisibility")
     ]
 }
