@@ -44,7 +44,7 @@ let package = Package(
         .package(path: "../swift-iec-61966"),
         .package(path: "../swift-w3c-png"),
         .package(path: "../swift-iso-14496-22"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0")
+        // .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0")
     ],
     targets: [
         // MARK: - Shared
@@ -152,7 +152,19 @@ let package = Package(
                 .product(name: "RFC 1950", package: "swift-rfc-1950"),
                 .product(name: "W3C PNG", package: "swift-w3c-png")
             ]
-        )
+        ),
+        .testTarget(
+            name: "ISO 32000 Annex D Tests",
+            dependencies: [
+                "ISO 32000",
+            ]
+        ),
+        .testTarget(
+            name: "ISO 32000 Tests",
+            dependencies: [
+                "ISO 32000",
+            ]
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
@@ -167,6 +179,7 @@ for target in package.targets where ![.system, .binary, .plugin, .macro].contain
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
         .enableUpcomingFeature("MemberImportVisibility"),
+        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
         .enableExperimentalFeature("Lifetimes"),
         .enableExperimentalFeature("SuppressedAssociatedTypes"),
         .enableExperimentalFeature("SuppressedAssociatedTypesWithDefaults"),
