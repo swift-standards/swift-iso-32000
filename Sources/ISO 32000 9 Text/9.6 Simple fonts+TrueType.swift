@@ -49,7 +49,7 @@ extension ISO_32000.`9`.`6` {
         ///
         /// - Parameter data: The raw font file bytes
         /// - Throws: `ISO_14496_22.FontFile.ParsingError` if the font cannot be parsed
-        public init(data: [UInt8]) throws {
+        public init(data: [UInt8]) throws(ISO_14496_22.FontFile.ParsingError) {
             let fontFile = try ISO_14496_22.FontFile(data: data)
 
             self.fontFile = fontFile
@@ -68,6 +68,14 @@ extension ISO_32000.`9`.`6` {
             ISO_32000.`9`.`8`.Descriptor(fontFile: fontFile, fontName: fontName)
         }
 
+        /// Errors that can occur during font subsetting.
+        public enum SubsettingError: Swift.Error, Sendable {
+            /// The font subsetter failed.
+            case subset(ISO_14496_22.FontSubsetter.SubsetError)
+            /// The subset font data could not be parsed.
+            case parsing(ISO_14496_22.FontFile.ParsingError)
+        }
+
         /// Create a subset of this font containing only the specified characters.
         ///
         /// Font subsetting significantly reduces PDF file size by including only
@@ -76,7 +84,7 @@ extension ISO_32000.`9`.`6` {
         ///
         /// - Parameter characters: The characters to include in the subset
         /// - Returns: A new `Embedded` instance with subset font data
-        /// - Throws: `ISO_14496_22.FontSubsetter.SubsetError` if subsetting fails
+        /// - Throws: `SubsettingError` if subsetting or re-parsing fails
         ///
         /// ## Example
         ///
@@ -87,12 +95,21 @@ extension ISO_32000.`9`.`6` {
         /// let subset = try embedded.subsetted(for: usedChars)
         /// // subset.data is now ~5KB instead of 500KB
         /// ```
-        public func subsetted(for characters: Set<Character>) throws -> Embedded {
+        public func subsetted(for characters: Set<Character>) throws(SubsettingError) -> Embedded {
             let subsetter = ISO_14496_22.FontSubsetter(fontFile: fontFile)
-            let subsetData = try subsetter.subset(characters: characters)
+            let subsetData: [UInt8]
+            do {
+                subsetData = try subsetter.subset(characters: characters)
+            } catch {
+                throw .subset(error)
+            }
 
             // Parse the subset font to get updated metrics
-            return try Embedded(data: subsetData)
+            do {
+                return try Embedded(data: subsetData)
+            } catch {
+                throw .parsing(error)
+            }
         }
     }
 }
@@ -191,7 +208,7 @@ extension ISO_32000.`9`.`6`.Font {
         resourceName: ISO_32000.`7`.`3`.COS.Name,
         weight: Weight = .regular,
         style: Style = .normal
-    ) throws {
+    ) throws(ISO_32000.`7`.`3`.COS.Name.Error) {
         // Sanitize PostScript name per ISO 32000-2:2020 Section 9.6.3
         let sanitizedName = ISO_32000.`9`.`6`.sanitizePostScriptName(embedded.postScriptName)
 
@@ -207,6 +224,14 @@ extension ISO_32000.`9`.`6`.Font {
         )
     }
 
+    /// Errors that can occur when creating a font from raw data.
+    public enum DataError: Swift.Error, Sendable {
+        /// The font data could not be parsed.
+        case parsing(ISO_14496_22.FontFile.ParsingError)
+        /// The PostScript name is not a valid COS name.
+        case name(ISO_32000.`7`.`3`.COS.Name.Error)
+    }
+
     /// Create a font by parsing TrueType/OpenType data.
     ///
     /// This is a convenience initializer that parses the font data and creates
@@ -217,14 +242,23 @@ extension ISO_32000.`9`.`6`.Font {
     ///   - resourceName: Resource name for this font in page resources
     ///   - weight: Font weight (defaults to `.regular`)
     ///   - style: Font style (defaults to `.normal`)
-    /// - Throws: Parsing errors if the font cannot be parsed, or name errors if invalid
+    /// - Throws: `DataError` if the font cannot be parsed or the PostScript name is invalid
     public init(
         data: [UInt8],
         resourceName: ISO_32000.`7`.`3`.COS.Name,
         weight: Weight = .regular,
         style: Style = .normal
-    ) throws {
-        let embedded = try ISO_32000.`9`.`6`.Embedded(data: data)
-        try self.init(embedded: embedded, resourceName: resourceName, weight: weight, style: style)
+    ) throws(DataError) {
+        let embedded: ISO_32000.`9`.`6`.Embedded
+        do {
+            embedded = try ISO_32000.`9`.`6`.Embedded(data: data)
+        } catch {
+            throw .parsing(error)
+        }
+        do {
+            try self.init(embedded: embedded, resourceName: resourceName, weight: weight, style: style)
+        } catch {
+            throw .name(error)
+        }
     }
 }
