@@ -1004,7 +1004,7 @@ extension ISO_32000.`8`.`4`.Graphics.State {
         ///
         /// - Parameter body: The closure to execute with saved state
         /// - Returns: The result of the closure
-        public mutating func withSavedState<T>(_ body: (inout Self) throws -> T) rethrows -> T {
+        public mutating func withSavedState<T, E: Swift.Error>(_ body: (inout Self) throws(E) -> T) throws(E) -> T {
             save()
             defer { restore() }
             return try body(&self)
