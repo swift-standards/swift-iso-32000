@@ -4,6 +4,7 @@ import ISO_32000_9_Text
 import RFC_4648
 import Standard_Library_Extensions
 public import Binary_Primitives
+public import Witness_Primitives
 
 extension ISO_32000 {
     /// PDF Writer - serializes documents to PDF format
@@ -939,7 +940,7 @@ extension ISO_32000 {
     /// depending on RFC 1950/1951 directly.
     ///
     /// Uses `inout` pattern for consistency with RFC compress APIs.
-    public struct StreamCompression: Sendable {
+    public struct StreamCompression: Sendable, Witness.`Protocol` {
         private let _compress: @Sendable ([UInt8], inout [UInt8]) -> Void
 
         /// Create a compression callback

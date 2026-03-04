@@ -35,6 +35,7 @@ let package = Package(
         .package(path: "../../swift-primitives/swift-numeric-primitives"),
         .package(path: "../../swift-primitives/swift-binary-primitives"),
         .package(path: "../../swift-primitives/swift-standard-library-extensions"),
+        .package(path: "../../swift-primitives/swift-witness-primitives"),
         // Standards
         .package(path: "../swift-iso-9899"),
         .package(path: "../swift-ieee-754"),
@@ -141,7 +142,8 @@ let package = Package(
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
                 .product(name: "ASCII", package: "swift-ascii"),
-                .product(name: "RFC 4648", package: "swift-rfc-4648")
+                .product(name: "RFC 4648", package: "swift-rfc-4648"),
+                .product(name: "Witness Primitives", package: "swift-witness-primitives"),
             ]
         ),
         .target(
