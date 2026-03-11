@@ -111,14 +111,14 @@ extension ISO_32000.Text {
         public var knockout: Bool
 
         public init(
-            characterSpacing: ISO_32000.TextSpace.Dx = 0,
-            wordSpacing: ISO_32000.TextSpace.Dx = 0,
+            characterSpacing: ISO_32000.TextSpace.Dx = .init(0),
+            wordSpacing: ISO_32000.TextSpace.Dx = .init(0),
             horizontalScaling: Scale<1, Double> = 100,
-            leading: ISO_32000.TextSpace.Dy = 0,
+            leading: ISO_32000.TextSpace.Dy = .init(0),
             font: Font.Reference? = nil,
             fontSize: ISO_32000.UserSpace.Size<1>? = nil,
             renderingMode: Rendering.Mode = .fill,
-            rise: ISO_32000.TextSpace.Dy = 0,
+            rise: ISO_32000.TextSpace.Dy = .init(0),
             knockout: Bool = true
         ) {
             self.characterSpacing = characterSpacing

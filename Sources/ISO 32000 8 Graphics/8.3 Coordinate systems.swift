@@ -38,7 +38,7 @@ extension ISO_32000.`8`.`3`.`2`.`3` {
 
 extension ISO_32000.UserSpace.Length {
     /// One inch (72 user space units)
-    public static let inch: Self = 72
+    public static let inch: Self = .init(72)
 
     /// Create from inches (1 inch = 72 units)
     @inlinable
@@ -58,20 +58,20 @@ extension ISO_32000.UserSpace.Length {
 
     /// The measurement in inches
     @inlinable
-    public var inches: Self { Self(_rawValue / 72) }
+    public var inches: Self { Self(rawValue / 72) }
 
     /// The measurement in millimeters
     @inlinable
-    public var millimeters: Self { Self(_rawValue / 2.83465) }
+    public var millimeters: Self { Self(rawValue / 2.83465) }
 
     /// The measurement in centimeters
     @inlinable
-    public var centimeters: Self { Self(_rawValue / 28.3465) }
+    public var centimeters: Self { Self(rawValue / 28.3465) }
 }
 
 extension ISO_32000.UserSpace.Width {
     /// One inch (72 user space units)
-    public static let inch: Self = 72
+    public static let inch: Self = .init(72)
 
     /// Create from inches (1 inch = 72 units)
     @inlinable
@@ -92,7 +92,7 @@ extension ISO_32000.UserSpace.Width {
 
 extension ISO_32000.UserSpace.Height {
     /// One inch (72 user space units)
-    public static let inch: Self = 72
+    public static let inch: Self = .init(72)
 
     /// Create from inches (1 inch = 72 units)
     @inlinable
@@ -115,22 +115,22 @@ extension ISO_32000.UserSpace.Height {
 
 extension ISO_32000.`8`.`3`.`2`.`3`.UserSpace.Rectangle {
     /// A4 paper size (210mm × 297mm)
-    public static let a4 = Self(x: 0, y: 0, width: 595.276, height: 841.890)
+    public static let a4 = Self(x: .init(0), y: .init(0), width: .init(595.276), height: .init(841.890))
 
     /// A3 paper size (297mm × 420mm)
-    public static let a3 = Self(x: 0, y: 0, width: 841.890, height: 1190.551)
+    public static let a3 = Self(x: .init(0), y: .init(0), width: .init(841.890), height: .init(1190.551))
 
     /// A5 paper size (148mm × 210mm)
-    public static let a5 = Self(x: 0, y: 0, width: 419.528, height: 595.276)
+    public static let a5 = Self(x: .init(0), y: .init(0), width: .init(419.528), height: .init(595.276))
 
     /// US Letter size (8.5" × 11")
-    public static let letter = Self(x: 0, y: 0, width: 612, height: 792)
+    public static let letter = Self(x: .init(0), y: .init(0), width: .init(612), height: .init(792))
 
     /// US Legal size (8.5" × 14")
-    public static let legal = Self(x: 0, y: 0, width: 612, height: 1008)
+    public static let legal = Self(x: .init(0), y: .init(0), width: .init(612), height: .init(1008))
 
     /// US Tabloid size (11" × 17")
-    public static let tabloid = Self(x: 0, y: 0, width: 792, height: 1224)
+    public static let tabloid = Self(x: .init(0), y: .init(0), width: .init(792), height: .init(1224))
 }
 
 // MARK: - Rectangle Orientation

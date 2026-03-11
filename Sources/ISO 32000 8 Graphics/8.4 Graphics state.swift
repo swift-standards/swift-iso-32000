@@ -601,18 +601,18 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
             strokingColor: ISO_32000.`8`.`4`.Graphics.State.Color = .gray(0),
             nonstrokingColor: ISO_32000.`8`.`4`.Graphics.State.Color = .gray(0),
             textState: TextState,
-            lineWidth: ISO_32000.UserSpace.Width = 1,
+            lineWidth: ISO_32000.UserSpace.Width = .init(1),
             lineCap: ISO_32000.`8`.`4`.Graphics.State.Line.Cap = .butt,
             lineJoin: ISO_32000.`8`.`4`.Graphics.State.Line.Join = .miter,
-            miterLimit: Scale<1, Double> = 10,
+            miterLimit: Scale<1, Double> = .init(10),
             dashPattern: ISO_32000.`8`.`4`.Graphics.State.Line.Dash.Pattern = .solid,
             renderingIntent: ISO_32000.`8`.`4`.Graphics.State.Rendering.Intent =
                 .relativeColorimetric,
             strokeAdjustment: Bool = false,
             blendMode: ISO_32000.`8`.`4`.Graphics.State.Blend.Mode = .normal,
             softMask: ISO_32000.`8`.`4`.Graphics.State.SoftMask? = nil,
-            strokingAlphaConstant: Opacity<Double> = 1,
-            nonstrokingAlphaConstant: Opacity<Double> = 1,
+            strokingAlphaConstant: Opacity<Double> = .one,
+            nonstrokingAlphaConstant: Opacity<Double> = .one,
             alphaSource: Bool = false,
             blackPointCompensation: ISO_32000.`8`.`4`.Graphics.State.BlackPoint.Compensation =
                 .default

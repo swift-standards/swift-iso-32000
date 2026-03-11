@@ -224,7 +224,7 @@ extension ISO_32000 {
                     pageDict[.cropBox] = COS.Object(cropBox)
                 }
 
-                if let rotation = page.rotation, rotation != 0 {
+                if let rotation = page.rotation, rotation.rawValue != 0 {
                     pageDict[.rotate] = .integer(Int64(rotation.rawValue))
                 }
 

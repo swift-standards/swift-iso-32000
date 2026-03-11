@@ -29,5 +29,5 @@ extension ISO_32000 {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 8.3.3 — Common transformations
-    public typealias AffineTransform<Space> = Affine<Double, Space>.Transform
+    public typealias AffineTransform<Space> = Affine.Continuous<Double, Space>.Transform
 }

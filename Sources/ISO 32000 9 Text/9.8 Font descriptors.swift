@@ -44,14 +44,14 @@ extension Tagged: AdditiveArithmetic
 where Tag == ISO_32000.`9`.`8`.FontDesign, RawValue: AdditiveArithmetic {
     /// The zero value in font design units.
     @inlinable
-    public static var zero: Self { Self(RawValue.zero) }
+    public static var zero: Self { Self(__unchecked: (), RawValue.zero) }
 
     /// Adds two font design unit values.
     ///
     /// Valid for accumulating glyph widths (e.g., total string width).
     @inlinable
     public static func + (lhs: Self, rhs: Self) -> Self {
-        Self(lhs.rawValue + rhs.rawValue)
+        Self(__unchecked: (), lhs.rawValue + rhs.rawValue)
     }
 
     /// Subtracts one font design unit value from another.
@@ -59,7 +59,7 @@ where Tag == ISO_32000.`9`.`8`.FontDesign, RawValue: AdditiveArithmetic {
     /// Valid for computing differences (e.g., `ascender - descender` for line height).
     @inlinable
     public static func - (lhs: Self, rhs: Self) -> Self {
-        Self(lhs.rawValue - rhs.rawValue)
+        Self(__unchecked: (), lhs.rawValue - rhs.rawValue)
     }
 }
 
