@@ -38,12 +38,12 @@ let package = Package(
         .package(path: "../../swift-primitives/swift-witness-primitives"),
         // Standards
         .package(path: "../swift-iso-9899"),
-        .package(path: "../../../swift-ieee/swift-ieee-754"),
+        .package(path: "../../swift-ieee/swift-ieee-754"),
         .package(path: "../../swift-foundations/swift-ascii"),
-        .package(path: "../../../swift-ietf/swift-rfc-1950"),
-        .package(path: "../../../swift-ietf/swift-rfc-4648"),
-        .package(path: "../../../swift-iec/swift-iec-61966"),
-        .package(path: "../../../swift-w3c/swift-w3c-png"),
+        .package(path: "../../swift-ietf/swift-rfc-1950"),
+        .package(path: "../../swift-ietf/swift-rfc-4648"),
+        .package(path: "../../swift-iec/swift-iec-61966"),
+        .package(path: "../../swift-w3c/swift-w3c-png"),
         .package(path: "../swift-iso-14496-22"),
         // .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0")
     ],
