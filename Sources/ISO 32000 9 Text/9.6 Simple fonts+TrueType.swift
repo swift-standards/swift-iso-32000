@@ -10,6 +10,7 @@
 public import ISO_14496_22
 public import ISO_32000_7_Syntax
 public import ISO_32000_Shared
+import Ownership_Primitives
 
 // MARK: - Embedded TrueType Font
 

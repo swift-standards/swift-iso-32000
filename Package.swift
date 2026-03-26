@@ -36,6 +36,7 @@ let package = Package(
         .package(path: "../../swift-primitives/swift-binary-primitives"),
         .package(path: "../../swift-primitives/swift-standard-library-extensions"),
         .package(path: "../../swift-primitives/swift-witness-primitives"),
+        .package(path: "../../swift-primitives/swift-ownership-primitives"),
         // Standards
         .package(path: "../swift-iso-9899"),
         .package(path: "../../swift-ieee/swift-ieee-754"),
@@ -89,7 +90,8 @@ let package = Package(
                 "ISO 32000 7 Syntax",
                 "ISO 32000 8 Graphics",
                 "ISO 32000 Annex D",
-                .product(name: "ISO 14496-22", package: "swift-iso-14496-22")
+                .product(name: "ISO 14496-22", package: "swift-iso-14496-22"),
+                .product(name: "Ownership Primitives", package: "swift-ownership-primitives")
             ]
         ),
         .target(

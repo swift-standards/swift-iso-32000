@@ -11,6 +11,7 @@
 public import ISO_32000_7_Syntax
 import ISO_32000_8_Graphics
 public import ISO_32000_Shared
+public import Ownership_Primitives
 
 extension ISO_32000.`9` {
     /// ISO 32000-2:2020, 9.6 Simple fonts
@@ -43,37 +44,22 @@ extension ISO_32000.`9`.`6` {
     ///
     /// ISO 32000-2:2020, Section 9.6.2.2 — Standard Type 1 fonts (standard 14 fonts)
     public struct Font: Sendable {
-        /// The PDF base font name (e.g., "Helvetica", "Times-Roman")
-        public let baseFontName: ISO_32000.`7`.`3`.COS.Name
+        /// Font storage is boxed behind `Ownership.Shared` for two reasons:
+        /// 1. `Embedded` is a large immutable resource — shared, not copied
+        /// 2. Nested @CoW `_modify` coroutines in the rendering pipeline
+        ///    produce dangling pointers to large inline structs in debug mode
+        private let _storage: Ownership.Shared<Storage>
 
-        /// Resource name for this font in the page resources (e.g., "F1")
-        public let resourceName: ISO_32000.`7`.`3`.COS.Name
-
-        /// Font metrics for text measurement
-        public let metrics: ISO_32000.`9`.`8`.Metrics
-
-        /// Whether this is a fixed-width (monospaced) font
-        public let isMonospaced: Bool
-
-        /// Font weight
-        public let weight: Weight
-
-        /// Font style
-        public let style: Style
-
-        /// Font family
-        public let family: Family
-
-        /// Embedded font source (nil for standard 14 fonts).
-        ///
-        /// When present, contains the raw TrueType/OpenType data and descriptor
-        /// needed for embedding in the PDF.
-        public let embeddedSource: Embedded?
-
-        /// Whether this is an embedded font (TrueType/OpenType)
+        public var baseFontName: ISO_32000.`7`.`3`.COS.Name { _storage.value.baseFontName }
+        public var resourceName: ISO_32000.`7`.`3`.COS.Name { _storage.value.resourceName }
+        public var metrics: ISO_32000.`9`.`8`.Metrics { _storage.value.metrics }
+        public var isMonospaced: Bool { _storage.value.isMonospaced }
+        public var weight: Weight { _storage.value.weight }
+        public var style: Style { _storage.value.style }
+        public var family: Family { _storage.value.family }
+        public var embeddedSource: Embedded? { _storage.value.embeddedSource }
         public var isEmbedded: Bool { embeddedSource != nil }
 
-        /// Create a font with explicit properties
         public init(
             baseFontName: ISO_32000.`7`.`3`.COS.Name,
             resourceName: ISO_32000.`7`.`3`.COS.Name,
@@ -84,14 +70,27 @@ extension ISO_32000.`9`.`6` {
             family: Family,
             embeddedSource: Embedded? = nil
         ) {
-            self.baseFontName = baseFontName
-            self.resourceName = resourceName
-            self.metrics = metrics
-            self.isMonospaced = isMonospaced
-            self.weight = weight
-            self.style = style
-            self.family = family
-            self.embeddedSource = embeddedSource
+            self._storage = Ownership.Shared(Storage(
+                baseFontName: baseFontName,
+                resourceName: resourceName,
+                metrics: metrics,
+                isMonospaced: isMonospaced,
+                weight: weight,
+                style: style,
+                family: family,
+                embeddedSource: embeddedSource
+            ))
+        }
+
+        struct Storage: Sendable {
+            let baseFontName: ISO_32000.`7`.`3`.COS.Name
+            let resourceName: ISO_32000.`7`.`3`.COS.Name
+            let metrics: ISO_32000.`9`.`8`.Metrics
+            let isMonospaced: Bool
+            let weight: Weight
+            let style: Style
+            let family: Family
+            let embeddedSource: Embedded?
         }
     }
 }

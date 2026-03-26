@@ -1,6 +1,7 @@
 // ISO_32000.Writer.swift
 
 import ISO_32000_9_Text
+import Ownership_Primitives
 import RFC_4648
 import Standard_Library_Extensions
 public import Binary_Primitives
