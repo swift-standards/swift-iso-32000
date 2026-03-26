@@ -1,4 +1,4 @@
-// ISO_32000.AffineTransform.swift
+// ISO_32000.Transform.swift
 // Generic 2D affine transformation parameterized by coordinate space
 
 public import Geometry_Primitives
@@ -7,8 +7,8 @@ extension ISO_32000 {
     /// A generic 2D affine transformation matrix parameterized by its coordinate space
     ///
     /// This generic structure can be specialized for different coordinate systems:
-    /// - User space: `AffineTransform<UserSpace>` (default, 1/72 inch)
-    /// - Device space: `AffineTransform<DeviceSpace>` (pixels)
+    /// - User space: `Transform<UserSpace>` (default, 1/72 inch)
+    /// - Device space: `Transform<DeviceSpace>` (pixels)
     ///
     /// The matrix is represented as:
     /// ```
@@ -20,7 +20,7 @@ extension ISO_32000 {
     /// ## Example
     ///
     /// ```swift
-    /// let transform = ISO_32000.AffineTransform<UserSpace>.identity
+    /// let transform = ISO_32000.Transform<UserSpace>.identity
     ///     .translated(x: 100, y: 50)
     ///     .rotated(by: .fortyFive)
     ///     .scaled(by: 2.0)
@@ -29,5 +29,5 @@ extension ISO_32000 {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 8.3.3 — Common transformations
-    public typealias AffineTransform<Space> = Affine.Continuous<Double, Space>.Transform
+    public typealias Transform<Space> = Affine.Continuous<Double, Space>.Transform
 }

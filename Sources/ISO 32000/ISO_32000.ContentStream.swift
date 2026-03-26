@@ -468,7 +468,7 @@ extension ISO_32000.ContentStream {
         ///
         /// Note: AffineTransform's a,b,c,d are dimensionless Scale coefficients,
         /// while tx,ty are actual spatial translations (displacements).
-        public mutating func transform(_ t: ISO_32000.UserSpace.AffineTransform) {
+        public mutating func transform(_ t: ISO_32000.UserSpace.Transform) {
             emit(
                 .transform(
                     a: t.a,
@@ -576,7 +576,7 @@ extension ISO_32000.ContentStream {
         }
 
         /// Set text matrix from an AffineTransform (Tm)
-        public mutating func setTextMatrix(_ t: ISO_32000.UserSpace.AffineTransform) {
+        public mutating func setTextMatrix(_ t: ISO_32000.UserSpace.Transform) {
             emit(
                 .setTextMatrix(
                     a: t.a,

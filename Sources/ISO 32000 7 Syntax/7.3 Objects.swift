@@ -182,9 +182,9 @@ extension ISO_32000.`7`.`3`.`3` {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 7.3.3 — Numeric objects
-    public struct RealFormatStyle: FormatStyle, Sendable {
-        public typealias FormatInput = Double
-        public typealias FormatOutput = String
+    public struct RealFormatStyle: Format.Style, Sendable {
+        public typealias Input = Double
+        public typealias Output = String
 
         /// Maximum decimal places for real numbers (per Annex C recommendations)
         private static let maxDecimalPlaces = 5
@@ -247,7 +247,7 @@ extension ISO_32000.`7`.`3`.`3` {
     }
 }
 
-extension FormatStyle where Self == ISO_32000.`7`.`3`.`3`.RealFormatStyle {
+extension Format.Style where Self == ISO_32000.`7`.`3`.`3`.RealFormatStyle {
     /// PDF number format style
     ///
     /// Formats numbers according to ISO 32000-2:2020 Section 7.3.3 (Numeric objects):
@@ -1221,7 +1221,7 @@ extension ISO_32000.`7`.`3`.`3` {
         ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
             // Handle special cases (PDF doesn't support infinity/NaN)
             guard number.value.isFinite else {
-                buffer.append(INCITS_4_1986.GraphicCharacters.`0`)
+                buffer.append(INCITS_4_1986.Character.Graphic.`0`)
                 return
             }
 
@@ -1235,7 +1235,7 @@ extension ISO_32000.`7`.`3`.`3` {
             // Handle negative numbers
             let absValue: Double
             if number.value < 0 {
-                buffer.append(INCITS_4_1986.GraphicCharacters.hyphen)
+                buffer.append(INCITS_4_1986.Character.Graphic.hyphen)
                 absValue = -number.value
             } else {
                 absValue = number.value
@@ -1252,11 +1252,11 @@ extension ISO_32000.`7`.`3`.`3` {
             let fracDigits = Int64((fracPart * Self.multiplier).rounded())
 
             if fracDigits != 0 {
-                buffer.append(INCITS_4_1986.GraphicCharacters.period)
+                buffer.append(INCITS_4_1986.Character.Graphic.period)
                 // Serialize fractional digits with leading zeros, then strip trailing zeros
                 // Use InlineArray for fixed-size stack storage (no heap allocation)
                 var fracValue = fracDigits
-                let digit0 = INCITS_4_1986.GraphicCharacters.`0`
+                let digit0 = INCITS_4_1986.Character.Graphic.`0`
 
                 // Build digits in reverse order into InlineArray (most significant at index 0)
                 var digits = InlineArray<5, UInt8>(repeating: digit0)

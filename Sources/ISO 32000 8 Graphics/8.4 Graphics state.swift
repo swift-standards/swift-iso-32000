@@ -422,7 +422,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         /// Modified by the `cm` operator.
         ///
         /// Initial value: a matrix that transforms default user coordinates to device coordinates.
-        public var ctm: ISO_32000.UserSpace.AffineTransform
+        public var ctm: ISO_32000.UserSpace.Transform
 
         // MARK: - Clipping (internal, not directly representable)
 
@@ -595,7 +595,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Device {
         /// The `textState` parameter must be provided as it depends on the
         /// concrete `TextState` type.
         public init(
-            ctm: ISO_32000.UserSpace.AffineTransform = .identity,
+            ctm: ISO_32000.UserSpace.Transform = .identity,
             strokingColorSpace: ISO_32000.`8`.`4`.Graphics.State.ColorSpace = .deviceGray,
             nonstrokingColorSpace: ISO_32000.`8`.`4`.Graphics.State.ColorSpace = .deviceGray,
             strokingColor: ISO_32000.`8`.`4`.Graphics.State.Color = .gray(0),
@@ -1100,7 +1100,7 @@ extension ISO_32000.`8`.`4`.Graphics.State.Stack {
     /// - Parameter transform: The transform to concatenate
     @inlinable
     public mutating func concatenate<TextState>(
-        _ transform: ISO_32000.UserSpace.AffineTransform
+        _ transform: ISO_32000.UserSpace.Transform
     ) where State == ISO_32000.`8`.`4`.Graphics.State.Device.Independent<TextState> {
         current.ctm = current.ctm.concatenating(transform)
     }
