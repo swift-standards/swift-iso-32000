@@ -40,7 +40,7 @@ let package = Package(
         // Standards
         .package(path: "../swift-iso-9899"),
         .package(path: "../../swift-ieee/swift-ieee-754"),
-        .package(path: "../../swift-foundations/swift-ascii"),
+        .package(path: "../../swift-primitives/swift-ascii-primitives"),
         .package(path: "../../swift-ietf/swift-rfc-1950"),
         .package(path: "../../swift-ietf/swift-rfc-4648"),
         .package(path: "../../swift-iec/swift-iec-61966"),
@@ -68,7 +68,7 @@ let package = Package(
             dependencies: [
                 "ISO 32000 Shared",
                 "ISO 32000 3 Terms and definitions",
-                .product(name: "ASCII", package: "swift-ascii"),
+                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
                 .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "IEEE 754", package: "swift-ieee-754")
@@ -143,7 +143,7 @@ let package = Package(
                 .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
-                .product(name: "ASCII", package: "swift-ascii"),
+                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
                 .product(name: "Witness Primitives", package: "swift-witness-primitives"),
             ]

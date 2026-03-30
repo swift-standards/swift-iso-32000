@@ -1,6 +1,6 @@
 // exports.swift
 
-@_exported public import ASCII
+@_exported public import ASCII_Primitives
 @_exported public import ISO_32000_12_Interactive_features
 @_exported public import ISO_32000_14_Document_interchange
 @_exported public import ISO_32000_7_Syntax

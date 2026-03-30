@@ -15,7 +15,7 @@
 public import Formatting_Primitives
 public import Binary_Primitives
 import IEEE_754
-public import ASCII
+public import ASCII_Primitives
 public import ISO_32000_Shared
 import Standard_Library_Extensions
 
@@ -1221,21 +1221,21 @@ extension ISO_32000.`7`.`3`.`3` {
         ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
             // Handle special cases (PDF doesn't support infinity/NaN)
             guard number.value.isFinite else {
-                buffer.append(INCITS_4_1986.Character.Graphic.`0`)
+                buffer.append(ASCII.Character.Graphic.`0`)
                 return
             }
 
             // Check if value is effectively an integer
             let rounded = number.value.rounded()
             if number.value == rounded && abs(number.value) < Double(Int64.max) {
-                Int64(number.value).serialize(into: &buffer)
+                ASCII.Serialization.serializeDecimal(Int64(number.value), into: &buffer)
                 return
             }
 
             // Handle negative numbers
             let absValue: Double
             if number.value < 0 {
-                buffer.append(INCITS_4_1986.Character.Graphic.hyphen)
+                buffer.append(ASCII.Character.Graphic.hyphen)
                 absValue = -number.value
             } else {
                 absValue = number.value
@@ -1246,17 +1246,17 @@ extension ISO_32000.`7`.`3`.`3` {
             let fracPart = absValue - Double(intPart)
 
             // Serialize integer part
-            intPart.serialize(into: &buffer)
+            ASCII.Serialization.serializeDecimal(intPart, into: &buffer)
 
             // Calculate fractional digits (up to 5 decimal places)
             let fracDigits = Int64((fracPart * Self.multiplier).rounded())
 
             if fracDigits != 0 {
-                buffer.append(INCITS_4_1986.Character.Graphic.period)
+                buffer.append(ASCII.Character.Graphic.period)
                 // Serialize fractional digits with leading zeros, then strip trailing zeros
                 // Use InlineArray for fixed-size stack storage (no heap allocation)
                 var fracValue = fracDigits
-                let digit0 = INCITS_4_1986.Character.Graphic.`0`
+                let digit0 = ASCII.Character.Graphic.`0`
 
                 // Build digits in reverse order into InlineArray (most significant at index 0)
                 var digits = InlineArray<5, UInt8>(repeating: digit0)
