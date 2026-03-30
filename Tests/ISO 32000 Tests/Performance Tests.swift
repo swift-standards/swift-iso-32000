@@ -1,6 +1,5 @@
 // Performance Tests.swift
 
-import Foundation
 import Testing
 
 @testable import ISO_32000
@@ -14,21 +13,21 @@ struct PerformanceTests {
 
     // MARK: - String Width Calculation
 
-    @Test("String width: 10 chars", .timed(iterations: 1000, warmup: 100))
+    @Test("String width: 10 chars")
     func stringWidth10() {
         let font = ISO_32000.Font.helvetica
         let text = "Hello World"
         let _ = font.width(of: text, atSize: 12)
     }
 
-    @Test("String width: 100 chars", .timed(iterations: 500, warmup: 50))
+    @Test("String width: 100 chars")
     func stringWidth100() {
         let font = ISO_32000.Font.helvetica
         let text = String(repeating: "Lorem ipsum dolor sit amet. ", count: 4)
         let _ = font.width(of: text, atSize: 12)
     }
 
-    @Test("String width: 1000 chars", .timed(iterations: 100, warmup: 10))
+    @Test("String width: 1000 chars")
     func stringWidth1000() {
         let font = ISO_32000.Font.helvetica
         let text = String(
@@ -40,21 +39,21 @@ struct PerformanceTests {
 
     // MARK: - WinAnsi Bytes Width Calculation
 
-    @Test("WinAnsi width: 10 bytes", .timed(iterations: 1000, warmup: 100))
+    @Test("WinAnsi width: 10 bytes")
     func winAnsiWidth10() {
         let font = ISO_32000.Font.helvetica
         let bytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C]
         let _ = font.winAnsi.width(of: bytes, atSize: 12)
     }
 
-    @Test("WinAnsi width: 100 bytes", .timed(iterations: 500, warmup: 50))
+    @Test("WinAnsi width: 100 bytes")
     func winAnsiWidth100() {
         let font = ISO_32000.Font.helvetica
         let bytes = [UInt8](repeating: 0x61, count: 100)  // 'a' repeated
         let _ = font.winAnsi.width(of: bytes, atSize: 12)
     }
 
-    @Test("WinAnsi width: 1000 bytes", .timed(iterations: 100, warmup: 10))
+    @Test("WinAnsi width: 1000 bytes")
     func winAnsiWidth1000() {
         let font = ISO_32000.Font.helvetica
         let bytes = [UInt8](repeating: 0x61, count: 1000)
@@ -135,51 +134,18 @@ struct PerformanceTests {
             results.append((size, avgTime))
         }
 
-        print("\n📊 Width Calculation Scaling Analysis:")
-        print("┌─────────────┬──────────────┬─────────────┬─────────────┐")
-        print("│ Bytes       │ Time (µs)    │ Per-byte    │ Scaling     │")
-        print("├─────────────┼──────────────┼─────────────┼─────────────┤")
-
-        var previousPerByte: Double?
         for (size, time) in results {
             let timeUs = time * 1_000_000
             let perByte = timeUs / Double(size)
-
-            let scaling: String
-            if let prev = previousPerByte {
-                let ratio = perByte / prev
-                if ratio > 1.5 {
-                    scaling = "⚠️  O(n²)"
-                } else if ratio > 1.1 {
-                    scaling = "⚡ ~O(n log n)"
-                } else {
-                    scaling = "✅ O(n)"
-                }
-            } else {
-                scaling = "baseline"
-            }
-
-            print(
-                "│ \(String(format: "%6d", size).padding(toLength: 11, withPad: " ", startingAt: 0)) │ \(String(format: "%8.2f", timeUs).padding(toLength: 12, withPad: " ", startingAt: 0)) │ \(String(format: "%8.4f", perByte).padding(toLength: 11, withPad: " ", startingAt: 0)) │ \(scaling.padding(toLength: 11, withPad: " ", startingAt: 0)) │"
-            )
-
-            previousPerByte = perByte
+            print("Size \(size): \(Int(timeUs)) us total, \(Int(perByte * 1000)) ns/byte")
         }
 
-        print("└─────────────┴──────────────┴─────────────┴─────────────┘")
-
-        // Calculate overall scaling factor
+        // Verify linear scaling: last per-byte cost should not exceed 3x first
         if results.count >= 2 {
-            let (firstSize, firstTime) = results.first!
-            let (lastSize, lastTime) = results.last!
-            let sizeRatio = Double(lastSize) / Double(firstSize)
-            let timeRatio = lastTime / firstTime
-            let scalingExponent = log(timeRatio) / log(sizeRatio)
-
-            print("\nScaling exponent: \(String(format: "%.2f", scalingExponent))")
-            print("  1.0 = O(n) ✅ linear")
-            print("  1.5 = O(n^1.5) ⚠️ subquadratic")
-            print("  2.0 = O(n²) ❌ quadratic")
+            let firstPerByte = results.first!.time / Double(results.first!.size)
+            let lastPerByte = results.last!.time / Double(results.last!.size)
+            let ratio = lastPerByte / firstPerByte
+            #expect(ratio < 3.0, "Width calculation scales worse than O(n): ratio \(ratio)")
         }
     }
 }

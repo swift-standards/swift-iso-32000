@@ -230,7 +230,7 @@ struct `ISO_32000.Font Tests` {
     func `String width calculation`() {
         let font = ISO_32000.Font.helvetica
         let width = font.width(of: "Hello", atSize: 12)
-        #expect(width > 0)
+        #expect(width.rawValue > 0)
     }
 
     @Test
@@ -238,6 +238,6 @@ struct `ISO_32000.Font Tests` {
         let font = ISO_32000.Font.helvetica
         let bytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]  // "Hello" in ASCII/WinAnsi
         let width = font.winAnsi.width(of: bytes, atSize: 12)
-        #expect(width > 0)
+        #expect(width.rawValue > 0)
     }
 }

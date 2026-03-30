@@ -167,6 +167,8 @@ let package = Package(
             name: "ISO 32000 Tests",
             dependencies: [
                 "ISO 32000",
+                "ISO 32000 9 Text",
+                "ISO 32000 Flate",
             ]
         ),
     ],
