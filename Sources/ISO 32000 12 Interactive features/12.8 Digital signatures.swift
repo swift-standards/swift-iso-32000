@@ -18,7 +18,7 @@
 //   12.8.6  Permissions (Table 263)
 //   12.8.7  Legal content attestations (Table 264)
 
-public import Foundation
+public import ISO_32000_7_Syntax
 public import ISO_32000_Shared
 
 extension ISO_32000.`12` {
@@ -64,7 +64,7 @@ extension ISO_32000.DigitalSignature {
         public var subFilter: SubFilter?
 
         /// The signature value (byte range digest as hex string). Required.
-        public var contents: Data
+        public var contents: [UInt8]
 
         /// X.509 certificate chain. Required when SubFilter is adbe.x509.rsa_sha1.
         public var cert: CertValue?
@@ -82,7 +82,7 @@ extension ISO_32000.DigitalSignature {
         public var name: String?
 
         /// Time of signing. Optional.
-        public var signingTime: Date?
+        public var signingTime: ISO_32000.`7`.`9`.`4`.Date?
 
         /// CPU host name or physical location of signing. Optional.
         public var location: String?
@@ -112,13 +112,13 @@ extension ISO_32000.DigitalSignature {
             type: DictionaryType = .sig,
             filter: String,
             subFilter: SubFilter? = nil,
-            contents: Data,
+            contents: [UInt8],
             cert: CertValue? = nil,
             byteRange: [ByteRangePair]? = nil,
             reference: [SignatureReference]? = nil,
             changes: Changes? = nil,
             name: String? = nil,
-            signingTime: Date? = nil,
+            signingTime: ISO_32000.`7`.`9`.`4`.Date? = nil,
             location: String? = nil,
             reason: String? = nil,
             contactInfo: String? = nil,
@@ -207,9 +207,9 @@ extension ISO_32000.DigitalSignature.SignatureDictionary {
     /// Certificate value (single or chain)
     public enum CertValue: Sendable, Hashable {
         /// Single certificate
-        case single(Data)
+        case single([UInt8])
         /// Certificate chain (signing cert first)
-        case chain([Data])
+        case chain([[UInt8]])
     }
 
     /// Byte range pair (offset, length)
@@ -593,7 +593,7 @@ extension ISO_32000.DigitalSignature {
         public var ocsp: [Int]?  // Indirect references to streams
 
         /// Time at which this VRI was created. Optional.
-        public var createdTime: Date?
+        public var createdTime: ISO_32000.`7`.`9`.`4`.Date?
 
         /// Timestamp stream (DER-encoded RFC 3161). Optional.
         public var timestamp: Int?  // Indirect reference to stream
@@ -602,7 +602,7 @@ extension ISO_32000.DigitalSignature {
             cert: [Int]? = nil,
             crl: [Int]? = nil,
             ocsp: [Int]? = nil,
-            createdTime: Date? = nil,
+            createdTime: ISO_32000.`7`.`9`.`4`.Date? = nil,
             timestamp: Int? = nil
         ) {
             self.cert = cert
