@@ -13,22 +13,22 @@ struct PerformanceTests {
 
     // MARK: - String Width Calculation
 
-    @Test("String width: 10 chars")
-    func stringWidth10() {
+    @Test
+    func `String width: 10 chars`() {
         let font = ISO_32000.Font.helvetica
         let text = "Hello World"
         let _ = font.width(of: text, atSize: 12)
     }
 
-    @Test("String width: 100 chars")
-    func stringWidth100() {
+    @Test
+    func `String width: 100 chars`() {
         let font = ISO_32000.Font.helvetica
         let text = String(repeating: "Lorem ipsum dolor sit amet. ", count: 4)
         let _ = font.width(of: text, atSize: 12)
     }
 
-    @Test("String width: 1000 chars")
-    func stringWidth1000() {
+    @Test
+    func `String width: 1000 chars`() {
         let font = ISO_32000.Font.helvetica
         let text = String(
             repeating: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
@@ -39,22 +39,22 @@ struct PerformanceTests {
 
     // MARK: - WinAnsi Bytes Width Calculation
 
-    @Test("WinAnsi width: 10 bytes")
-    func winAnsiWidth10() {
+    @Test
+    func `WinAnsi width: 10 bytes`() {
         let font = ISO_32000.Font.helvetica
         let bytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C]
         let _ = font.winAnsi.width(of: bytes, atSize: 12)
     }
 
-    @Test("WinAnsi width: 100 bytes")
-    func winAnsiWidth100() {
+    @Test
+    func `WinAnsi width: 100 bytes`() {
         let font = ISO_32000.Font.helvetica
         let bytes = [UInt8](repeating: 0x61, count: 100)  // 'a' repeated
         let _ = font.winAnsi.width(of: bytes, atSize: 12)
     }
 
-    @Test("WinAnsi width: 1000 bytes")
-    func winAnsiWidth1000() {
+    @Test
+    func `WinAnsi width: 1000 bytes`() {
         let font = ISO_32000.Font.helvetica
         let bytes = [UInt8](repeating: 0x61, count: 1000)
         let _ = font.winAnsi.width(of: bytes, atSize: 12)
@@ -62,8 +62,8 @@ struct PerformanceTests {
 
     // MARK: - Throughput Tests
 
-    @Test("String width throughput (5s)")
-    func stringWidthThroughput() {
+    @Test
+    func `String width throughput (5s)`() {
         let font = ISO_32000.Font.helvetica
         let text = String(repeating: "Lorem ipsum dolor sit amet. ", count: 4)  // ~100 chars
         let duration: Duration = .seconds(5)
@@ -85,8 +85,8 @@ struct PerformanceTests {
         print("📊 String width throughput: \(Int(throughput)) calculations/sec")
     }
 
-    @Test("WinAnsi width throughput (5s)")
-    func winAnsiWidthThroughput() {
+    @Test
+    func `WinAnsi width throughput (5s)`() {
         let font = ISO_32000.Font.helvetica
         let bytes = [UInt8](repeating: 0x61, count: 100)
         let duration: Duration = .seconds(5)
@@ -110,8 +110,8 @@ struct PerformanceTests {
 
     // MARK: - Scaling Analysis
 
-    @Test("Width calculation scaling analysis")
-    func scalingAnalysis() {
+    @Test
+    func `Width calculation scaling analysis`() {
         let font = ISO_32000.Font.helvetica
         let sizes = [10, 100, 500, 1000, 2000]
         var results: [(size: Int, time: Double)] = []
@@ -155,8 +155,8 @@ struct PerformanceTests {
 @Suite("Regression Guards", .serialized, .tags(.performance))
 struct RegressionGuards {
 
-    @Test("Width calculation regression guard")
-    func widthCalculationRegression() {
+    @Test
+    func `Width calculation regression guard`() {
         let font = ISO_32000.Font.helvetica
         let bytes = [UInt8](repeating: 0x61, count: 100)
 
@@ -191,8 +191,8 @@ struct RegressionGuards {
         )
     }
 
-    @Test("String width regression guard")
-    func stringWidthRegression() {
+    @Test
+    func `String width regression guard`() {
         let font = ISO_32000.Font.helvetica
         let text = String(repeating: "a", count: 100)
 
