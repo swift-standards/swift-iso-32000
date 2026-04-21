@@ -1,6 +1,6 @@
 // ISO_32000.ContentStream.Operator.swift
 
-import Formatting_Primitives
+import Format_Primitives
 import Geometry_Primitives
 import Binary_Primitives
 import ISO_32000_7_Syntax

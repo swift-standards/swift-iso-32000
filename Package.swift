@@ -30,7 +30,7 @@ let package = Package(
     dependencies: [
         // Primitives
         .package(path: "../../swift-primitives/swift-geometry-primitives"),
-        .package(path: "../../swift-primitives/swift-formatting-primitives"),
+        .package(path: "../../swift-primitives/swift-format-primitives"),
         .package(path: "../../swift-primitives/swift-dimension-primitives"),
         .package(path: "../../swift-primitives/swift-numeric-primitives"),
         .package(path: "../../swift-primitives/swift-binary-primitives"),
@@ -69,7 +69,7 @@ let package = Package(
                 "ISO 32000 Shared",
                 "ISO 32000 3 Terms and definitions",
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
-                .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
+                .product(name: "Format Primitives", package: "swift-format-primitives"),
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "IEEE 754", package: "swift-ieee-754")
             ]
@@ -140,7 +140,7 @@ let package = Package(
                 "ISO 32000 Annex D",
                 .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
                 .product(name: "Geometry Primitives", package: "swift-geometry-primitives"),
-                .product(name: "Formatting Primitives", package: "swift-formatting-primitives"),
+                .product(name: "Format Primitives", package: "swift-format-primitives"),
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),
                 .product(name: "ISO 9899", package: "swift-iso-9899"),
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),

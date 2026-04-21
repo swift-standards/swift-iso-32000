@@ -12,7 +12,7 @@
 //   7.3.9  Null object
 //   7.3.10 Indirect objects
 
-public import Formatting_Primitives
+public import Format_Primitives
 public import Binary_Primitives
 import IEEE_754
 public import ASCII_Primitives
