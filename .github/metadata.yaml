@@ -1,0 +1,10 @@
+# .github/metadata.yaml
+# Triaged by AI-assisted bulk pass (2026-04-29).
+description: "Swift implementation of ISO 32000: Document management - Portable document format."
+topics:
+  - standards
+  - iso
+  - iso-32000
+  - pdf
+  - document-format
+homepage: "https://swift-institute.org"
