@@ -23,6 +23,10 @@ extension ISO_32000.COS.StringValue {
     ///
     /// Uses PDFDocEncoding if all characters are encodable, otherwise
     /// falls back to UTF-16BE with BOM per ISO 32000-2 Section 7.9.2.2.
+    /// `.utf16` iteration emits surrogate pairs for scalars beyond U+FFFF.
+    ///
+    /// TODO: dedup with StringValue.serialize(_:into:) at ISO 32000 7 Syntax/7.3 Objects.swift —
+    /// both now carry the §7.9.2.2 algorithm; dedup pending separate dispatch.
     public func asLiteral() -> [UInt8] {
         var result: [UInt8] = [.ascii.leftParenthesis]
 
@@ -41,8 +45,7 @@ extension ISO_32000.COS.StringValue {
             // UTF-16BE with BOM (0xFE 0xFF)
             result.append(0xFE)
             result.append(0xFF)
-            for scalar in value.unicodeScalars {
-                let codeUnit = UInt16(scalar.value)
+            for codeUnit in value.utf16 {
                 let hi = UInt8((codeUnit >> 8) & 0xFF)
                 let lo = UInt8(codeUnit & 0xFF)
                 // Escape special bytes

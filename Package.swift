@@ -68,6 +68,7 @@ let package = Package(
             dependencies: [
                 "ISO 32000 Shared",
                 "ISO 32000 3 Terms and definitions",
+                "ISO 32000 Annex D",
                 .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
                 .product(name: "Format Primitives", package: "swift-format-primitives"),
                 .product(name: "Binary Primitives", package: "swift-binary-primitives"),

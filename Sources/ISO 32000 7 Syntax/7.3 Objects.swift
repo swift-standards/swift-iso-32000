@@ -17,6 +17,7 @@ public import Binary_Primitives
 import IEEE_754
 public import ASCII_Primitives
 public import ISO_32000_Shared
+import ISO_32000_Annex_D
 import Standard_Library_Extensions
 
 extension ISO_32000.`7` {
@@ -1129,19 +1130,46 @@ extension ISO_32000.`7`.`3`.`5`.Name: Binary.Serializable {
 }
 
 extension ISO_32000.`7`.`3`.COS.StringValue: Binary.Serializable {
-    /// Serialize a PDF String to bytes
+    /// Serialize a PDF String per ISO 32000-2 §7.9.2.2.
     ///
-    /// Strings are serialized as literal strings: `(Hello)`
+    /// PDFDocEncoding (single-byte) when every Unicode scalar is encodable;
+    /// otherwise UTF-16BE with `0xFE 0xFF` BOM. The result is wrapped in
+    /// literal-string `(...)` syntax with the Table-3 escape set applied
+    /// per emitted byte. `.utf16` iteration emits surrogate pairs for
+    /// scalars beyond U+FFFF.
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ str: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == UInt8 {
         buffer.append(.ascii.leftParenthesis)
-        for byte in str.value.utf8 {
-            if let escaped = ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] {
-                buffer.append(contentsOf: escaped)
-            } else {
-                buffer.append(byte)
+        let useDocEnc = str.value.unicodeScalars.allSatisfy {
+            ISO_32000.PDFDocEncoding.canEncode($0)
+        }
+        if useDocEnc {
+            for scalar in str.value.unicodeScalars {
+                guard let byte = ISO_32000.PDFDocEncoding.encode(scalar) else { continue }
+                if let escaped = ISO_32000.`7`.`3`.Table.`3`.escapeTable[byte] {
+                    buffer.append(contentsOf: escaped)
+                } else {
+                    buffer.append(byte)
+                }
+            }
+        } else {
+            buffer.append(0xFE)
+            buffer.append(0xFF)
+            for codeUnit in str.value.utf16 {
+                let hi = UInt8((codeUnit >> 8) & 0xFF)
+                let lo = UInt8(codeUnit & 0xFF)
+                if let escaped = ISO_32000.`7`.`3`.Table.`3`.escapeTable[hi] {
+                    buffer.append(contentsOf: escaped)
+                } else {
+                    buffer.append(hi)
+                }
+                if let escaped = ISO_32000.`7`.`3`.Table.`3`.escapeTable[lo] {
+                    buffer.append(contentsOf: escaped)
+                } else {
+                    buffer.append(lo)
+                }
             }
         }
         buffer.append(.ascii.rightParenthesis)
