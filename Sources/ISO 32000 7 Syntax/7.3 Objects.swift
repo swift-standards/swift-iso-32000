@@ -13,6 +13,7 @@
 //   7.3.10 Indirect objects
 
 public import Format_Primitives
+public import Formatter_Primitives
 public import Binary_Primitives
 import IEEE_754
 public import ASCII_Primitives
@@ -183,9 +184,10 @@ extension ISO_32000.`7`.`3`.`3` {
     /// ## Reference
     ///
     /// ISO 32000-2:2020, Section 7.3.3 — Numeric objects
-    public struct RealFormatStyle: Format.Style, Sendable {
+    public struct RealFormatStyle: Formatter.`Protocol`, Sendable {
         public typealias Input = Double
         public typealias Output = String
+        public typealias Failure = Never
 
         /// Maximum decimal places for real numbers (per Annex C recommendations)
         private static let maxDecimalPlaces = 5
@@ -248,7 +250,7 @@ extension ISO_32000.`7`.`3`.`3` {
     }
 }
 
-extension Format.Style where Self == ISO_32000.`7`.`3`.`3`.RealFormatStyle {
+extension Formatter.`Protocol` where Self == ISO_32000.`7`.`3`.`3`.RealFormatStyle {
     /// PDF number format style
     ///
     /// Formats numbers according to ISO 32000-2:2020 Section 7.3.3 (Numeric objects):
